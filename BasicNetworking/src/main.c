@@ -1,14 +1,36 @@
-
+#include <stdio.h>
+#include <string.h>
 #include <zephyr/kernel.h>
 #include <modem/lte_lc.h>
 #include <modem/modem_info.h>
+#include <modem/sms.h>
 #include <modem/nrf_modem_lib.h>
 #include <date_time.h>
 #include <zephyr/posix/time.h>
 #include <zephyr/posix/sys/time.h>
+#include <zephyr/net/mqtt.h>
 #include "http_get.h"
 
 K_SEM_DEFINE(lte_connected, 0, 1);
+
+
+	/* Buffers for MQTT client. */
+	static uint8_t rx_buffer[256];
+	static uint8_t tx_buffer[256];
+
+	/* MQTT client context */
+	static struct mqtt_client client_ctx;
+
+	static struct sockaddr_storage broker;
+
+void mqtt_evt_handler(struct mqtt_client *client, const struct mqtt_evt *evt)
+{
+switch (evt->type) {
+/* Handle events here. */
+}
+}
+
+
 
 static void lte_handler(const struct lte_lc_evt *const evt)
 {
@@ -79,6 +101,11 @@ int main(void)
 	int sock;
 	struct zsock_addrinfo *res;
 
+
+
+
+
+
 	printk("\nnRF9160 Basic Networking Example (%s)\n", CONFIG_BOARD);
 
 	err = nrf_modem_lib_init();
@@ -115,14 +142,36 @@ int main(void)
 
 	printk("\r\n");
 	printk("Looking up IP addresses\n");
-	nslookup("iot.beyondlogic.org", &res);
+	nslookup("gpstracking.cz", &res);
 	print_addrinfo_results(&res);
 		
 	printk("\r\n");
 	printk("Connecting to HTTP Server:\n");
 	sock = connect_socket(&res, 80);
-	http_get(sock, "iot.beyondlogic.org", "/LoremIpsum.txt");
+	http_get(sock, "http2demo.io","/");
 	zsock_close(sock);
+
+	mqtt_client_init(&client_ctx);
+
+	/* MQTT client configuration */
+	client_ctx.broker = &broker;
+	client_ctx.evt_cb = mqtt_evt_handler;
+	client_ctx.client_id.utf8 = (uint8_t *)"zephyr_mqtt_client";
+	client_ctx.client_id.size = sizeof("zephyr_mqtt_client") - 1;
+	client_ctx.password = NULL;
+	client_ctx.user_name = NULL;
+	client_ctx.protocol_version = MQTT_VERSION_3_1_1;
+	client_ctx.transport.type = MQTT_TRANSPORT_NON_SECURE;
+	
+	/* MQTT buffers configuration */
+	client_ctx.rx_buf = rx_buffer;
+	client_ctx.rx_buf_size = sizeof(rx_buffer);
+	client_ctx.tx_buf = tx_buffer;
+	client_ctx.tx_buf_size = sizeof(tx_buffer);
+
+
+
+
 
 	while (1) {
 		/*

@@ -1,0 +1,12 @@
+/dts-v1/;
+#include <nordic/nrf9161ns_laca.dtsi>
+#include "jhk-pinctrl.dtsi"
+#include "jhk-partitioning.dtsi"
+
+/ {
+	chosen {
+		zephyr,flash = &flash0;
+		zephyr,sram = &sram0_ns;
+		zephyr,code-partition = &slot0_ns_partition;
+	};
+};
