@@ -13,10 +13,11 @@
 
 #include <zephyr/random/random.h>
 
+
 /* Buffers for MQTT client. */
-static uint8_t rx_buffer[CONFIG_MQTT_MESSAGE_BUFFER_SIZE];
-static uint8_t tx_buffer[CONFIG_MQTT_MESSAGE_BUFFER_SIZE];
-static uint8_t payload_buf[CONFIG_MQTT_PAYLOAD_BUFFER_SIZE];
+static uint8_t rx_buffer[MQTT_BUFFER_SIZE];
+static uint8_t tx_buffer[MQTT_BUFFER_SIZE];
+static uint8_t payload_buf[MQTT_BUFFER_SIZE];
 
 /* MQTT Broker details. */
 static struct sockaddr_storage broker;
@@ -329,8 +330,9 @@ int client_init(struct mqtt_client *client)
 	client->evt_cb = mqtt_evt_handler;
 	client->client_id.utf8 = client_id_get();
 	client->client_id.size = strlen(client->client_id.utf8);
-	client->password = NULL;
-	client->user_name = NULL;
+
+	client->password = &password;
+	client->user_name = &username;
 	client->protocol_version = MQTT_VERSION_3_1_1;
 
 	/* MQTT buffers configuration */
@@ -338,6 +340,7 @@ int client_init(struct mqtt_client *client)
 	client->rx_buf_size = sizeof(rx_buffer);
 	client->tx_buf = tx_buffer;
 	client->tx_buf_size = sizeof(tx_buffer);
+	
 
 	/* We are not using TLS in Exercise 1 */
 	client->transport.type = MQTT_TRANSPORT_NON_SECURE;

@@ -9,6 +9,24 @@
 #define IMEI_LEN 15
 #define CGSN_RESPONSE_LENGTH (IMEI_LEN + 6 + 1) /* Add 6 for \r\nOK\r\n and 1 for \0 */
 #define CLIENT_ID_LEN sizeof("nrf-") + IMEI_LEN
+#define MQTT_BUFFER_SIZE 2048
+
+//	client->password->utf8 = "thisisthemostsecretsecretever";
+	//client->user_name->utf8 = "iot-course-but";
+
+
+static struct mqtt_utf8 username = {
+	.utf8 = (uint8_t *)"iot-course-but",
+	.size = sizeof("iot-course-but") - 1
+};
+
+static struct mqtt_utf8 password = {
+	.utf8 = (uint8_t *)"thisisthemostsecretsecretever",
+	.size = sizeof("thisisthemostsecretsecretever") - 1
+};
+
+
+
 
 /**@brief Initialize the MQTT client structure
  */

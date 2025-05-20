@@ -1,7 +1,7 @@
 #define CONFIG_MQTT_PUB_TOPIC "devacademy/publish/topic"
 #define CONFIG_MQTT_SUB_TOPIC "devacademy/subscribe/topic"
 #define CONFIG_MQTT_CLIENT_ID ""
-#define CONFIG_MQTT_BROKER_HOSTNAME "mqtt.nordicsemi.academy"
+#define CONFIG_MQTT_BROKER_HOSTNAME "iot-course-but.cloud.shiftr.io"
 #define CONFIG_MQTT_BROKER_PORT 1883
 #define CONFIG_MQTT_MESSAGE_BUFFER_SIZE 128
 #define CONFIG_MQTT_PAYLOAD_BUFFER_SIZE 128
