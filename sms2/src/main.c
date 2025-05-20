@@ -28,22 +28,14 @@
 #define CHANNEL_3 3
 #define CHANNEL_4 4
 
-
-
 #define BUFFER_WIDTH 4
 #define BUFFER_LENGTH 5
 
-//nt buffer[BUFFER_SIZE] = {0};
-//int index = 0;
-
-
-
-
+// nt buffer[BUFFER_SIZE] = {0};
+// int index = 0;
 
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
 int index = 0;
-
-
 
 /*
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
@@ -132,23 +124,17 @@ static void sms_callback(struct sms_data *const data, void *context)
 	}
 }
 
-
-
-
-
-
-
-
 void add_samples_to_buffer(int16_t samples[BUFFER_WIDTH], int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH])
 {
 	for (int i = 0; i < BUFFER_WIDTH; i++)
 	{
 		buffer[index][i] = samples[i];
-
-		
 	}
 	index++;
-	if (index==BUFFER_LENGTH) {index=0;}
+	if (index == BUFFER_LENGTH)
+	{
+		index = 0;
+	}
 }
 
 void print_4buffer(int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH])
@@ -163,55 +149,18 @@ void print_4buffer(int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH])
 	}
 }
 
-
-
-
-void average_of_vectors(int16_t array[BUFFER_LENGTH][BUFFER_WIDTH], int16_t averages[BUFFER_WIDTH]) {
-for (int i = 0; i < BUFFER_WIDTH; i++) {
-int32_t total_sum = 0;
-for (int j = 0; j < BUFFER_LENGTH; j++) {
-total_sum += array[j][i];
-}
-averages[i] =  (int16_t)(total_sum / BUFFER_LENGTH);
-}
-}
-
-
-
-
-
-/*
-void add_sample_to_buffer(int sample, int *buffer, int *index)
+void average_of_vectors(int16_t array[BUFFER_LENGTH][BUFFER_WIDTH], int16_t averages[BUFFER_WIDTH])
 {
-	buffer[*index] = sample;
-	*index = (*index + 1) % BUFFER_SIZE;
-}
-
-void print_buffer(int *buffer)
-{
-	for (int i = 0; i < BUFFER_SIZE; i++)
+	for (int i = 0; i < BUFFER_WIDTH; i++)
 	{
-		printf("%d ", buffer[i]);
+		int32_t total_sum = 0;
+		for (int j = 0; j < BUFFER_LENGTH; j++)
+		{
+			total_sum += array[j][i];
+		}
+		averages[i] = (int16_t)(total_sum / BUFFER_LENGTH);
 	}
-	printf("\n");
 }
-*/
-/*
-
-void add_sample(int sample, int *array, int *index) {
-    array[*index] = sample;
-    *index = (*index + 1) % ARRAY_SIZE;
-}
-
-float calculate_average(int *array) {
-    int sum = 0;
-    for (int i = 0; i < ARRAY_SIZE; i++) {
-        sum += array[i];
-    }
-    return (float)sum / ARRAY_SIZE;
-}
-
-*/
 
 int main(void)
 {
@@ -234,16 +183,6 @@ int main(void)
 	adc_channel_setup(adc_dev, &channel_cfg_3);
 	adc_channel_setup(adc_dev, &channel_cfg_4);
 
-	/*
-		//.channels    = BIT(CHANNEL_1) | BIT(CHANNEL_2),
-		struct adc_sequence sequence = {
-			.channels    = BIT(CHANNEL_3),
-			.buffer      = sample_buffer,
-			.buffer_size = sizeof(sample_buffer),
-			.resolution  = 14,
-			//.oversampling = NRF_SAADC_OVERSAMPLE_16X
-		};
-	*/
 	struct adc_sequence sequence = {
 		.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
 		.buffer = sample_buffer,
@@ -251,35 +190,6 @@ int main(void)
 		.resolution = 14
 		//.oversampling = NRF_SAADC_OVERSAMPLE_16X
 	};
-
-	uint8_t smpcnt = 0;
-	while (1)
-	{
-		int ret = adc_read(adc_dev, &sequence);
-		smpcnt++;
-		if (ret == 0)
-		{
-			//printk("%d,%d,%d,%d\n\r", sample_buffer[0], sample_buffer[1], sample_buffer[2], sample_buffer[3]);
-			//	add_samples_to_buffer(&sample_buffer, &buffer, &index);
-			 add_samples_to_buffer(sample_buffer, &buffer);
-			//add_sample_to_buffer(sample_buffer[2], buffer, &index);
-		}
-		else
-		{
-			printk("ADC read error: %d\n", ret);
-		}
-		k_sleep(K_USEC(100));
-
-		if (smpcnt == BUFFER_LENGTH)
-		{
-			smpcnt = 0;
-			int16_t sample_buffer2[4]={0};
-			average_of_vectors(buffer,&sample_buffer2);
-			printk("%d,%d,%d,%d\n\r", sample_buffer2[0], sample_buffer2[1], sample_buffer2[2], sample_buffer2[3]);
-
-			//print_4buffer(buffer);
-		}
-	}
 
 	ret = gpio_pin_configure_dt(&btn0, GPIO_INPUT);
 	if (ret < 0)
@@ -342,6 +252,32 @@ int main(void)
 
 	while (1)
 	{
+
+		uint8_t smpcnt = 0;
+		while (1)
+		{
+			int ret = adc_read(adc_dev, &sequence);
+			smpcnt++;
+			if (ret == 0)
+			{
+				add_samples_to_buffer(sample_buffer, &buffer);
+			}
+			else
+			{
+				printk("ADC read error: %d\n", ret);
+			}
+			k_sleep(K_USEC(100));
+
+			if (smpcnt == BUFFER_LENGTH)
+			{
+				smpcnt = 0;
+				int16_t sample_buffer2[4] = {0};
+				average_of_vectors(buffer, &sample_buffer2);
+				printk("%d,%d,%d,%d\n\r", sample_buffer2[0], sample_buffer2[1], sample_buffer2[2], sample_buffer2[3]);
+
+				// print_4buffer(buffer);
+			}
+		}
 
 		if (gpio_pin_get_dt(&btn0))
 		{

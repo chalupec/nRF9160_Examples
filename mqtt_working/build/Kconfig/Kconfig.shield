@@ -1,0 +1,5 @@
+osource "c:/ncs/v2.6.0/zephyr/samples/drivers/spi_flash/boards/shields/*/Kconfig.shield"
+osource "c:/ncs/v2.6.0/zephyr/samples/drivers/adc/boards/shields/*/Kconfig.shield"
+osource "c:/ncs/v2.6.0/nrf/applications/serial_lte_modem/boards/shields/*/Kconfig.shield"
+osource "c:/ncs/v2.6.0/zephyr/samples/net/mqtt_publisher/boards/shields/*/Kconfig.shield"
+osource "C:/ncs/v2.6.0/nrf/boards/shields/*/Kconfig.shield"
