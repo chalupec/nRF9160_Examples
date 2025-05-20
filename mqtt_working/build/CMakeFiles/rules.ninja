@@ -865,7 +865,7 @@ rule C_STATIC_LIBRARY_LINKER__kernel_
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\ncs\toolchains\cf2149caf2\opt\bin\cmake.exe --regenerate-during-build -SC:\ADWITECH\nrf_academy_cell-fund\l4\l4_e1_sol -BC:\ADWITECH\nrf_academy_cell-fund\l4\l4_e1_sol\build
+  command = C:\ncs\toolchains\cf2149caf2\opt\bin\cmake.exe --regenerate-during-build -SC:\ADWITECH\nRF9160_Examples\mqtt_working -BC:\ADWITECH\nRF9160_Examples\mqtt_working\build
   description = Re-running CMake...
   generator = 1
 

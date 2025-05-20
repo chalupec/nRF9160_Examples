@@ -39,66 +39,66 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/disk/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/disk/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/interrupt_controller/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/interrupt_controller/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/misc/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/misc/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/pcie/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/pcie/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/usb/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/usb/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/usb_c/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/usb_c/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/clock_control/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/clock_control/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/console/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/console/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/entropy/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/entropy/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/gpio/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/gpio/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/pinctrl/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/pinctrl/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/serial/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/serial/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/drivers/timer/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/timer/cmake_install.cmake")
 endif()
 

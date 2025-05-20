@@ -2,7 +2,7 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns")
+  set(CMAKE_INSTALL_PREFIX "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,59 +39,59 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/platform/target/nrf91/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/platform/target/nrf91/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/platform/target/tfm_board/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/platform/target/tfm_board/cmake_install.cmake")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform/cpuarch.cmake")
+   "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/cpuarch.cmake")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform" TYPE FILE MESSAGE_NEVER RENAME "cpuarch.cmake" FILES "C:/ncs/v2.6.0/nrf/modules/trusted-firmware-m/tfm_boards/nrf9120/ns/cpuarch_ns.cmake")
+  file(INSTALL DESTINATION "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform" TYPE FILE MESSAGE_NEVER RENAME "cpuarch.cmake" FILES "C:/ncs/v2.6.0/nrf/modules/trusted-firmware-m/tfm_boards/nrf9120/ns/cpuarch_ns.cmake")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform/common/nrf9120/cpuarch.cmake")
+   "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/common/nrf9120/cpuarch.cmake")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform/common/nrf9120" TYPE FILE MESSAGE_NEVER FILES "C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/platform/ext/target/nordic_nrf/common/nrf9120/cpuarch.cmake")
+  file(INSTALL DESTINATION "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/common/nrf9120" TYPE FILE MESSAGE_NEVER FILES "C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/platform/ext/target/nordic_nrf/common/nrf9120/cpuarch.cmake")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform/../common/config.cmake")
+   "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/../common/config.cmake")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform/../common" TYPE FILE MESSAGE_NEVER FILES "C:/ncs/v2.6.0/nrf/modules/trusted-firmware-m/tfm_boards/nrf9120/config.cmake")
+  file(INSTALL DESTINATION "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/../common" TYPE FILE MESSAGE_NEVER FILES "C:/ncs/v2.6.0/nrf/modules/trusted-firmware-m/tfm_boards/nrf9120/config.cmake")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform/tests")
+   "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/tests")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns/platform" TYPE DIRECTORY MESSAGE_NEVER FILES "C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/platform/ext/target/nordic_nrf/nrf9161dk_nrf9161/tests")
+  file(INSTALL DESTINATION "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform" TYPE DIRECTORY MESSAGE_NEVER FILES "C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/platform/ext/target/nordic_nrf/nrf9161dk_nrf9161/tests")
 endif()
 

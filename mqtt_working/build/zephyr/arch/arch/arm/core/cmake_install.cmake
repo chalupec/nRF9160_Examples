@@ -39,21 +39,21 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/arch/arch/arm/core/cortex_m/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/arch/arch/arm/core/cortex_m/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/arch/arch/arm/core/cortex_m/cmse/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/arch/arch/arm/core/cortex_m/cmse/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/arch/arch/arm/core/cortex_m/tz/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/arch/arch/arm/core/cortex_m/tz/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/zephyr/arch/arch/arm/core/mpu/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/arch/arch/arm/core/mpu/cmake_install.cmake")
 endif()
 

@@ -2,7 +2,7 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/api_ns")
+  set(CMAKE_INSTALL_PREFIX "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,6 +39,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/secure_fw/partitions/crypto/mbedcrypto/nrf_security_src/core/nrf_oberon/cmake_install.cmake")
+  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/secure_fw/partitions/crypto/mbedcrypto/nrf_security_src/core/nrf_oberon/cmake_install.cmake")
 endif()
 

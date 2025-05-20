@@ -1,8 +1,8 @@
-C:\ADWITECH\nrf_academy_cell-fund\l4\l4_e1_sol\Kconfig
-C:\ADWITECH\nrf_academy_cell-fund\l4\l4_e1_sol\build\Kconfig\Kconfig.dts
-C:\ADWITECH\nrf_academy_cell-fund\l4\l4_e1_sol\build\Kconfig\Kconfig.modules
-C:\ADWITECH\nrf_academy_cell-fund\l4\l4_e1_sol\build\Kconfig\Kconfig.shield
-C:\ADWITECH\nrf_academy_cell-fund\l4\l4_e1_sol\build\Kconfig\Kconfig.shield.defconfig
+C:\ADWITECH\nRF9160_Examples\mqtt_working\Kconfig
+C:\ADWITECH\nRF9160_Examples\mqtt_working\build\Kconfig\Kconfig.dts
+C:\ADWITECH\nRF9160_Examples\mqtt_working\build\Kconfig\Kconfig.modules
+C:\ADWITECH\nRF9160_Examples\mqtt_working\build\Kconfig\Kconfig.shield
+C:\ADWITECH\nRF9160_Examples\mqtt_working\build\Kconfig\Kconfig.shield.defconfig
 C:\ncs\toolchains\cf2149caf2\opt\zephyr-sdk\cmake\zephyr\Kconfig
 C:\ncs\v2.6.0\modules\hal\cirrus-logic\Kconfig
 C:\ncs\v2.6.0\modules\lib\chre\platform\zephyr\Kconfig

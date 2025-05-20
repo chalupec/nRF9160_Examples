@@ -1,13 +1,13 @@
 # Target labels
  tfm
 # Source files and their labels
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/CMakeFiles/tfm
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/CMakeFiles/tfm.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/CMakeFiles/tfm-complete.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-build.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-configure.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-download.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-install.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-mkdir.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-patch.rule
-C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-update.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/CMakeFiles/tfm
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/CMakeFiles/tfm.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/CMakeFiles/tfm-complete.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-build.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-configure.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-download.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-install.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-mkdir.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-patch.rule
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/modules/trusted-firmware-m/tfm-prefix/src/tfm-stamp/tfm-update.rule

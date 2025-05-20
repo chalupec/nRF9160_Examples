@@ -11,7 +11,7 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.o"
 
-The C compiler identification is GNU, found in "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/CMakeFiles/3.21.0/CompilerIdC/CMakeCCompilerId.o"
+The C compiler identification is GNU, found in "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/CMakeFiles/3.21.0/CompilerIdC/CMakeCCompilerId.o"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: C:/ncs/toolchains/cf2149caf2/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-g++.exe 
@@ -24,7 +24,7 @@ The output was:
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.o"
 
-The CXX compiler identification is GNU, found in "C:/ADWITECH/nrf_academy_cell-fund/l4/l4_e1_sol/build/tfm/CMakeFiles/3.21.0/CompilerIdCXX/CMakeCXXCompilerId.o"
+The CXX compiler identification is GNU, found in "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/CMakeFiles/3.21.0/CompilerIdCXX/CMakeCXXCompilerId.o"
 
 Checking whether the ASM compiler is GNU using "--version" matched "(GNU assembler)|(GCC)|(Free Software Foundation)":
 arm-zephyr-eabi-gcc.exe (Zephyr SDK 0.16.5) 12.2.0
