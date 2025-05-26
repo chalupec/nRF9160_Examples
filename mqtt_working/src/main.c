@@ -20,7 +20,7 @@
 
 #include "mqtt_connection.h"
 
-#define WAVE_SAMPLE_LEN 256
+#define WAVE_SAMPLE_LEN 512
 /* The mqtt client struct */
 static struct mqtt_client client;
 /* File descriptor */
@@ -46,11 +46,34 @@ struct __attribute__((__packed__)) data_packet_t
 	uint16_t CRC;
 };
 
+struct __attribute__((__packed__)) servis_packet_t
+{
+	uint16_t packet_header;
+	uint16_t packet_version;
+	uint16_t reserve_word;
+	uint16_t packet_counter;
+	uint16_t batt_voltage;
+	int16_t unit_temperature;
+	uint32_t IMEI;
+	uint32_t DEV_ID;
+	uint16_t train_counter;
+	uint16_t pwr_cycle_counter;
+	uint32_t uptime_minutes;
+	uint32_t last_powercycle_timestamp;
+	uint16_t unit_status_bits;
+	uint8_t signal_stength;
+	uint16_t modem_status_word; 
+	float GPS_lat;
+	float GPS_lon;
+	float GPS_alt;
+	uint16_t CRC;
+};
+
 static struct data_packet_t seed_packet;
 uint16_t train_counter = 0;
 
-uint16_t chan_dat[64]= {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-uint16_t chan_dat_128[128]= {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+uint16_t chan_dat[64] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+uint16_t chan_dat_128[128] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
 LOG_MODULE_REGISTER(Lesson4_Exercise1, LOG_LEVEL_INF);
 
@@ -103,6 +126,43 @@ static int modem_configure(void)
 	return 0;
 }
 
+void send_multiple_packets(uint16_t total_packet_to_send)
+{
+
+	uint16_t pckt_cnt = 1;
+
+	while (pckt_cnt <= total_packet_to_send)
+	{
+		seed_packet.packet_header = 0xBEEF;
+		seed_packet.packet_version = 0x0101;
+		seed_packet.actual_packet_nr = pckt_cnt++;
+		seed_packet.total_packet_nr = total_packet_to_send;
+
+		seed_packet.timestamp = 1748277406;
+		seed_packet.train_counter = train_counter;
+		
+		seed_packet.CRC = 0xABCD;
+
+		memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
+		memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
+		memcpy(seed_packet.chan_0_int, chan_dat_128, 128);
+		memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
+
+		uint16_t sizestruct = sizeof(seed_packet);
+		LOG_INF("size of struct is: %d", sizestruct);
+		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
+
+		int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
+							   byte_ptr, sizestruct);
+		if (err)
+		{
+			LOG_INF("Failed to send message, %d", err);
+			return;
+		}
+	}
+	train_counter++;
+}
+
 static void button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	switch (has_changed)
@@ -115,30 +175,21 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 			seed_packet.packet_version = 0x0101;
 			seed_packet.actual_packet_nr = 0x0001;
 			seed_packet.total_packet_nr = 0x0008;
-			
+
 			seed_packet.timestamp = 1748277406;
 			seed_packet.train_counter = train_counter;
 			train_counter++;
-			seed_packet.CRC=0xABCD;
+			seed_packet.CRC = 0xABCD;
 
-			memcpy(seed_packet.chan_0_vlt,chan_dat,64);
-			memcpy(seed_packet.chan_1_vlt,chan_dat,16);
-			memcpy(seed_packet.chan_1_int,chan_dat_128,128);
+			memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
+			memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
+			memcpy(seed_packet.chan_0_int, chan_dat_128, 128);
+			memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
 
-
-			uint16_t sizestruct=sizeof(seed_packet); 
+			uint16_t sizestruct = sizeof(seed_packet);
 			LOG_INF("size of struct is: %d", sizestruct);
 			uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
-			
-
-		
-/*
-			for(uint16_t c=0; c<sizestruct; c=c+4) {
-				LOG_INF(" x%0x\t x%0x\t x%0x\t x%0x", byte_ptr[c],byte_ptr[c+1],byte_ptr[c+2],byte_ptr[c+3]);
-			    k_sleep(K_USEC(8000));
-			}
-*/
 			k_sleep(K_MSEC(100));
 			LOG_INF("step: %d", 4);
 			k_sleep(K_MSEC(100));
@@ -150,18 +201,16 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 				return;
 			}
 		}
+		break;
 
-		/*
-		if (button_state & DK_BTN1_MSK){
-			int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
-				   CONFIG_BUTTON_EVENT_PUBLISH_MSG, sizeof(CONFIG_BUTTON_EVENT_PUBLISH_MSG)-1);
-			if (err) {
-				LOG_INF("Failed to send message, %d", err);
-				return;
-			}
+	case DK_BTN2_MSK:
+		if (button_state & DK_BTN2_MSK)
+		{
+			send_multiple_packets(4);
 		}
-*/
+		break;
 
+	default:
 		break;
 	}
 }
