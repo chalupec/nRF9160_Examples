@@ -9,7 +9,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/net/socket.h>
 #include <poll.h>
-
+#include <zephyr/types.h>
 
 #include <zephyr/logging/log.h>
 #include <dk_buttons_and_leds.h>
@@ -20,6 +20,7 @@
 
 #include "mqtt_connection.h"
 
+#define WAVE_SAMPLE_LEN 64
 /* The mqtt client struct */
 static struct mqtt_client client;
 /* File descriptor */
@@ -27,28 +28,50 @@ static struct pollfd fds;
 
 static K_SEM_DEFINE(lte_connected, 0, 1);
 
+struct __attribute__((__packed__)) data_packet_t
+{
+	uint16_t packet_header;
+
+	uint16_t packet_id;
+	uint32_t timestamp;
+	uint32_t total_sample_count;
+	uint16_t train_counter;
+
+	uint16_t chan_0_vlt[WAVE_SAMPLE_LEN];
+	uint16_t chan_0_int[WAVE_SAMPLE_LEN];
+	uint16_t chan_1_vlt[WAVE_SAMPLE_LEN];
+	uint16_t chan_1_int[WAVE_SAMPLE_LEN];
+
+	uint16_t CRC;
+};
+
+struct data_packet_t seed_packet;
+uint16_t train_counter = 0;
+
+uint16_t chan_dat[64]= {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,};
+
 LOG_MODULE_REGISTER(Lesson4_Exercise1, LOG_LEVEL_INF);
 
 static void lte_handler(const struct lte_lc_evt *const evt)
 {
-     switch (evt->type) {
-     case LTE_LC_EVT_NW_REG_STATUS:
-        if ((evt->nw_reg_status != LTE_LC_NW_REG_REGISTERED_HOME) &&
-            (evt->nw_reg_status != LTE_LC_NW_REG_REGISTERED_ROAMING)) {
-            break;
-        }
+	switch (evt->type)
+	{
+	case LTE_LC_EVT_NW_REG_STATUS:
+		if ((evt->nw_reg_status != LTE_LC_NW_REG_REGISTERED_HOME) &&
+			(evt->nw_reg_status != LTE_LC_NW_REG_REGISTERED_ROAMING))
+		{
+			break;
+		}
 		LOG_INF("Network registration status: %s",
-				evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ?
-				"Connected - home network" : "Connected - roaming");
+				evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ? "Connected - home network" : "Connected - roaming");
 		k_sem_give(&lte_connected);
-        break;
-	case LTE_LC_EVT_RRC_UPDATE:
-		LOG_INF("RRC mode: %s", evt->rrc_mode == LTE_LC_RRC_MODE_CONNECTED ?
-				"Connected" : "Idle");
 		break;
-     default:
-             break;
-     }
+	case LTE_LC_EVT_RRC_UPDATE:
+		LOG_INF("RRC mode: %s", evt->rrc_mode == LTE_LC_RRC_MODE_CONNECTED ? "Connected" : "Idle");
+		break;
+	default:
+		break;
+	}
 }
 
 static int modem_configure(void)
@@ -57,14 +80,16 @@ static int modem_configure(void)
 
 	LOG_INF("Initializing modem library");
 	err = nrf_modem_lib_init();
-	if (err) {
+	if (err)
+	{
 		LOG_ERR("Failed to initialize the modem library, error: %d", err);
 		return err;
 	}
-	
+
 	LOG_INF("Connecting to LTE network");
 	err = lte_lc_connect_async(lte_handler);
-	if (err) {
+	if (err)
+	{
 		LOG_ERR("Error in lte_lc_connect_async, error: %d", err);
 		return err;
 	}
@@ -78,9 +103,41 @@ static int modem_configure(void)
 
 static void button_handler(uint32_t button_state, uint32_t has_changed)
 {
-	switch (has_changed) {
+	switch (has_changed)
+	{
 	case DK_BTN1_MSK:
-		/* STEP 7.2 - When button 1 is pressed, call data_publish() to publish a message */
+
+		if (button_state & DK_BTN1_MSK)
+		{
+			seed_packet.packet_header = 0xBEEF;
+			seed_packet.packet_id = 0x0001;
+			seed_packet.timestamp = 0x11223344;
+			seed_packet.train_counter = train_counter;
+			train_counter++;
+			memcpy(seed_packet.chan_0_vlt,chan_dat,64);
+			memcpy(seed_packet.chan_1_vlt,chan_dat,16);
+
+			uint8_t *byte_ptr = (uint8_t *)&seed_packet;
+			uint16_t sizestruct=sizeof(seed_packet); 
+
+			LOG_INF("size of struct is: %d", sizestruct);
+
+			for(uint16_t c=0; c<sizestruct; c=c+4) {
+				LOG_INF(" x%0x\t x%0x\t x%0x\t x%0x", byte_ptr[c],byte_ptr[c+1],byte_ptr[c+2],byte_ptr[c+3]);
+			    k_sleep(K_USEC(8000));
+			}
+
+
+			int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
+								   byte_ptr, sizestruct);
+			if (err)
+			{
+				LOG_INF("Failed to send message, %d", err);
+				return;
+			}
+		}
+
+		/*
 		if (button_state & DK_BTN1_MSK){
 			int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 				   CONFIG_BUTTON_EVENT_PUBLISH_MSG, sizeof(CONFIG_BUTTON_EVENT_PUBLISH_MSG)-1);
@@ -89,6 +146,8 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 				return;
 			}
 		}
+*/
+
 		break;
 	}
 }
@@ -98,72 +157,86 @@ int main(void)
 	int err;
 	uint32_t connect_attempt = 0;
 
-	if (dk_leds_init() != 0) {
+	if (dk_leds_init() != 0)
+	{
 		LOG_ERR("Failed to initialize the LED library");
 	}
 
 	err = modem_configure();
-	if (err) {
+	if (err)
+	{
 		LOG_ERR("Failed to configure the modem");
 		return 0;
 	}
 
-	if (dk_buttons_init(button_handler) != 0) {
+	if (dk_buttons_init(button_handler) != 0)
+	{
 		LOG_ERR("Failed to initialize the buttons library");
 	}
 
 	err = client_init(&client);
-	if (err) {
+	if (err)
+	{
 		LOG_ERR("Failed to initialize MQTT client: %d", err);
 		return 0;
 	}
 
 do_connect:
-	if (connect_attempt++ > 0) {
+	if (connect_attempt++ > 0)
+	{
 		LOG_INF("Reconnecting in %d seconds...",
-			CONFIG_MQTT_RECONNECT_DELAY_S);
+				CONFIG_MQTT_RECONNECT_DELAY_S);
 		k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
 	}
 
 	err = mqtt_connect(&client);
-	if (err) {
+	if (err)
+	{
 		LOG_ERR("Error in mqtt_connect: %d", err);
 		goto do_connect;
 	}
 
-	err = fds_init(&client,&fds);
-	if (err) {
+	err = fds_init(&client, &fds);
+	if (err)
+	{
 		LOG_ERR("Error in fds_init: %d", err);
 		return 0;
 	}
 
-	while (1) {
+	while (1)
+	{
 		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
-		if (err < 0) {
+		if (err < 0)
+		{
 			LOG_ERR("Error in poll(): %d", errno);
 			break;
 		}
 
 		err = mqtt_live(&client);
-		if ((err != 0) && (err != -EAGAIN)) {
+		if ((err != 0) && (err != -EAGAIN))
+		{
 			LOG_ERR("Error in mqtt_live: %d", err);
 			break;
 		}
 
-		if ((fds.  revents & POLLIN) == POLLIN) {
+		if ((fds.revents & POLLIN) == POLLIN)
+		{
 			err = mqtt_input(&client);
-			if (err != 0) {
+			if (err != 0)
+			{
 				LOG_ERR("Error in mqtt_input: %d", err);
 				break;
 			}
 		}
 
-		if ((fds.revents & POLLERR) == POLLERR) {
+		if ((fds.revents & POLLERR) == POLLERR)
+		{
 			LOG_ERR("POLLERR");
 			break;
 		}
 
-		if ((fds.revents & POLLNVAL) == POLLNVAL) {
+		if ((fds.revents & POLLNVAL) == POLLNVAL)
+		{
 			LOG_ERR("POLLNVAL");
 			break;
 		}
@@ -172,7 +245,8 @@ do_connect:
 	LOG_INF("Disconnecting MQTT client");
 
 	err = mqtt_disconnect(&client);
-	if (err) {
+	if (err)
+	{
 		LOG_ERR("Could not disconnect MQTT client: %d", err);
 	}
 	goto do_connect;
