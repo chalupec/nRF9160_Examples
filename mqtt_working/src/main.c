@@ -20,7 +20,7 @@
 
 #include "mqtt_connection.h"
 
-#define WAVE_SAMPLE_LEN 64
+#define WAVE_SAMPLE_LEN 256
 /* The mqtt client struct */
 static struct mqtt_client client;
 /* File descriptor */
@@ -31,8 +31,9 @@ static K_SEM_DEFINE(lte_connected, 0, 1);
 struct __attribute__((__packed__)) data_packet_t
 {
 	uint16_t packet_header;
-
-	uint16_t packet_id;
+	uint16_t packet_version;
+	uint16_t actual_packet_nr;
+	uint16_t total_packet_nr;
 	uint32_t timestamp;
 	uint32_t total_sample_count;
 	uint16_t train_counter;
@@ -45,10 +46,11 @@ struct __attribute__((__packed__)) data_packet_t
 	uint16_t CRC;
 };
 
-struct data_packet_t seed_packet;
+static struct data_packet_t seed_packet;
 uint16_t train_counter = 0;
 
-uint16_t chan_dat[64]= {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,};
+uint16_t chan_dat[64]= {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+uint16_t chan_dat_128[128]= {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 
 LOG_MODULE_REGISTER(Lesson4_Exercise1, LOG_LEVEL_INF);
 
@@ -110,24 +112,36 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 		if (button_state & DK_BTN1_MSK)
 		{
 			seed_packet.packet_header = 0xBEEF;
-			seed_packet.packet_id = 0x0001;
-			seed_packet.timestamp = 0x11223344;
+			seed_packet.packet_version = 0x0101;
+			seed_packet.actual_packet_nr = 0x0001;
+			seed_packet.total_packet_nr = 0x0008;
+			
+			seed_packet.timestamp = 1748277406;
 			seed_packet.train_counter = train_counter;
 			train_counter++;
+			seed_packet.CRC=0xABCD;
+
 			memcpy(seed_packet.chan_0_vlt,chan_dat,64);
 			memcpy(seed_packet.chan_1_vlt,chan_dat,16);
+			memcpy(seed_packet.chan_1_int,chan_dat_128,128);
 
-			uint8_t *byte_ptr = (uint8_t *)&seed_packet;
+
 			uint16_t sizestruct=sizeof(seed_packet); 
-
 			LOG_INF("size of struct is: %d", sizestruct);
+			uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
+			
+
+		
+/*
 			for(uint16_t c=0; c<sizestruct; c=c+4) {
 				LOG_INF(" x%0x\t x%0x\t x%0x\t x%0x", byte_ptr[c],byte_ptr[c+1],byte_ptr[c+2],byte_ptr[c+3]);
 			    k_sleep(K_USEC(8000));
 			}
-
-
+*/
+			k_sleep(K_MSEC(100));
+			LOG_INF("step: %d", 4);
+			k_sleep(K_MSEC(100));
 			int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 								   byte_ptr, sizestruct);
 			if (err)
