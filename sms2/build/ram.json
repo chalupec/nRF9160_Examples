@@ -1,0 +1,2636 @@
+{
+    "symbols": {
+        "name": "Root",
+        "size": 54798,
+        "identifier": "root",
+        "children": [
+            {
+                "name": "(no paths)",
+                "size": 6591,
+                "identifier": ":",
+                "children": [
+                    {
+                        "name": "edrx_lookup_ltem.2",
+                        "size": 32,
+                        "identifier": ":\\edrx_lookup_ltem.2"
+                    },
+                    {
+                        "name": "edrx_lookup_nbiot.1",
+                        "size": 32,
+                        "identifier": ":\\edrx_lookup_nbiot.1"
+                    },
+                    {
+                        "name": "event_types.0",
+                        "size": 40,
+                        "identifier": ":\\event_types.0"
+                    },
+                    {
+                        "name": "process_lock.0",
+                        "size": 4,
+                        "identifier": ":\\process_lock.0"
+                    },
+                    {
+                        "name": "prefix.1",
+                        "size": 12,
+                        "identifier": ":\\prefix.1"
+                    },
+                    {
+                        "name": "postfix.0",
+                        "size": 28,
+                        "identifier": ":\\postfix.0"
+                    },
+                    {
+                        "name": "delay_machine_code.0",
+                        "size": 6,
+                        "identifier": ":\\delay_machine_code.0"
+                    },
+                    {
+                        "name": "count.1",
+                        "size": 4,
+                        "identifier": ":\\count.1"
+                    },
+                    {
+                        "name": "count.0",
+                        "size": 4,
+                        "identifier": ":\\count.0"
+                    },
+                    {
+                        "name": "ctx.0",
+                        "size": 40,
+                        "identifier": ":\\ctx.0"
+                    },
+                    {
+                        "name": "all_nodes_mcast_group.0",
+                        "size": 16,
+                        "identifier": ":\\all_nodes_mcast_group.0"
+                    },
+                    {
+                        "name": "buf.0",
+                        "size": 152,
+                        "identifier": ":\\buf.0"
+                    },
+                    {
+                        "name": "transitions.0",
+                        "size": 12,
+                        "identifier": ":\\transitions.0"
+                    },
+                    {
+                        "name": "on.2",
+                        "size": 4,
+                        "identifier": ":\\on.2"
+                    },
+                    {
+                        "name": "cli.1",
+                        "size": 16,
+                        "identifier": ":\\cli.1"
+                    },
+                    {
+                        "name": "used.1",
+                        "size": 1,
+                        "identifier": ":\\used.1"
+                    },
+                    {
+                        "name": "getaddrinfo_lock.1",
+                        "size": 20,
+                        "identifier": ":\\getaddrinfo_lock.1"
+                    },
+                    {
+                        "name": "sendmsg_lock.2",
+                        "size": 20,
+                        "identifier": ":\\sendmsg_lock.2"
+                    },
+                    {
+                        "name": "toclip.0",
+                        "size": 16,
+                        "identifier": ":\\toclip.0"
+                    },
+                    {
+                        "name": "response.0",
+                        "size": 160,
+                        "identifier": ":\\response.0"
+                    },
+                    {
+                        "name": "prev_reg_status.5",
+                        "size": 1,
+                        "identifier": ":\\prev_reg_status.5"
+                    },
+                    {
+                        "name": "prev_cell.4",
+                        "size": 48,
+                        "identifier": ":\\prev_cell.4"
+                    },
+                    {
+                        "name": "prev_lte_mode.3",
+                        "size": 1,
+                        "identifier": ":\\prev_lte_mode.3"
+                    },
+                    {
+                        "name": "prev_psm_cfg.2",
+                        "size": 8,
+                        "identifier": ":\\prev_psm_cfg.2"
+                    },
+                    {
+                        "name": "sms_deliver.0",
+                        "size": 200,
+                        "identifier": ":\\sms_deliver.0"
+                    },
+                    {
+                        "name": "CSWTCH.3",
+                        "size": 24,
+                        "identifier": ":\\CSWTCH.3"
+                    },
+                    {
+                        "name": "shmem",
+                        "size": 4,
+                        "identifier": ":\\shmem"
+                    },
+                    {
+                        "name": "rpc_data_list",
+                        "size": 4,
+                        "identifier": ":\\rpc_data_list"
+                    },
+                    {
+                        "name": "expected_seq_num",
+                        "size": 2,
+                        "identifier": ":\\expected_seq_num"
+                    },
+                    {
+                        "name": "modem_chan",
+                        "size": 8,
+                        "identifier": ":\\modem_chan"
+                    },
+                    {
+                        "name": "ipc_transport_state",
+                        "size": 1,
+                        "identifier": ":\\ipc_transport_state"
+                    },
+                    {
+                        "name": "initialization_result",
+                        "size": 4,
+                        "identifier": ":\\initialization_result"
+                    },
+                    {
+                        "name": "ipc_sem",
+                        "size": 4,
+                        "identifier": ":\\ipc_sem"
+                    },
+                    {
+                        "name": "CSWTCH.74",
+                        "size": 6,
+                        "identifier": ":\\CSWTCH.74"
+                    },
+                    {
+                        "name": "mdm_desc",
+                        "size": 4,
+                        "identifier": ":\\mdm_desc"
+                    },
+                    {
+                        "name": "rpc_data_buf",
+                        "size": 4,
+                        "identifier": ":\\rpc_data_buf"
+                    },
+                    {
+                        "name": "sequence_num",
+                        "size": 2,
+                        "identifier": ":\\sequence_num"
+                    },
+                    {
+                        "name": "rpc_ctrl_buf",
+                        "size": 4,
+                        "identifier": ":\\rpc_ctrl_buf"
+                    },
+                    {
+                        "name": "rpc_ctrl_list",
+                        "size": 4,
+                        "identifier": ":\\rpc_ctrl_list"
+                    },
+                    {
+                        "name": "data_tx_suspend",
+                        "size": 1,
+                        "identifier": ":\\data_tx_suspend"
+                    },
+                    {
+                        "name": "cfun_handler",
+                        "size": 4,
+                        "identifier": ":\\cfun_handler"
+                    },
+                    {
+                        "name": "response_status",
+                        "size": 1,
+                        "identifier": ":\\response_status"
+                    },
+                    {
+                        "name": "at_response_str",
+                        "size": 16,
+                        "identifier": ":\\at_response_str"
+                    },
+                    {
+                        "name": "custom_commands",
+                        "size": 4,
+                        "identifier": ":\\custom_commands"
+                    },
+                    {
+                        "name": "custom_commands_len",
+                        "size": 4,
+                        "identifier": ":\\custom_commands_len"
+                    },
+                    {
+                        "name": "notif_handler",
+                        "size": 4,
+                        "identifier": ":\\notif_handler"
+                    },
+                    {
+                        "name": "at_timeout_ms",
+                        "size": 4,
+                        "identifier": ":\\at_timeout_ms"
+                    },
+                    {
+                        "name": "at_call_mutex",
+                        "size": 4,
+                        "identifier": ":\\at_call_mutex"
+                    },
+                    {
+                        "name": "at_call_sem",
+                        "size": 4,
+                        "identifier": ":\\at_call_sem"
+                    },
+                    {
+                        "name": "response",
+                        "size": 8,
+                        "identifier": ":\\response"
+                    },
+                    {
+                        "name": "response_handler",
+                        "size": 4,
+                        "identifier": ":\\response_handler"
+                    },
+                    {
+                        "name": "rpc_flow_control_enabled",
+                        "size": 1,
+                        "identifier": ":\\rpc_flow_control_enabled"
+                    },
+                    {
+                        "name": "socket",
+                        "size": 832,
+                        "identifier": ":\\socket"
+                    },
+                    {
+                        "name": "getaddrinfo_cookie",
+                        "size": 12,
+                        "identifier": ":\\getaddrinfo_cookie"
+                    },
+                    {
+                        "name": "addrinfo_sem",
+                        "size": 4,
+                        "identifier": ":\\addrinfo_sem"
+                    },
+                    {
+                        "name": "fam",
+                        "size": 4,
+                        "identifier": ":\\fam"
+                    },
+                    {
+                        "name": "type",
+                        "size": 4,
+                        "identifier": ":\\type"
+                    },
+                    {
+                        "name": "proto",
+                        "size": 4,
+                        "identifier": ":\\proto"
+                    },
+                    {
+                        "name": "port",
+                        "size": 2,
+                        "identifier": ":\\port"
+                    },
+                    {
+                        "name": "flags",
+                        "size": 4,
+                        "identifier": ":\\flags"
+                    },
+                    {
+                        "name": "CSWTCH.1",
+                        "size": 4,
+                        "identifier": ":\\CSWTCH.1"
+                    },
+                    {
+                        "name": "CSWTCH.7",
+                        "size": 216,
+                        "identifier": ":\\CSWTCH.7"
+                    },
+                    {
+                        "name": "CSWTCH.9",
+                        "size": 452,
+                        "identifier": ":\\CSWTCH.9"
+                    },
+                    {
+                        "name": "CSWTCH.12",
+                        "size": 20,
+                        "identifier": ":\\CSWTCH.12"
+                    },
+                    {
+                        "name": "pvt_data",
+                        "size": 4,
+                        "identifier": ":\\pvt_data"
+                    },
+                    {
+                        "name": "pvt_data_version",
+                        "size": 1,
+                        "identifier": ":\\pvt_data_version"
+                    },
+                    {
+                        "name": "nmea_data",
+                        "size": 4,
+                        "identifier": ":\\nmea_data"
+                    },
+                    {
+                        "name": "agnss_data",
+                        "size": 4,
+                        "identifier": ":\\agnss_data"
+                    },
+                    {
+                        "name": "agnss_data_version",
+                        "size": 1,
+                        "identifier": ":\\agnss_data_version"
+                    },
+                    {
+                        "name": "gnss_event_callback",
+                        "size": 4,
+                        "identifier": ":\\gnss_event_callback"
+                    },
+                    {
+                        "name": "blocked",
+                        "size": 1,
+                        "identifier": ":\\blocked"
+                    },
+                    {
+                        "name": "nrf_modem_softsim_req_handler",
+                        "size": 4,
+                        "identifier": ":\\nrf_modem_softsim_req_handler"
+                    },
+                    {
+                        "name": "fault_handler",
+                        "size": 4,
+                        "identifier": ":\\fault_handler"
+                    },
+                    {
+                        "name": "modem_state",
+                        "size": 1,
+                        "identifier": ":\\modem_state"
+                    },
+                    {
+                        "name": "fifo_initialized",
+                        "size": 1,
+                        "identifier": ":\\fifo_initialized"
+                    },
+                    {
+                        "name": "coredump_complete",
+                        "size": 1,
+                        "identifier": ":\\coredump_complete"
+                    },
+                    {
+                        "name": "data_bytes_not_acked",
+                        "size": 4,
+                        "identifier": ":\\data_bytes_not_acked"
+                    },
+                    {
+                        "name": "header_bytes_not_acked",
+                        "size": 4,
+                        "identifier": ":\\header_bytes_not_acked"
+                    },
+                    {
+                        "name": "trace_descr",
+                        "size": 4,
+                        "identifier": ":\\trace_descr"
+                    },
+                    {
+                        "name": "trace_sem",
+                        "size": 4,
+                        "identifier": ":\\trace_sem"
+                    },
+                    {
+                        "name": "fifos",
+                        "size": 12,
+                        "identifier": ":\\fifos"
+                    },
+                    {
+                        "name": "CSWTCH.489",
+                        "size": 20,
+                        "identifier": ":\\CSWTCH.489"
+                    },
+                    {
+                        "name": "levels.0",
+                        "size": 24,
+                        "identifier": ":\\levels.0"
+                    },
+                    {
+                        "name": "state.1",
+                        "size": 8,
+                        "identifier": ":\\state.1"
+                    },
+                    {
+                        "name": "wait_q.0",
+                        "size": 8,
+                        "identifier": ":\\wait_q.0"
+                    },
+                    {
+                        "name": "in6addr_any",
+                        "size": 16,
+                        "identifier": ":\\in6addr_any"
+                    },
+                    {
+                        "name": "_cpus_active",
+                        "size": 4,
+                        "identifier": ":\\_cpus_active"
+                    },
+                    {
+                        "name": "rpc_transport",
+                        "size": 40,
+                        "identifier": ":\\rpc_transport"
+                    },
+                    {
+                        "name": "net_buf_fixed_cb",
+                        "size": 12,
+                        "identifier": ":\\net_buf_fixed_cb"
+                    },
+                    {
+                        "name": "_kernel",
+                        "size": 32,
+                        "identifier": ":\\_kernel"
+                    },
+                    {
+                        "name": "mpu_config",
+                        "size": 8,
+                        "identifier": ":\\mpu_config"
+                    },
+                    {
+                        "name": "z_main_thread",
+                        "size": 168,
+                        "identifier": ":\\z_main_thread"
+                    },
+                    {
+                        "name": "sms_buf_tmp",
+                        "size": 512,
+                        "identifier": ":\\sms_buf_tmp"
+                    },
+                    {
+                        "name": "k_sys_work_q",
+                        "size": 200,
+                        "identifier": ":\\k_sys_work_q"
+                    },
+                    {
+                        "name": "z_interrupt_stacks",
+                        "size": 2048,
+                        "identifier": ":\\z_interrupt_stacks"
+                    },
+                    {
+                        "name": "z_idle_threads",
+                        "size": 168,
+                        "identifier": ":\\z_idle_threads"
+                    },
+                    {
+                        "name": "sms_payload_tmp",
+                        "size": 160,
+                        "identifier": ":\\sms_payload_tmp"
+                    },
+                    {
+                        "name": "_sw_isr_table",
+                        "size": 520,
+                        "identifier": ":\\_sw_isr_table"
+                    },
+                    {
+                        "name": "tls_handshake_sem",
+                        "size": 4,
+                        "identifier": ":\\tls_handshake_sem"
+                    },
+                    {
+                        "name": "gnss_event",
+                        "size": 8,
+                        "identifier": ":\\gnss_event"
+                    },
+                    {
+                        "name": "sched_spinlock",
+                        "size": 4,
+                        "identifier": ":\\sched_spinlock"
+                    }
+                ]
+            },
+            {
+                "name": "ZEPHYR_BASE",
+                "size": 22073,
+                "identifier": "C:/ncs/v2.6.0/zephyr",
+                "children": [
+                    {
+                        "name": "lib",
+                        "size": 2040,
+                        "identifier": "lib",
+                        "children": [
+                            {
+                                "name": "os",
+                                "size": 680,
+                                "identifier": "lib\\os",
+                                "children": [
+                                    {
+                                        "name": "fdtable.c",
+                                        "size": 676,
+                                        "identifier": "lib\\os\\fdtable.c",
+                                        "children": [
+                                            {
+                                                "name": "fdtable",
+                                                "size": 640,
+                                                "identifier": "lib\\os\\fdtable.c\\fdtable"
+                                            },
+                                            {
+                                                "name": "fdtable_lock",
+                                                "size": 20,
+                                                "identifier": "lib\\os\\fdtable.c\\fdtable_lock"
+                                            },
+                                            {
+                                                "name": "stdinout_fd_op_vtable",
+                                                "size": 16,
+                                                "identifier": "lib\\os\\fdtable.c\\stdinout_fd_op_vtable"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "printk.c",
+                                        "size": 4,
+                                        "identifier": "lib\\os\\printk.c",
+                                        "children": [
+                                            {
+                                                "name": "_char_out",
+                                                "size": 4,
+                                                "identifier": "lib\\os\\printk.c\\_char_out"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "libc",
+                                "size": 32,
+                                "identifier": "lib\\libc",
+                                "children": [
+                                    {
+                                        "name": "picolibc",
+                                        "size": 20,
+                                        "identifier": "lib\\libc\\picolibc",
+                                        "children": [
+                                            {
+                                                "name": "libc-hooks.c",
+                                                "size": 20,
+                                                "identifier": "lib\\libc\\picolibc\\libc-hooks.c",
+                                                "children": [
+                                                    {
+                                                        "name": "_stdout_hook",
+                                                        "size": 4,
+                                                        "identifier": "lib\\libc\\picolibc\\libc-hooks.c\\_stdout_hook"
+                                                    },
+                                                    {
+                                                        "name": "__stdout",
+                                                        "size": 16,
+                                                        "identifier": "lib\\libc\\picolibc\\libc-hooks.c\\__stdout"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "common",
+                                        "size": 12,
+                                        "identifier": "lib\\libc\\common",
+                                        "children": [
+                                            {
+                                                "name": "source",
+                                                "size": 12,
+                                                "identifier": "lib\\libc\\common\\source",
+                                                "children": [
+                                                    {
+                                                        "name": "stdlib",
+                                                        "size": 12,
+                                                        "identifier": "lib\\libc\\common\\source\\stdlib",
+                                                        "children": [
+                                                            {
+                                                                "name": "malloc.c",
+                                                                "size": 12,
+                                                                "identifier": "lib\\libc\\common\\source\\stdlib\\malloc.c",
+                                                                "children": [
+                                                                    {
+                                                                        "name": "z_malloc_heap",
+                                                                        "size": 12,
+                                                                        "identifier": "lib\\libc\\common\\source\\stdlib\\malloc.c\\z_malloc_heap"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "posix",
+                                "size": 1328,
+                                "identifier": "lib\\posix",
+                                "children": [
+                                    {
+                                        "name": "barrier.c",
+                                        "size": 180,
+                                        "identifier": "lib\\posix\\barrier.c",
+                                        "children": [
+                                            {
+                                                "name": "posix_barrier_pool",
+                                                "size": 180,
+                                                "identifier": "lib\\posix\\barrier.c\\posix_barrier_pool"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "cond.c",
+                                        "size": 40,
+                                        "identifier": "lib\\posix\\cond.c",
+                                        "children": [
+                                            {
+                                                "name": "posix_cond_pool",
+                                                "size": 40,
+                                                "identifier": "lib\\posix\\cond.c\\posix_cond_pool"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "mutex.c",
+                                        "size": 100,
+                                        "identifier": "lib\\posix\\mutex.c",
+                                        "children": [
+                                            {
+                                                "name": "posix_mutex_pool",
+                                                "size": 100,
+                                                "identifier": "lib\\posix\\mutex.c\\posix_mutex_pool"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "pthread.c",
+                                        "size": 1008,
+                                        "identifier": "lib\\posix\\pthread.c",
+                                        "children": [
+                                            {
+                                                "name": "ready_q",
+                                                "size": 8,
+                                                "identifier": "lib\\posix\\pthread.c\\ready_q"
+                                            },
+                                            {
+                                                "name": "posix_thread_pool",
+                                                "size": 1000,
+                                                "identifier": "lib\\posix\\pthread.c\\posix_thread_pool"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "subsys",
+                        "size": 15750,
+                        "identifier": "subsys",
+                        "children": [
+                            {
+                                "name": "logging",
+                                "size": 3615,
+                                "identifier": "subsys\\logging",
+                                "children": [
+                                    {
+                                        "name": "log_core.c",
+                                        "size": 3462,
+                                        "identifier": "subsys\\logging\\log_core.c",
+                                        "children": [
+                                            {
+                                                "name": "log_process_thread_timer",
+                                                "size": 56,
+                                                "identifier": "subsys\\logging\\log_core.c\\log_process_thread_timer"
+                                            },
+                                            {
+                                                "name": "initialized",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_core.c\\initialized"
+                                            },
+                                            {
+                                                "name": "format_table",
+                                                "size": 16,
+                                                "identifier": "subsys\\logging\\log_core.c\\format_table"
+                                            },
+                                            {
+                                                "name": "timestamp_func",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_core.c\\timestamp_func"
+                                            },
+                                            {
+                                                "name": "backend_attached",
+                                                "size": 1,
+                                                "identifier": "subsys\\logging\\log_core.c\\backend_attached"
+                                            },
+                                            {
+                                                "name": "buffered_cnt",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_core.c\\buffered_cnt"
+                                            },
+                                            {
+                                                "name": "dropped_cnt",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_core.c\\dropped_cnt"
+                                            },
+                                            {
+                                                "name": "log_buffer",
+                                                "size": 68,
+                                                "identifier": "subsys\\logging\\log_core.c\\log_buffer"
+                                            },
+                                            {
+                                                "name": "mpsc_config",
+                                                "size": 20,
+                                                "identifier": "subsys\\logging\\log_core.c\\mpsc_config"
+                                            },
+                                            {
+                                                "name": "curr_log_buffer",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_core.c\\curr_log_buffer"
+                                            },
+                                            {
+                                                "name": "panic_mode",
+                                                "size": 1,
+                                                "identifier": "subsys\\logging\\log_core.c\\panic_mode"
+                                            },
+                                            {
+                                                "name": "last_failure_report",
+                                                "size": 8,
+                                                "identifier": "subsys\\logging\\log_core.c\\last_failure_report"
+                                            },
+                                            {
+                                                "name": "proc_tid",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_core.c\\proc_tid"
+                                            },
+                                            {
+                                                "name": "buf32",
+                                                "size": 1024,
+                                                "identifier": "subsys\\logging\\log_core.c\\buf32"
+                                            },
+                                            {
+                                                "name": "log_msg_ptr",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_core.c\\log_msg_ptr"
+                                            },
+                                            {
+                                                "name": "log_process_thread_sem",
+                                                "size": 24,
+                                                "identifier": "subsys\\logging\\log_core.c\\log_process_thread_sem"
+                                            },
+                                            {
+                                                "name": "logging_thread",
+                                                "size": 168,
+                                                "identifier": "subsys\\logging\\log_core.c\\logging_thread"
+                                            },
+                                            {
+                                                "name": "logging_stack",
+                                                "size": 2048,
+                                                "identifier": "subsys\\logging\\log_core.c\\logging_stack"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "log_output.c",
+                                        "size": 48,
+                                        "identifier": "subsys\\logging\\log_output.c",
+                                        "children": [
+                                            {
+                                                "name": "colors",
+                                                "size": 20,
+                                                "identifier": "subsys\\logging\\log_output.c\\colors"
+                                            },
+                                            {
+                                                "name": "severity",
+                                                "size": 20,
+                                                "identifier": "subsys\\logging\\log_output.c\\severity"
+                                            },
+                                            {
+                                                "name": "freq",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_output.c\\freq"
+                                            },
+                                            {
+                                                "name": "timestamp_div",
+                                                "size": 4,
+                                                "identifier": "subsys\\logging\\log_output.c\\timestamp_div"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "backends",
+                                        "size": 105,
+                                        "identifier": "subsys\\logging\\backends",
+                                        "children": [
+                                            {
+                                                "name": "log_backend_uart.c",
+                                                "size": 105,
+                                                "identifier": "subsys\\logging\\backends\\log_backend_uart.c",
+                                                "children": [
+                                                    {
+                                                        "name": "backend_cb_log_backend_uart",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\logging\\backends\\log_backend_uart.c\\backend_cb_log_backend_uart"
+                                                    },
+                                                    {
+                                                        "name": "lbu_cb_ctx",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\logging\\backends\\log_backend_uart.c\\lbu_cb_ctx"
+                                                    },
+                                                    {
+                                                        "name": "lbu_output",
+                                                        "size": 16,
+                                                        "identifier": "subsys\\logging\\backends\\log_backend_uart.c\\lbu_output"
+                                                    },
+                                                    {
+                                                        "name": "lbu_data",
+                                                        "size": 32,
+                                                        "identifier": "subsys\\logging\\backends\\log_backend_uart.c\\lbu_data"
+                                                    },
+                                                    {
+                                                        "name": "lbu_output_control_block",
+                                                        "size": 12,
+                                                        "identifier": "subsys\\logging\\backends\\log_backend_uart.c\\lbu_output_control_block"
+                                                    },
+                                                    {
+                                                        "name": "lbu_buffer",
+                                                        "size": 1,
+                                                        "identifier": "subsys\\logging\\backends\\log_backend_uart.c\\lbu_buffer"
+                                                    },
+                                                    {
+                                                        "name": "log_backend_uart_api",
+                                                        "size": 28,
+                                                        "identifier": "subsys\\logging\\backends\\log_backend_uart.c\\log_backend_uart_api"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "net",
+                                "size": 12135,
+                                "identifier": "subsys\\net",
+                                "children": [
+                                    {
+                                        "name": "ip",
+                                        "size": 10956,
+                                        "identifier": "subsys\\net\\ip",
+                                        "children": [
+                                            {
+                                                "name": "net_if.c",
+                                                "size": 632,
+                                                "identifier": "subsys\\net\\ip\\net_if.c",
+                                                "children": [
+                                                    {
+                                                        "name": "lock",
+                                                        "size": 20,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\lock"
+                                                    },
+                                                    {
+                                                        "name": "active_address_lifetime_timers",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\active_address_lifetime_timers"
+                                                    },
+                                                    {
+                                                        "name": "address_lifetime_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\address_lifetime_timer"
+                                                    },
+                                                    {
+                                                        "name": "active_router_timers",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\active_router_timers"
+                                                    },
+                                                    {
+                                                        "name": "router_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\router_timer"
+                                                    },
+                                                    {
+                                                        "name": "active_dad_timers",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\active_dad_timers"
+                                                    },
+                                                    {
+                                                        "name": "dad_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\dad_timer"
+                                                    },
+                                                    {
+                                                        "name": "default_iface",
+                                                        "size": 4,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\default_iface"
+                                                    },
+                                                    {
+                                                        "name": "mcast_monitor_callbacks",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\mcast_monitor_callbacks"
+                                                    },
+                                                    {
+                                                        "name": "ipv6_addresses",
+                                                        "size": 276,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\ipv6_addresses"
+                                                    },
+                                                    {
+                                                        "name": "active_rs_timers",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\active_rs_timers"
+                                                    },
+                                                    {
+                                                        "name": "rs_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\rs_timer"
+                                                    },
+                                                    {
+                                                        "name": "active_prefix_lifetime_timers",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\active_prefix_lifetime_timers"
+                                                    },
+                                                    {
+                                                        "name": "prefix_lifetime_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\prefix_lifetime_timer"
+                                                    },
+                                                    {
+                                                        "name": "routers",
+                                                        "size": 36,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\routers"
+                                                    },
+                                                    {
+                                                        "name": "link_callbacks",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_if.c\\link_callbacks"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "icmp.c",
+                                                "size": 28,
+                                                "identifier": "subsys\\net\\ip\\icmp.c",
+                                                "children": [
+                                                    {
+                                                        "name": "lock",
+                                                        "size": 20,
+                                                        "identifier": "subsys\\net\\ip\\icmp.c\\lock"
+                                                    },
+                                                    {
+                                                        "name": "handlers",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\icmp.c\\handlers"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "route.c",
+                                                "size": 896,
+                                                "identifier": "subsys\\net\\ip\\route.c",
+                                                "children": [
+                                                    {
+                                                        "name": "lock",
+                                                        "size": 20,
+                                                        "identifier": "subsys\\net\\ip\\route.c\\lock"
+                                                    },
+                                                    {
+                                                        "name": "net_nbr_routes",
+                                                        "size": 12,
+                                                        "identifier": "subsys\\net\\ip\\route.c\\net_nbr_routes"
+                                                    },
+                                                    {
+                                                        "name": "routes",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\route.c\\routes"
+                                                    },
+                                                    {
+                                                        "name": "active_route_lifetime_timers",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\route.c\\active_route_lifetime_timers"
+                                                    },
+                                                    {
+                                                        "name": "route_lifetime_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\route.c\\route_lifetime_timer"
+                                                    },
+                                                    {
+                                                        "name": "net_route_entries_pool",
+                                                        "size": 576,
+                                                        "identifier": "subsys\\net\\ip\\route.c\\net_route_entries_pool"
+                                                    },
+                                                    {
+                                                        "name": "net_route_nexthop_pool",
+                                                        "size": 224,
+                                                        "identifier": "subsys\\net\\ip\\route.c\\net_route_nexthop_pool"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "net_context.c",
+                                                "size": 1008,
+                                                "identifier": "subsys\\net\\ip\\net_context.c",
+                                                "children": [
+                                                    {
+                                                        "name": "contexts",
+                                                        "size": 984,
+                                                        "identifier": "subsys\\net\\ip\\net_context.c\\contexts"
+                                                    },
+                                                    {
+                                                        "name": "contexts_lock",
+                                                        "size": 24,
+                                                        "identifier": "subsys\\net\\ip\\net_context.c\\contexts_lock"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "net_pkt.c",
+                                                "size": 5416,
+                                                "identifier": "subsys\\net\\ip\\net_pkt.c",
+                                                "children": [
+                                                    {
+                                                        "name": "rx_bufs",
+                                                        "size": 52,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\rx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "tx_bufs",
+                                                        "size": 52,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\tx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "net_buf_fixed_alloc_tx_bufs",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\net_buf_fixed_alloc_tx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "_net_buf_tx_bufs",
+                                                        "size": 448,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\_net_buf_tx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "net_buf_fixed_tx_bufs",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\net_buf_fixed_tx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "net_buf_data_tx_bufs",
+                                                        "size": 2048,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\net_buf_data_tx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "net_buf_fixed_alloc_rx_bufs",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\net_buf_fixed_alloc_rx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "_net_buf_rx_bufs",
+                                                        "size": 448,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\_net_buf_rx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "net_buf_fixed_rx_bufs",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\net_buf_fixed_rx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "net_buf_data_rx_bufs",
+                                                        "size": 2048,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\net_buf_data_rx_bufs"
+                                                    },
+                                                    {
+                                                        "name": "_k_mem_slab_buf_tx_pkts",
+                                                        "size": 256,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\_k_mem_slab_buf_tx_pkts"
+                                                    },
+                                                    {
+                                                        "name": "tx_pkts",
+                                                        "size": 32,
+                                                        "identifier": "subsys\\net\\ip\\net_pkt.c\\tx_pkts"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "net_tc.c",
+                                                "size": 1712,
+                                                "identifier": "subsys\\net\\ip\\net_tc.c",
+                                                "children": [
+                                                    {
+                                                        "name": "rx_classes",
+                                                        "size": 208,
+                                                        "identifier": "subsys\\net\\ip\\net_tc.c\\rx_classes"
+                                                    },
+                                                    {
+                                                        "name": "rx_stack",
+                                                        "size": 1504,
+                                                        "identifier": "subsys\\net\\ip\\net_tc.c\\rx_stack"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "connection.c",
+                                                "size": 324,
+                                                "identifier": "subsys\\net\\ip\\connection.c",
+                                                "children": [
+                                                    {
+                                                        "name": "conn_lock",
+                                                        "size": 20,
+                                                        "identifier": "subsys\\net\\ip\\connection.c\\conn_lock"
+                                                    },
+                                                    {
+                                                        "name": "conn_unused",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\connection.c\\conn_unused"
+                                                    },
+                                                    {
+                                                        "name": "conn_used",
+                                                        "size": 8,
+                                                        "identifier": "subsys\\net\\ip\\connection.c\\conn_used"
+                                                    },
+                                                    {
+                                                        "name": "conns",
+                                                        "size": 288,
+                                                        "identifier": "subsys\\net\\ip\\connection.c\\conns"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "ipv6_nbr.c",
+                                                "size": 868,
+                                                "identifier": "subsys\\net\\ip\\ipv6_nbr.c",
+                                                "children": [
+                                                    {
+                                                        "name": "ipv6_nd_reachable_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\ipv6_nd_reachable_timer"
+                                                    },
+                                                    {
+                                                        "name": "ipv6_ns_reply_timer",
+                                                        "size": 48,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\ipv6_ns_reply_timer"
+                                                    },
+                                                    {
+                                                        "name": "stale_counter",
+                                                        "size": 4,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\stale_counter"
+                                                    },
+                                                    {
+                                                        "name": "nbr_lock",
+                                                        "size": 24,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\nbr_lock"
+                                                    },
+                                                    {
+                                                        "name": "ns_ctx",
+                                                        "size": 20,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\ns_ctx"
+                                                    },
+                                                    {
+                                                        "name": "na_ctx",
+                                                        "size": 20,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\na_ctx"
+                                                    },
+                                                    {
+                                                        "name": "ra_ctx",
+                                                        "size": 20,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\ra_ctx"
+                                                    },
+                                                    {
+                                                        "name": "net_neighbor",
+                                                        "size": 12,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\net_neighbor"
+                                                    },
+                                                    {
+                                                        "name": "net_neighbor_pool",
+                                                        "size": 672,
+                                                        "identifier": "subsys\\net\\ip\\ipv6_nbr.c\\net_neighbor_pool"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "nbr.c",
+                                                "size": 72,
+                                                "identifier": "subsys\\net\\ip\\nbr.c",
+                                                "children": [
+                                                    {
+                                                        "name": "net_neighbor_lladdr",
+                                                        "size": 72,
+                                                        "identifier": "subsys\\net\\ip\\nbr.c\\net_neighbor_lladdr"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "lib",
+                                        "size": 1179,
+                                        "identifier": "subsys\\net\\lib",
+                                        "children": [
+                                            {
+                                                "name": "dns",
+                                                "size": 1111,
+                                                "identifier": "subsys\\net\\lib\\dns",
+                                                "children": [
+                                                    {
+                                                        "name": "resolve.c",
+                                                        "size": 1111,
+                                                        "identifier": "subsys\\net\\lib\\dns\\resolve.c",
+                                                        "children": [
+                                                            {
+                                                                "name": "dns_msg_pool",
+                                                                "size": 52,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\dns_msg_pool"
+                                                            },
+                                                            {
+                                                                "name": "dns_qname_pool",
+                                                                "size": 52,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\dns_qname_pool"
+                                                            },
+                                                            {
+                                                                "name": "dns_default_ctx",
+                                                                "size": 160,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\dns_default_ctx"
+                                                            },
+                                                            {
+                                                                "name": "net_buf_fixed_alloc_dns_qname_pool",
+                                                                "size": 8,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\net_buf_fixed_alloc_dns_qname_pool"
+                                                            },
+                                                            {
+                                                                "name": "_net_buf_dns_qname_pool",
+                                                                "size": 24,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\_net_buf_dns_qname_pool"
+                                                            },
+                                                            {
+                                                                "name": "net_buf_fixed_dns_qname_pool",
+                                                                "size": 8,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\net_buf_fixed_dns_qname_pool"
+                                                            },
+                                                            {
+                                                                "name": "net_buf_data_dns_qname_pool",
+                                                                "size": 255,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\net_buf_data_dns_qname_pool"
+                                                            },
+                                                            {
+                                                                "name": "net_buf_fixed_alloc_dns_msg_pool",
+                                                                "size": 8,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\net_buf_fixed_alloc_dns_msg_pool"
+                                                            },
+                                                            {
+                                                                "name": "_net_buf_dns_msg_pool",
+                                                                "size": 24,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\_net_buf_dns_msg_pool"
+                                                            },
+                                                            {
+                                                                "name": "net_buf_fixed_dns_msg_pool",
+                                                                "size": 8,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\net_buf_fixed_dns_msg_pool"
+                                                            },
+                                                            {
+                                                                "name": "net_buf_data_dns_msg_pool",
+                                                                "size": 512,
+                                                                "identifier": "subsys\\net\\lib\\dns\\resolve.c\\net_buf_data_dns_msg_pool"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "sockets",
+                                                "size": 68,
+                                                "identifier": "subsys\\net\\lib\\sockets",
+                                                "children": [
+                                                    {
+                                                        "name": "sockets.c",
+                                                        "size": 64,
+                                                        "identifier": "subsys\\net\\lib\\sockets\\sockets.c",
+                                                        "children": [
+                                                            {
+                                                                "name": "sock_fd_op_vtable",
+                                                                "size": 64,
+                                                                "identifier": "subsys\\net\\lib\\sockets\\sockets.c\\sock_fd_op_vtable"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "name": "socket_offload.c",
+                                                        "size": 4,
+                                                        "identifier": "subsys\\net\\lib\\sockets\\socket_offload.c",
+                                                        "children": [
+                                                            {
+                                                                "name": "dns_offload",
+                                                                "size": 4,
+                                                                "identifier": "subsys\\net\\lib\\sockets\\socket_offload.c\\dns_offload"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "arch",
+                        "size": 69,
+                        "identifier": "arch",
+                        "children": [
+                            {
+                                "name": "arm",
+                                "size": 69,
+                                "identifier": "arch\\arm",
+                                "children": [
+                                    {
+                                        "name": "core",
+                                        "size": 69,
+                                        "identifier": "arch\\arm\\core",
+                                        "children": [
+                                            {
+                                                "name": "mpu",
+                                                "size": 65,
+                                                "identifier": "arch\\arm\\core\\mpu",
+                                                "children": [
+                                                    {
+                                                        "name": "arm_core_mpu.c",
+                                                        "size": 12,
+                                                        "identifier": "arch\\arm\\core\\mpu\\arm_core_mpu.c",
+                                                        "children": [
+                                                            {
+                                                                "name": "static_regions",
+                                                                "size": 12,
+                                                                "identifier": "arch\\arm\\core\\mpu\\arm_core_mpu.c\\static_regions"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "name": "arm_mpu.c",
+                                                        "size": 1,
+                                                        "identifier": "arch\\arm\\core\\mpu\\arm_mpu.c",
+                                                        "children": [
+                                                            {
+                                                                "name": "static_regions_num",
+                                                                "size": 1,
+                                                                "identifier": "arch\\arm\\core\\mpu\\arm_mpu.c\\static_regions_num"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "name": "arm_mpu_v8_internal.h",
+                                                        "size": 20,
+                                                        "identifier": "arch\\arm\\core\\mpu\\arm_mpu_v8_internal.h",
+                                                        "children": [
+                                                            {
+                                                                "name": "dyn_reg_info",
+                                                                "size": 20,
+                                                                "identifier": "arch\\arm\\core\\mpu\\arm_mpu_v8_internal.h\\dyn_reg_info"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "name": "arm_mpu_regions.c",
+                                                        "size": 32,
+                                                        "identifier": "arch\\arm\\core\\mpu\\arm_mpu_regions.c",
+                                                        "children": [
+                                                            {
+                                                                "name": "mpu_regions",
+                                                                "size": 32,
+                                                                "identifier": "arch\\arm\\core\\mpu\\arm_mpu_regions.c\\mpu_regions"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "tls.c",
+                                                "size": 4,
+                                                "identifier": "arch\\arm\\core\\tls.c",
+                                                "children": [
+                                                    {
+                                                        "name": "z_arm_tls_ptr",
+                                                        "size": 4,
+                                                        "identifier": "arch\\arm\\core\\tls.c\\z_arm_tls_ptr"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "kernel",
+                        "size": 3642,
+                        "identifier": "kernel",
+                        "children": [
+                            {
+                                "name": "mutex.c",
+                                "size": 4,
+                                "identifier": "kernel\\mutex.c",
+                                "children": [
+                                    {
+                                        "name": "lock",
+                                        "size": 4,
+                                        "identifier": "kernel\\mutex.c\\lock"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "sem.c",
+                                "size": 4,
+                                "identifier": "kernel\\sem.c",
+                                "children": [
+                                    {
+                                        "name": "lock",
+                                        "size": 4,
+                                        "identifier": "kernel\\sem.c\\lock"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "work.c",
+                                "size": 12,
+                                "identifier": "kernel\\work.c",
+                                "children": [
+                                    {
+                                        "name": "lock",
+                                        "size": 4,
+                                        "identifier": "kernel\\work.c\\lock"
+                                    },
+                                    {
+                                        "name": "pending_cancels",
+                                        "size": 8,
+                                        "identifier": "kernel\\work.c\\pending_cancels"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "condvar.c",
+                                "size": 4,
+                                "identifier": "kernel\\condvar.c",
+                                "children": [
+                                    {
+                                        "name": "lock",
+                                        "size": 4,
+                                        "identifier": "kernel\\condvar.c\\lock"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "timer.c",
+                                "size": 4,
+                                "identifier": "kernel\\timer.c",
+                                "children": [
+                                    {
+                                        "name": "lock",
+                                        "size": 4,
+                                        "identifier": "kernel\\timer.c\\lock"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "poll.c",
+                                "size": 4,
+                                "identifier": "kernel\\poll.c",
+                                "children": [
+                                    {
+                                        "name": "lock",
+                                        "size": 4,
+                                        "identifier": "kernel\\poll.c\\lock"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "init.c",
+                                "size": 1857,
+                                "identifier": "kernel\\init.c",
+                                "children": [
+                                    {
+                                        "name": "z_idle_stacks",
+                                        "size": 320,
+                                        "identifier": "kernel\\init.c\\z_idle_stacks"
+                                    },
+                                    {
+                                        "name": "z_main_stack",
+                                        "size": 1536,
+                                        "identifier": "kernel\\init.c\\z_main_stack"
+                                    },
+                                    {
+                                        "name": "z_sys_post_kernel",
+                                        "size": 1,
+                                        "identifier": "kernel\\init.c\\z_sys_post_kernel"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "sched.c",
+                                "size": 37,
+                                "identifier": "kernel\\sched.c",
+                                "children": [
+                                    {
+                                        "name": "slice_ticks",
+                                        "size": 4,
+                                        "identifier": "kernel\\sched.c\\slice_ticks"
+                                    },
+                                    {
+                                        "name": "slice_max_prio",
+                                        "size": 4,
+                                        "identifier": "kernel\\sched.c\\slice_max_prio"
+                                    },
+                                    {
+                                        "name": "slice_timeouts",
+                                        "size": 24,
+                                        "identifier": "kernel\\sched.c\\slice_timeouts"
+                                    },
+                                    {
+                                        "name": "slice_expired",
+                                        "size": 1,
+                                        "identifier": "kernel\\sched.c\\slice_expired"
+                                    },
+                                    {
+                                        "name": "pending_current",
+                                        "size": 4,
+                                        "identifier": "kernel\\sched.c\\pending_current"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "timeout.c",
+                                "size": 24,
+                                "identifier": "kernel\\timeout.c",
+                                "children": [
+                                    {
+                                        "name": "announce_remaining",
+                                        "size": 4,
+                                        "identifier": "kernel\\timeout.c\\announce_remaining"
+                                    },
+                                    {
+                                        "name": "timeout_list",
+                                        "size": 8,
+                                        "identifier": "kernel\\timeout.c\\timeout_list"
+                                    },
+                                    {
+                                        "name": "timeout_lock",
+                                        "size": 4,
+                                        "identifier": "kernel\\timeout.c\\timeout_lock"
+                                    },
+                                    {
+                                        "name": "curr_tick",
+                                        "size": 8,
+                                        "identifier": "kernel\\timeout.c\\curr_tick"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "system_work_q.c",
+                                "size": 1152,
+                                "identifier": "kernel\\system_work_q.c",
+                                "children": [
+                                    {
+                                        "name": "sys_work_q_stack",
+                                        "size": 1152,
+                                        "identifier": "kernel\\system_work_q.c\\sys_work_q_stack"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "compiler_stack_protect.c",
+                                "size": 4,
+                                "identifier": "kernel\\compiler_stack_protect.c",
+                                "children": [
+                                    {
+                                        "name": "__stack_chk_guard",
+                                        "size": 4,
+                                        "identifier": "kernel\\compiler_stack_protect.c\\__stack_chk_guard"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "mempool.c",
+                                "size": 536,
+                                "identifier": "kernel\\mempool.c",
+                                "children": [
+                                    {
+                                        "name": "kheap__system_heap",
+                                        "size": 512,
+                                        "identifier": "kernel\\mempool.c\\kheap__system_heap"
+                                    },
+                                    {
+                                        "name": "_system_heap",
+                                        "size": 24,
+                                        "identifier": "kernel\\mempool.c\\_system_heap"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "drivers",
+                        "size": 552,
+                        "identifier": "drivers",
+                        "children": [
+                            {
+                                "name": "adc",
+                                "size": 182,
+                                "identifier": "drivers\\adc",
+                                "children": [
+                                    {
+                                        "name": "adc_nrfx_saadc.c",
+                                        "size": 182,
+                                        "identifier": "drivers\\adc\\adc_nrfx_saadc.c",
+                                        "children": [
+                                            {
+                                                "name": "m_data",
+                                                "size": 168,
+                                                "identifier": "drivers\\adc\\adc_nrfx_saadc.c\\m_data"
+                                            },
+                                            {
+                                                "name": "adc_nrfx_driver_api",
+                                                "size": 12,
+                                                "identifier": "drivers\\adc\\adc_nrfx_saadc.c\\adc_nrfx_driver_api"
+                                            },
+                                            {
+                                                "name": "__devstate_dts_ord_15",
+                                                "size": 2,
+                                                "identifier": "drivers\\adc\\adc_nrfx_saadc.c\\__devstate_dts_ord_15"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "clock_control",
+                                "size": 146,
+                                "identifier": "drivers\\clock_control",
+                                "children": [
+                                    {
+                                        "name": "clock_control_nrf.c",
+                                        "size": 146,
+                                        "identifier": "drivers\\clock_control\\clock_control_nrf.c",
+                                        "children": [
+                                            {
+                                                "name": "data",
+                                                "size": 88,
+                                                "identifier": "drivers\\clock_control\\clock_control_nrf.c\\data"
+                                            },
+                                            {
+                                                "name": "hfclk_users",
+                                                "size": 4,
+                                                "identifier": "drivers\\clock_control\\clock_control_nrf.c\\hfclk_users"
+                                            },
+                                            {
+                                                "name": "config",
+                                                "size": 24,
+                                                "identifier": "drivers\\clock_control\\clock_control_nrf.c\\config"
+                                            },
+                                            {
+                                                "name": "clock_control_api",
+                                                "size": 28,
+                                                "identifier": "drivers\\clock_control\\clock_control_nrf.c\\clock_control_api"
+                                            },
+                                            {
+                                                "name": "__devstate_dts_ord_62",
+                                                "size": 2,
+                                                "identifier": "drivers\\clock_control\\clock_control_nrf.c\\__devstate_dts_ord_62"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "entropy",
+                                "size": 10,
+                                "identifier": "drivers\\entropy",
+                                "children": [
+                                    {
+                                        "name": "entropy_psa_crypto.c",
+                                        "size": 10,
+                                        "identifier": "drivers\\entropy\\entropy_psa_crypto.c",
+                                        "children": [
+                                            {
+                                                "name": "entropy_psa_crypto_rng_api",
+                                                "size": 8,
+                                                "identifier": "drivers\\entropy\\entropy_psa_crypto.c\\entropy_psa_crypto_rng_api"
+                                            },
+                                            {
+                                                "name": "__devstate_dts_ord_12",
+                                                "size": 2,
+                                                "identifier": "drivers\\entropy\\entropy_psa_crypto.c\\__devstate_dts_ord_12"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "gpio",
+                                "size": 74,
+                                "identifier": "drivers\\gpio",
+                                "children": [
+                                    {
+                                        "name": "gpio_nrfx.c",
+                                        "size": 74,
+                                        "identifier": "drivers\\gpio\\gpio_nrfx.c",
+                                        "children": [
+                                            {
+                                                "name": "gpio_nrfx_p0_data",
+                                                "size": 12,
+                                                "identifier": "drivers\\gpio\\gpio_nrfx.c\\gpio_nrfx_p0_data"
+                                            },
+                                            {
+                                                "name": "gpio_nrfx_p0_cfg",
+                                                "size": 24,
+                                                "identifier": "drivers\\gpio\\gpio_nrfx.c\\gpio_nrfx_p0_cfg"
+                                            },
+                                            {
+                                                "name": "gpio_nrfx_drv_api_funcs",
+                                                "size": 36,
+                                                "identifier": "drivers\\gpio\\gpio_nrfx.c\\gpio_nrfx_drv_api_funcs"
+                                            },
+                                            {
+                                                "name": "__devstate_dts_ord_10",
+                                                "size": 2,
+                                                "identifier": "drivers\\gpio\\gpio_nrfx.c\\__devstate_dts_ord_10"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "pinctrl",
+                                "size": 8,
+                                "identifier": "drivers\\pinctrl",
+                                "children": [
+                                    {
+                                        "name": "pinctrl_nrf.c",
+                                        "size": 8,
+                                        "identifier": "drivers\\pinctrl\\pinctrl_nrf.c",
+                                        "children": [
+                                            {
+                                                "name": "drive_modes",
+                                                "size": 8,
+                                                "identifier": "drivers\\pinctrl\\pinctrl_nrf.c\\drive_modes"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "serial",
+                                "size": 88,
+                                "identifier": "drivers\\serial",
+                                "children": [
+                                    {
+                                        "name": "uart_nrfx_uarte.c",
+                                        "size": 88,
+                                        "identifier": "drivers\\serial\\uart_nrfx_uarte.c",
+                                        "children": [
+                                            {
+                                                "name": "uarte_0z_config",
+                                                "size": 16,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\uarte_0z_config"
+                                            },
+                                            {
+                                                "name": "uart_nrfx_uarte_driver_api",
+                                                "size": 12,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\uart_nrfx_uarte_driver_api"
+                                            },
+                                            {
+                                                "name": "__devstate_dts_ord_88",
+                                                "size": 2,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\__devstate_dts_ord_88"
+                                            },
+                                            {
+                                                "name": "uarte_0_data",
+                                                "size": 28,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\uarte_0_data"
+                                            },
+                                            {
+                                                "name": "__pinctrl_dev_config__device_dts_ord_88",
+                                                "size": 12,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\__pinctrl_dev_config__device_dts_ord_88"
+                                            },
+                                            {
+                                                "name": "uarte0_char_out",
+                                                "size": 1,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\uarte0_char_out"
+                                            },
+                                            {
+                                                "name": "uarte0_rx_data",
+                                                "size": 1,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\uarte0_rx_data"
+                                            },
+                                            {
+                                                "name": "__pinctrl_states__device_dts_ord_88",
+                                                "size": 8,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\__pinctrl_states__device_dts_ord_88"
+                                            },
+                                            {
+                                                "name": "__pinctrl_state_pins_0__device_dts_ord_88",
+                                                "size": 8,
+                                                "identifier": "drivers\\serial\\uart_nrfx_uarte.c\\__pinctrl_state_pins_0__device_dts_ord_88"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "timer",
+                                "size": 44,
+                                "identifier": "drivers\\timer",
+                                "children": [
+                                    {
+                                        "name": "nrf_rtc_timer.c",
+                                        "size": 44,
+                                        "identifier": "drivers\\timer\\nrf_rtc_timer.c",
+                                        "children": [
+                                            {
+                                                "name": "last_count",
+                                                "size": 8,
+                                                "identifier": "drivers\\timer\\nrf_rtc_timer.c\\last_count"
+                                            },
+                                            {
+                                                "name": "overflow_cnt",
+                                                "size": 4,
+                                                "identifier": "drivers\\timer\\nrf_rtc_timer.c\\overflow_cnt"
+                                            },
+                                            {
+                                                "name": "anchor",
+                                                "size": 8,
+                                                "identifier": "drivers\\timer\\nrf_rtc_timer.c\\anchor"
+                                            },
+                                            {
+                                                "name": "force_isr_mask",
+                                                "size": 4,
+                                                "identifier": "drivers\\timer\\nrf_rtc_timer.c\\force_isr_mask"
+                                            },
+                                            {
+                                                "name": "cc_data",
+                                                "size": 16,
+                                                "identifier": "drivers\\timer\\nrf_rtc_timer.c\\cc_data"
+                                            },
+                                            {
+                                                "name": "int_mask",
+                                                "size": 4,
+                                                "identifier": "drivers\\timer\\nrf_rtc_timer.c\\int_mask"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "modules",
+                        "size": 20,
+                        "identifier": "modules",
+                        "children": [
+                            {
+                                "name": "trusted-firmware-m",
+                                "size": 20,
+                                "identifier": "modules\\trusted-firmware-m",
+                                "children": [
+                                    {
+                                        "name": "interface",
+                                        "size": 20,
+                                        "identifier": "modules\\trusted-firmware-m\\interface",
+                                        "children": [
+                                            {
+                                                "name": "interface.c",
+                                                "size": 20,
+                                                "identifier": "modules\\trusted-firmware-m\\interface\\interface.c",
+                                                "children": [
+                                                    {
+                                                        "name": "tfm_mutex",
+                                                        "size": 20,
+                                                        "identifier": "modules\\trusted-firmware-m\\interface\\interface.c\\tfm_mutex"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "/",
+                "size": 0,
+                "identifier": "/",
+                "children": [
+                    {
+                        "name": "C:\\",
+                        "size": 102,
+                        "identifier": "C:\\",
+                        "children": [
+                            {
+                                "name": "ADWITECH",
+                                "size": 102,
+                                "identifier": "C:\\ADWITECH",
+                                "children": [
+                                    {
+                                        "name": "nRF9160_Examples",
+                                        "size": 102,
+                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples",
+                                        "children": [
+                                            {
+                                                "name": "sms2",
+                                                "size": 102,
+                                                "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2",
+                                                "children": [
+                                                    {
+                                                        "name": "src",
+                                                        "size": 102,
+                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src",
+                                                        "children": [
+                                                            {
+                                                                "name": "main.c",
+                                                                "size": 102,
+                                                                "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c",
+                                                                "children": [
+                                                                    {
+                                                                        "name": "channel_cfg_1",
+                                                                        "size": 8,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\channel_cfg_1"
+                                                                    },
+                                                                    {
+                                                                        "name": "channel_cfg_2",
+                                                                        "size": 8,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\channel_cfg_2"
+                                                                    },
+                                                                    {
+                                                                        "name": "channel_cfg_3",
+                                                                        "size": 8,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\channel_cfg_3"
+                                                                    },
+                                                                    {
+                                                                        "name": "channel_cfg_4",
+                                                                        "size": 8,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\channel_cfg_4"
+                                                                    },
+                                                                    {
+                                                                        "name": "sequence",
+                                                                        "size": 20,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\sequence"
+                                                                    },
+                                                                    {
+                                                                        "name": "sample_buffer",
+                                                                        "size": 8,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\sample_buffer"
+                                                                    },
+                                                                    {
+                                                                        "name": "buffer",
+                                                                        "size": 40,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\buffer"
+                                                                    },
+                                                                    {
+                                                                        "name": "index",
+                                                                        "size": 1,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\index"
+                                                                    },
+                                                                    {
+                                                                        "name": "ADC_SAMPLE_FLAG",
+                                                                        "size": 1,
+                                                                        "identifier": "C:\\ADWITECH\\nRF9160_Examples\\sms2\\src\\main.c\\ADC_SAMPLE_FLAG"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "WORKSPACE",
+                "size": 2403,
+                "identifier": "C:/ncs/v2.6.0",
+                "children": [
+                    {
+                        "name": "nrf",
+                        "size": 2167,
+                        "identifier": "nrf",
+                        "children": [
+                            {
+                                "name": "lib",
+                                "size": 2051,
+                                "identifier": "nrf\\lib",
+                                "children": [
+                                    {
+                                        "name": "lte_link_control",
+                                        "size": 360,
+                                        "identifier": "nrf\\lib\\lte_link_control",
+                                        "children": [
+                                            {
+                                                "name": "lte_lc_helpers.c",
+                                                "size": 92,
+                                                "identifier": "nrf\\lib\\lte_link_control\\lte_lc_helpers.c",
+                                                "children": [
+                                                    {
+                                                        "name": "list_mtx",
+                                                        "size": 20,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc_helpers.c\\list_mtx"
+                                                    },
+                                                    {
+                                                        "name": "handler_list",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc_helpers.c\\handler_list"
+                                                    },
+                                                    {
+                                                        "name": "t3412_ext_lookup",
+                                                        "size": 32,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc_helpers.c\\t3412_ext_lookup"
+                                                    },
+                                                    {
+                                                        "name": "t3324_lookup",
+                                                        "size": 32,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc_helpers.c\\t3324_lookup"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "lte_lc.c",
+                                                "size": 244,
+                                                "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c",
+                                                "children": [
+                                                    {
+                                                        "name": "ncellmeas_params",
+                                                        "size": 2,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ncellmeas_params"
+                                                    },
+                                                    {
+                                                        "name": "cscon",
+                                                        "size": 11,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\cscon"
+                                                    },
+                                                    {
+                                                        "name": "psm_param_rptau",
+                                                        "size": 9,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\psm_param_rptau"
+                                                    },
+                                                    {
+                                                        "name": "psm_param_rat",
+                                                        "size": 9,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\psm_param_rat"
+                                                    },
+                                                    {
+                                                        "name": "psm_disable",
+                                                        "size": 10,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\psm_disable"
+                                                    },
+                                                    {
+                                                        "name": "link",
+                                                        "size": 24,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\link"
+                                                    },
+                                                    {
+                                                        "name": "edrx_param_ltem",
+                                                        "size": 5,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\edrx_param_ltem"
+                                                    },
+                                                    {
+                                                        "name": "edrx_param_nbiot",
+                                                        "size": 5,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\edrx_param_nbiot"
+                                                    },
+                                                    {
+                                                        "name": "ptw_param_ltem",
+                                                        "size": 5,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ptw_param_ltem"
+                                                    },
+                                                    {
+                                                        "name": "ptw_param_nbiot",
+                                                        "size": 5,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ptw_param_nbiot"
+                                                    },
+                                                    {
+                                                        "name": "edrx_disable",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\edrx_disable"
+                                                    },
+                                                    {
+                                                        "name": "system_mode_preference",
+                                                        "size": 5,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\system_mode_preference"
+                                                    },
+                                                    {
+                                                        "name": "system_mode_params",
+                                                        "size": 32,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\system_mode_params"
+                                                    },
+                                                    {
+                                                        "name": "ltelc_atmon_mdmev",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ltelc_atmon_mdmev"
+                                                    },
+                                                    {
+                                                        "name": "ltelc_atmon_xmodemsleep",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ltelc_atmon_xmodemsleep"
+                                                    },
+                                                    {
+                                                        "name": "ltelc_atmon_ncellmeas",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ltelc_atmon_ncellmeas"
+                                                    },
+                                                    {
+                                                        "name": "ltelc_atmon_xt3412",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ltelc_atmon_xt3412"
+                                                    },
+                                                    {
+                                                        "name": "ltelc_atmon_cedrxp",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ltelc_atmon_cedrxp"
+                                                    },
+                                                    {
+                                                        "name": "ltelc_atmon_cscon",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ltelc_atmon_cscon"
+                                                    },
+                                                    {
+                                                        "name": "ltelc_atmon_cereg",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ltelc_atmon_cereg"
+                                                    },
+                                                    {
+                                                        "name": "lte_lc_sys_mode_pref",
+                                                        "size": 1,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\lte_lc_sys_mode_pref"
+                                                    },
+                                                    {
+                                                        "name": "lte_lc_sys_mode",
+                                                        "size": 1,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\lte_lc_sys_mode"
+                                                    },
+                                                    {
+                                                        "name": "ncellmeas_idle_sem",
+                                                        "size": 24,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc.c\\ncellmeas_idle_sem"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "lte_lc_modem_hooks.c",
+                                                "size": 24,
+                                                "identifier": "nrf\\lib\\lte_link_control\\lte_lc_modem_hooks.c",
+                                                "children": [
+                                                    {
+                                                        "name": "nrf_modem_hook_lte_lc_shutdown_hook",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc_modem_hooks.c\\nrf_modem_hook_lte_lc_shutdown_hook"
+                                                    },
+                                                    {
+                                                        "name": "nrf_modem_hook_lte_lc_init_hook",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc_modem_hooks.c\\nrf_modem_hook_lte_lc_init_hook"
+                                                    },
+                                                    {
+                                                        "name": "nrf_modem_at_cfun_hook_lte_lc_cfun_hook",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\lte_link_control\\lte_lc_modem_hooks.c\\nrf_modem_at_cfun_hook_lte_lc_cfun_hook"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "nrf_modem_lib",
+                                        "size": 728,
+                                        "identifier": "nrf\\lib\\nrf_modem_lib",
+                                        "children": [
+                                            {
+                                                "name": "nrf_modem_os.c",
+                                                "size": 328,
+                                                "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c",
+                                                "children": [
+                                                    {
+                                                        "name": "rpc_event_cnt",
+                                                        "size": 4,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c\\rpc_event_cnt"
+                                                    },
+                                                    {
+                                                        "name": "thread_event_monitor",
+                                                        "size": 80,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c\\thread_event_monitor"
+                                                    },
+                                                    {
+                                                        "name": "sleeping_threads",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c\\sleeping_threads"
+                                                    },
+                                                    {
+                                                        "name": "nrf_modem_os_sems",
+                                                        "size": 168,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c\\nrf_modem_os_sems"
+                                                    },
+                                                    {
+                                                        "name": "nrf_modem_os_mutexes",
+                                                        "size": 20,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c\\nrf_modem_os_mutexes"
+                                                    },
+                                                    {
+                                                        "name": "nrf_modem_lib_shmem_heap",
+                                                        "size": 24,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c\\nrf_modem_lib_shmem_heap"
+                                                    },
+                                                    {
+                                                        "name": "nrf_modem_lib_heap",
+                                                        "size": 24,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf_modem_os.c\\nrf_modem_lib_heap"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "nrf91_sockets.c",
+                                                "size": 400,
+                                                "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c",
+                                                "children": [
+                                                    {
+                                                        "name": "offload_ctx",
+                                                        "size": 192,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\offload_ctx"
+                                                    },
+                                                    {
+                                                        "name": "offload_disabled",
+                                                        "size": 1,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\offload_disabled"
+                                                    },
+                                                    {
+                                                        "name": "tls_offload_disabled",
+                                                        "size": 1,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\tls_offload_disabled"
+                                                    },
+                                                    {
+                                                        "name": "ctx_lock",
+                                                        "size": 20,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\ctx_lock"
+                                                    },
+                                                    {
+                                                        "name": "nrf91_socket_fd_op_vtable",
+                                                        "size": 64,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\nrf91_socket_fd_op_vtable"
+                                                    },
+                                                    {
+                                                        "name": "nrf91_iface_data",
+                                                        "size": 4,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\nrf91_iface_data"
+                                                    },
+                                                    {
+                                                        "name": "nrf91_socket_dns_offload_ops",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\nrf91_socket_dns_offload_ops"
+                                                    },
+                                                    {
+                                                        "name": "__net_if_nrf91_socket_0",
+                                                        "size": 60,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\__net_if_nrf91_socket_0"
+                                                    },
+                                                    {
+                                                        "name": "__net_if_dev_nrf91_socket_0",
+                                                        "size": 36,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\__net_if_dev_nrf91_socket_0"
+                                                    },
+                                                    {
+                                                        "name": "nrf91_iface_offload_api",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\nrf91_iface_offload_api"
+                                                    },
+                                                    {
+                                                        "name": "__devstate_nrf91_socket",
+                                                        "size": 2,
+                                                        "identifier": "nrf\\lib\\nrf_modem_lib\\nrf91_sockets.c\\__devstate_nrf91_socket"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "at_monitor",
+                                        "size": 324,
+                                        "identifier": "nrf\\lib\\at_monitor",
+                                        "children": [
+                                            {
+                                                "name": "at_monitor.c",
+                                                "size": 324,
+                                                "identifier": "nrf\\lib\\at_monitor\\at_monitor.c",
+                                                "children": [
+                                                    {
+                                                        "name": "at_monitor_fifo",
+                                                        "size": 28,
+                                                        "identifier": "nrf\\lib\\at_monitor\\at_monitor.c\\at_monitor_fifo"
+                                                    },
+                                                    {
+                                                        "name": "at_monitor_work",
+                                                        "size": 16,
+                                                        "identifier": "nrf\\lib\\at_monitor\\at_monitor.c\\at_monitor_work"
+                                                    },
+                                                    {
+                                                        "name": "kheap_at_monitor_heap",
+                                                        "size": 256,
+                                                        "identifier": "nrf\\lib\\at_monitor\\at_monitor.c\\kheap_at_monitor_heap"
+                                                    },
+                                                    {
+                                                        "name": "at_monitor_heap",
+                                                        "size": 24,
+                                                        "identifier": "nrf\\lib\\at_monitor\\at_monitor.c\\at_monitor_heap"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "at_cmd_parser",
+                                        "size": 2,
+                                        "identifier": "nrf\\lib\\at_cmd_parser",
+                                        "children": [
+                                            {
+                                                "name": "at_cmd_parser.c",
+                                                "size": 2,
+                                                "identifier": "nrf\\lib\\at_cmd_parser\\at_cmd_parser.c",
+                                                "children": [
+                                                    {
+                                                        "name": "state",
+                                                        "size": 1,
+                                                        "identifier": "nrf\\lib\\at_cmd_parser\\at_cmd_parser.c\\state"
+                                                    },
+                                                    {
+                                                        "name": "set_type_string",
+                                                        "size": 1,
+                                                        "identifier": "nrf\\lib\\at_cmd_parser\\at_cmd_parser.c\\set_type_string"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "sms",
+                                        "size": 629,
+                                        "identifier": "nrf\\lib\\sms",
+                                        "children": [
+                                            {
+                                                "name": "sms.c",
+                                                "size": 321,
+                                                "identifier": "nrf\\lib\\sms\\sms.c",
+                                                "children": [
+                                                    {
+                                                        "name": "subscribers",
+                                                        "size": 16,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\subscribers"
+                                                    },
+                                                    {
+                                                        "name": "sms_data_info",
+                                                        "size": 212,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_data_info"
+                                                    },
+                                                    {
+                                                        "name": "sms_notify_work",
+                                                        "size": 16,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_notify_work"
+                                                    },
+                                                    {
+                                                        "name": "sms_ack_work",
+                                                        "size": 16,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_ack_work"
+                                                    },
+                                                    {
+                                                        "name": "sms_reregister_work",
+                                                        "size": 16,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_reregister_work"
+                                                    },
+                                                    {
+                                                        "name": "sms_client_registered",
+                                                        "size": 1,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_client_registered"
+                                                    },
+                                                    {
+                                                        "name": "sms_at_handler_cmt",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_at_handler_cmt"
+                                                    },
+                                                    {
+                                                        "name": "sms_at_handler_cds",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_at_handler_cds"
+                                                    },
+                                                    {
+                                                        "name": "sms_at_handler_cms",
+                                                        "size": 12,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\sms_at_handler_cms"
+                                                    },
+                                                    {
+                                                        "name": "lte_lc_cfun_cb_sms_cfun_hook",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\sms\\sms.c\\lte_lc_cfun_cb_sms_cfun_hook"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "sms_deliver.c",
+                                                "size": 52,
+                                                "identifier": "nrf\\lib\\sms\\sms_deliver.c",
+                                                "children": [
+                                                    {
+                                                        "name": "sms_pdu_deliver_parsers",
+                                                        "size": 32,
+                                                        "identifier": "nrf\\lib\\sms\\sms_deliver.c\\sms_pdu_deliver_parsers"
+                                                    },
+                                                    {
+                                                        "name": "sms_deliver_api",
+                                                        "size": 20,
+                                                        "identifier": "nrf\\lib\\sms\\sms_deliver.c\\sms_deliver_api"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "string_conversion.c",
+                                                "size": 256,
+                                                "identifier": "nrf\\lib\\sms\\string_conversion.c",
+                                                "children": [
+                                                    {
+                                                        "name": "gsm7bit_to_ascii_table",
+                                                        "size": 256,
+                                                        "identifier": "nrf\\lib\\sms\\string_conversion.c\\gsm7bit_to_ascii_table"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "modem_antenna",
+                                        "size": 8,
+                                        "identifier": "nrf\\lib\\modem_antenna",
+                                        "children": [
+                                            {
+                                                "name": "modem_antenna.c",
+                                                "size": 8,
+                                                "identifier": "nrf\\lib\\modem_antenna\\modem_antenna.c",
+                                                "children": [
+                                                    {
+                                                        "name": "nrf_modem_hook_gnss_cfg_init_hook",
+                                                        "size": 8,
+                                                        "identifier": "nrf\\lib\\modem_antenna\\modem_antenna.c\\nrf_modem_hook_gnss_cfg_init_hook"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "modules",
+                                "size": 116,
+                                "identifier": "nrf\\modules",
+                                "children": [
+                                    {
+                                        "name": "trusted-firmware-m",
+                                        "size": 116,
+                                        "identifier": "nrf\\modules\\trusted-firmware-m",
+                                        "children": [
+                                            {
+                                                "name": "fault.c",
+                                                "size": 116,
+                                                "identifier": "nrf\\modules\\trusted-firmware-m\\fault.c",
+                                                "children": [
+                                                    {
+                                                        "name": "g_context",
+                                                        "size": 116,
+                                                        "identifier": "nrf\\modules\\trusted-firmware-m\\fault.c\\g_context"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "modules",
+                        "size": 236,
+                        "identifier": "modules",
+                        "children": [
+                            {
+                                "name": "hal",
+                                "size": 236,
+                                "identifier": "modules\\hal",
+                                "children": [
+                                    {
+                                        "name": "nordic",
+                                        "size": 236,
+                                        "identifier": "modules\\hal\\nordic",
+                                        "children": [
+                                            {
+                                                "name": "nrfx",
+                                                "size": 236,
+                                                "identifier": "modules\\hal\\nordic\\nrfx",
+                                                "children": [
+                                                    {
+                                                        "name": "drivers",
+                                                        "size": 236,
+                                                        "identifier": "modules\\hal\\nordic\\nrfx\\drivers",
+                                                        "children": [
+                                                            {
+                                                                "name": "src",
+                                                                "size": 236,
+                                                                "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src",
+                                                                "children": [
+                                                                    {
+                                                                        "name": "nrfx_clock.c",
+                                                                        "size": 8,
+                                                                        "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_clock.c",
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "m_clock_cb",
+                                                                                "size": 8,
+                                                                                "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_clock.c\\m_clock_cb"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "nrfx_dppi.c",
+                                                                        "size": 4,
+                                                                        "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_dppi.c",
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "m_allocated_channels",
+                                                                                "size": 4,
+                                                                                "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_dppi.c\\m_allocated_channels"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "nrfx_gpiote.c",
+                                                                        "size": 200,
+                                                                        "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_gpiote.c",
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "m_cb",
+                                                                                "size": 200,
+                                                                                "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_gpiote.c\\m_cb"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "nrfx_ipc.c",
+                                                                        "size": 12,
+                                                                        "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_ipc.c",
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "m_cb",
+                                                                                "size": 12,
+                                                                                "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_ipc.c\\m_cb"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "nrfx_timer.c",
+                                                                        "size": 12,
+                                                                        "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_timer.c",
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "m_cb",
+                                                                                "size": 12,
+                                                                                "identifier": "modules\\hal\\nordic\\nrfx\\drivers\\src\\nrfx_timer.c\\m_cb"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "(hidden)",
+                "size": 23731,
+                "identifier": "(hidden)"
+            }
+        ]
+    },
+    "total_size": 54798
+}

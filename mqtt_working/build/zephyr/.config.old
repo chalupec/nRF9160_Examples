@@ -2,8 +2,8 @@
 #
 # Cellfund Lesson 4 Exercise
 #
-CONFIG_MQTT_PUB_TOPIC="devacademy/publish/topic"
-CONFIG_MQTT_SUB_TOPIC="devacademy/subscribe/topic"
+CONFIG_MQTT_PUB_TOPIC="NRF/01/UP_STREAM"
+CONFIG_MQTT_SUB_TOPIC="NRF/01/DOWN_STREAM"
 CONFIG_MQTT_CLIENT_ID=""
 CONFIG_MQTT_BROKER_HOSTNAME="iot-course-but.cloud.shiftr.io"
 CONFIG_MQTT_BROKER_PORT=1883

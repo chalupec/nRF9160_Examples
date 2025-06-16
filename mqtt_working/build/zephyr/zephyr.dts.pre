@@ -1046,9 +1046,9 @@ arduino_spi: &spi3 {
  status = "disabled";
 };
 
-
-
-
+&arduino_adc {
+ io-channel-map = <0 &adc 1>, <1 &adc 2>, <2 &adc 3>, <3 &adc 4>, <4 &adc 5>, <5 &adc 6>;
+};
 
 
 
@@ -1091,6 +1091,10 @@ arduino_spi: &spi3 {
 };
 
 &gd25wb256 {
+ status = "okay";
+};
+
+&timer0 {
  status = "okay";
 };
 # 0 "<command-line>" 2

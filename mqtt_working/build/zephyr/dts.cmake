@@ -681,7 +681,7 @@ set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@4000
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|interrupts" "15;1;")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|prescaler" "0")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|zli" "False")
-set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|status" "disabled")
+set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|status" "okay")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|compatible" "nordic,nrf-timer;")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|wakeup-source" "False")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/timer@f000|zephyr,pm-device-runtime-auto" "False")
