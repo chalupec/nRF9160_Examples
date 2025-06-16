@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2018 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ * TODO
+ * - ziskavani casu
+ * - rozliseni pomoci define na ruzne jednotky and topics NRF/01/UP_STREAM
+ * - mereni a ukladani hodnot
  */
 
 #include <stdio.h>
@@ -20,7 +21,7 @@
 
 #include "mqtt_connection.h"
 
-#define WAVE_SAMPLE_LEN 512
+#define WAVE_SAMPLE_LEN 1024
 /* The mqtt client struct */
 static struct mqtt_client client;
 /* File descriptor */
@@ -152,8 +153,12 @@ void send_multiple_packets(uint16_t total_packet_to_send)
 		LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
-		int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
+	//	int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
+	//						   byte_ptr, sizestruct);
+
+		int err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
 							   byte_ptr, sizestruct);
+							   
 		if (err)
 		{
 			LOG_INF("Failed to send message, %d", err);
@@ -174,7 +179,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 			seed_packet.packet_header = 0xBEEF;
 			seed_packet.packet_version = 0x0101;
 			seed_packet.actual_packet_nr = 0x0001;
-			seed_packet.total_packet_nr = 0x0008;
+			seed_packet.total_packet_nr = 0x0001;
 
 			seed_packet.timestamp = 1748277406;
 			seed_packet.train_counter = train_counter;
@@ -183,7 +188,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 
 			memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
 			memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
-			memcpy(seed_packet.chan_0_int, chan_dat_128, 128);
+			memcpy(&seed_packet.chan_0_int[5], chan_dat_128, 128);
 			memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
 
 			uint16_t sizestruct = sizeof(seed_packet);
@@ -206,7 +211,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	case DK_BTN2_MSK:
 		if (button_state & DK_BTN2_MSK)
 		{
-			send_multiple_packets(4);
+			send_multiple_packets(50);
 		}
 		break;
 

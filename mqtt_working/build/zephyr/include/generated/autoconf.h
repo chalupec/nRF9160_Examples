@@ -1,4 +1,4 @@
-#define CONFIG_MQTT_PUB_TOPIC "devacademy/publish/topic"
+#define CONFIG_MQTT_PUB_TOPIC "NRF/01/UP_STREAM"
 #define CONFIG_MQTT_SUB_TOPIC "devacademy/subscribe/topic"
 #define CONFIG_MQTT_CLIENT_ID ""
 #define CONFIG_MQTT_BROKER_HOSTNAME "iot-course-but.cloud.shiftr.io"
