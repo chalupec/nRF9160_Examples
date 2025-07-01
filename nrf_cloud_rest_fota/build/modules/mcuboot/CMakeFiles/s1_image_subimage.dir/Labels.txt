@@ -1,0 +1,13 @@
+# Target labels
+ s1_image_subimage
+# Source files and their labels
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/CMakeFiles/s1_image_subimage
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/CMakeFiles/s1_image_subimage.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/CMakeFiles/s1_image_subimage-complete.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-build.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-configure.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-download.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-install.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-mkdir.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-patch.rule
+C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-update.rule

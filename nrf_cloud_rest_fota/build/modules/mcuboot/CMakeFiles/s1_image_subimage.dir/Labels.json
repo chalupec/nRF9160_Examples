@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/CMakeFiles/s1_image_subimage"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/CMakeFiles/s1_image_subimage.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/CMakeFiles/s1_image_subimage-complete.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-build.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-configure.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-download.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-install.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-mkdir.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-patch.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/nrf_cloud_rest_fota/build/modules/mcuboot/s1_image_subimage-prefix/src/s1_image_subimage-stamp/s1_image_subimage-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"s1_image_subimage"
+		],
+		"name" : "s1_image_subimage"
+	}
+}

@@ -1,0 +1,37 @@
+{
+    "format-version": 0,
+    "time": 1751400545,
+    "files": [
+        {
+            "version_MCUBOOT": "0.0.0+0",
+            "version_B0": "1",
+            "type": "mcuboot",
+            "board": "nrf9161dk_nrf9161",
+            "soc": "nRF9161_LACA",
+            "load_address": 32768,
+            "size": 33988,
+            "file": "signed_by_mcuboot_and_b0_s0_image_update.bin",
+            "modtime": 1751400502
+        },
+        {
+            "version_MCUBOOT": "0.0.0+0",
+            "version_B0": "1",
+            "type": "mcuboot",
+            "board": "nrf9161dk_nrf9161",
+            "soc": "nRF9161_LACA",
+            "load_address": 98304,
+            "size": 33986,
+            "file": "signed_by_mcuboot_and_b0_s1_image_update.bin",
+            "modtime": 1751400502
+        }
+    ],
+    "name": "nrf_cloud_rest_fota",
+    "firmware": {
+        "zephyr": {
+            "revision": "c69784df808f632f4415a083d42374c68c14c929-dirty"
+        },
+        "nrf": {
+            "revision": "3190fa573ff67bfb745028f203e9d0ea4144a1ce-dirty"
+        }
+    }
+}

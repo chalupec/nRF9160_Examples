@@ -1,0 +1,25 @@
+{
+    "format-version": 0,
+    "time": 1751412251,
+    "files": [
+        {
+            "load_address": 98304,
+            "version_MCUBOOT": "0.0.0+0",
+            "type": "application",
+            "board": "nrf9161dk_nrf9161",
+            "soc": "nRF9161_LACA",
+            "size": 191619,
+            "file": "app_update.bin",
+            "modtime": 1751412251
+        }
+    ],
+    "name": "nrf_provisioning",
+    "firmware": {
+        "zephyr": {
+            "revision": "c69784df808f632f4415a083d42374c68c14c929-dirty"
+        },
+        "nrf": {
+            "revision": "3190fa573ff67bfb745028f203e9d0ea4144a1ce-dirty"
+        }
+    }
+}
