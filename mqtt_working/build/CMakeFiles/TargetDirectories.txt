@@ -185,6 +185,9 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/usb/common/nrf_us
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/usb/common/nrf_usbd_common/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/usb_c/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/usb_c/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/adc/CMakeFiles/drivers__adc.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/adc/CMakeFiles/edit_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/adc/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/clock_control/CMakeFiles/drivers__clock_control.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/clock_control/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/zephyr/drivers/clock_control/CMakeFiles/rebuild_cache.dir

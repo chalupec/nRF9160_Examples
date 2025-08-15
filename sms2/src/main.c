@@ -335,6 +335,8 @@ int main(void)
 	//k_sleep(K_MSEC(5000));
 	//nrfx_timer_disable(&timer_inst);
 
+
+	uint8_t sample_print=0;
 	while (1)
 	{
 
@@ -348,18 +350,35 @@ rec_counter=0;
 		//gpio_pin_toggle_dt(&led0);
 		//adc_read(adc_dev, &sequence);
 		if (ADC_SAMPLE_FLAG==1) {
-			gpio_pin_set_dt(&led0, 1);
+			//gpio_pin_set_dt(&led0, 1);
 			ADC_SAMPLE_FLAG=0;
 			adc_read(adc_dev, &sequence);  // takes 248 us
 			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
 			average_of_vectors(buffer, &sample_buffer2); // 3.5 us
 
+		//    printk("\nfinito\n");
 
+			/*
 			ch0_volt[rec_counter]=sample_buffer2[0];
 			ch1_volt[rec_counter]=sample_buffer2[1];
 			ch0_int[rec_counter]=sample_buffer2[2];
 			ch1_int[rec_counter]=sample_buffer2[3];
 			rec_counter++;                              // 1us
+*/
+
+if (sample_print>=4) {
+sample_print=0;
+
+    printk("%d, %d, %d, %d\n",
+           sample_buffer2[0],
+           sample_buffer2[1],
+           sample_buffer2[2],
+           sample_buffer2[3]);
+}
+sample_print++;
+
+
+/*
 
 			if (rec_counter>RES_VAR_LEN-1) {
 				while (1) {
@@ -367,9 +386,9 @@ rec_counter=0;
 					k_sleep(K_MSEC(1000));
 				};
 			}
+*/
 
-
-			gpio_pin_set_dt(&led0, 0);
+			//gpio_pin_set_dt(&led0, 0);
 
 		}
 		

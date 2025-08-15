@@ -21,7 +21,42 @@
 
 #include "mqtt_connection.h"
 
+
+#include <zephyr/drivers/adc.h>
+#include <hal/nrf_saadc.h>
+#include <nrfx_timer.h>
+
 #define WAVE_SAMPLE_LEN 1024
+
+
+#define DAQ_TIME_US 40
+
+#define ADC_NODE DT_IO_CHANNELS_CTLR(DT_PATH(zephyr_user))
+
+#define CHANNEL_0 0
+#define CHANNEL_1 1
+#define CHANNEL_2 2
+#define CHANNEL_3 3
+#define CHANNEL_4 4
+
+#define BUFFER_WIDTH 4
+#define BUFFER_LENGTH 5
+
+// nt buffer[BUFFER_SIZE] = {0};
+// int index = 0;
+
+
+/** @brief Symbol specifying timer instance to be used. */
+#define TIMER_INST_IDX 0
+
+/** @brief Symbol specifying time in milliseconds to wait for handler execution. */
+#define TIME_TO_WAIT_US 1000UL
+
+
+
+int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
+volatile uint8_t index = 0;
+
 /* The mqtt client struct */
 static struct mqtt_client client;
 /* File descriptor */
@@ -75,6 +110,83 @@ uint16_t train_counter = 0;
 
 uint16_t chan_dat[64] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 uint16_t chan_dat_128[128] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+
+
+static const struct device *adc_dev = DEVICE_DT_GET(ADC_NODE);
+
+static const nrfx_timer_t timer = NRFX_TIMER_INSTANCE(0);
+
+volatile uint8_t ADC_SAMPLE_FLAG=0;
+
+int16_t sample_buffer[4];
+
+#define RES_VAR_LEN  16000
+
+uint16_t rec_counter=0;
+
+uint16_t ch0_volt[RES_VAR_LEN];
+uint16_t ch1_volt[RES_VAR_LEN];
+uint16_t ch0_int[RES_VAR_LEN];
+uint16_t ch1_int[RES_VAR_LEN];
+
+static const struct adc_sequence sequence = {
+		.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
+		.buffer = sample_buffer,
+		.buffer_size = sizeof(sample_buffer),
+		.resolution = 14
+		//.oversampling = NRF_SAADC_OVERSAMPLE_16X
+	};
+
+static const struct adc_channel_cfg channel_cfg_0 = {
+	.gain = ADC_GAIN_1_6,
+	.reference = ADC_REF_INTERNAL,
+	.acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, DAQ_TIME_US),
+	.channel_id = CHANNEL_0,
+	.input_positive = NRF_SAADC_INPUT_AIN0};
+
+static const struct adc_channel_cfg channel_cfg_1 = {
+	.gain = ADC_GAIN_1_6,
+	.reference = ADC_REF_INTERNAL,
+	.acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, DAQ_TIME_US),
+	.channel_id = CHANNEL_1,
+	.input_positive = NRF_SAADC_INPUT_AIN1};
+
+static const struct adc_channel_cfg channel_cfg_2 = {
+	.gain = ADC_GAIN_1_6,
+	.reference = ADC_REF_INTERNAL,
+	.acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, DAQ_TIME_US),
+	.channel_id = CHANNEL_2,
+	.input_positive = NRF_SAADC_INPUT_AIN2};
+
+static const struct adc_channel_cfg channel_cfg_3 = {
+	.gain = ADC_GAIN_1_6,
+	.reference = ADC_REF_INTERNAL,
+	.acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, DAQ_TIME_US),
+	.channel_id = CHANNEL_3,
+	.input_positive = NRF_SAADC_INPUT_AIN3};
+
+static const struct adc_channel_cfg channel_cfg_4 = {
+	.gain = ADC_GAIN_1_6,
+	.reference = ADC_REF_INTERNAL,
+	.acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, DAQ_TIME_US),
+	.channel_id = CHANNEL_4,
+	.input_positive = NRF_SAADC_INPUT_AIN4};
+
+
+
+
+static void timer_handler(nrf_timer_event_t event_type, void * p_context)
+{
+    if(event_type == NRF_TIMER_EVENT_COMPARE0)
+    {
+		ADC_SAMPLE_FLAG=1;
+    }
+}
+
+
+
+
 
 LOG_MODULE_REGISTER(Lesson4_Exercise1, LOG_LEVEL_INF);
 
@@ -220,10 +332,114 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	}
 }
 
+
+
+
+void add_samples_to_buffer(int16_t samples[BUFFER_WIDTH], int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH])
+{
+	for (int i = 0; i < BUFFER_WIDTH; i++)
+	{
+		buffer[index][i] = samples[i];
+	}
+	index++;
+	if (index == BUFFER_LENGTH)
+	{
+		index = 0;
+	}
+}
+
+void print_4buffer(int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH])
+{
+	for (int i = 0; i < BUFFER_LENGTH; i++)
+	{
+		for (int j = 0; j < BUFFER_WIDTH; j++)
+		{
+			printf("%d,", buffer[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+void average_of_vectors(int16_t array[BUFFER_LENGTH][BUFFER_WIDTH], int16_t averages[BUFFER_WIDTH])
+{
+	for (int i = 0; i < BUFFER_WIDTH; i++)
+	{
+		int32_t total_sum = 0;
+		for (int j = 0; j < BUFFER_LENGTH; j++)
+		{
+			total_sum += array[j][i];
+		}
+		averages[i] = (int16_t)(total_sum / BUFFER_LENGTH);
+	}
+}
+
+
+
+
+
+
+	uint32_t record_cnt=1780;
+
+
 int main(void)
 {
 	int err;
 	uint32_t connect_attempt = 0;
+
+
+ nrfx_err_t status;
+    (void)status;
+
+#if defined(__ZEPHYR__)
+    IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST,NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
+#endif
+	
+	int handle = 0;
+	int ret = 0;
+
+
+
+
+ 	nrfx_timer_t timer_inst = NRFX_TIMER_INSTANCE(TIMER_INST_IDX);
+    uint32_t base_frequency = NRF_TIMER_BASE_FREQUENCY_GET(timer_inst.p_reg);
+    nrfx_timer_config_t config = NRFX_TIMER_DEFAULT_CONFIG(base_frequency);
+    config.bit_width = NRF_TIMER_BIT_WIDTH_32;
+    config.p_context = "Some context";
+	//config.interrupt_priority=20;
+
+    status = nrfx_timer_init(&timer_inst, &config, timer_handler);
+    NRFX_ASSERT(status == NRFX_SUCCESS);
+
+    nrfx_timer_clear(&timer_inst);
+	uint32_t desired_ticks = nrfx_timer_us_to_ticks(&timer_inst, TIME_TO_WAIT_US);
+    nrfx_timer_extended_compare(&timer_inst, NRF_TIMER_CC_CHANNEL0, desired_ticks,
+                                NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK, true);
+
+
+
+
+
+	k_sleep(K_MSEC(500));
+
+
+
+
+	printk("\nSAMPLE APP STARTS\n");
+
+	if (!device_is_ready(adc_dev))
+	{
+		printk("ADC not ready\n");
+		return;
+	}
+
+	// adc_channel_setup(adc_dev, &channel_cfg_0);
+	adc_channel_setup(adc_dev, &channel_cfg_1);
+	adc_channel_setup(adc_dev, &channel_cfg_2);
+	adc_channel_setup(adc_dev, &channel_cfg_3);
+	adc_channel_setup(adc_dev, &channel_cfg_4);
+
+
+
 
 	if (dk_leds_init() != 0)
 	{
@@ -249,6 +465,15 @@ int main(void)
 		return 0;
 	}
 
+
+
+
+
+
+
+
+
+
 do_connect:
 	if (connect_attempt++ > 0)
 	{
@@ -271,8 +496,61 @@ do_connect:
 		return 0;
 	}
 
-	while (1)
+
+
+	if (record_cnt>500) {
+		send_multiple_packets(5);
+		record_cnt=0;
+	} else {
+ 		record_cnt++;
+		k_sleep(K_MSEC(100));
+	}
+
+		
+
+	
+
+
+
+	while (0)
 	{
+
+	rec_counter=0;
+		int16_t sample_buffer2[4] = {0};
+
+
+
+			
+		//gpio_pin_set_dt(&led0, 1);
+		//gpio_pin_toggle_dt(&led0);
+		//adc_read(adc_dev, &sequence);
+		if (ADC_SAMPLE_FLAG==1) {
+			//gpio_pin_set_dt(&led0, 1);
+			ADC_SAMPLE_FLAG=0;
+			adc_read(adc_dev, &sequence);  // takes 248 us
+			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
+			average_of_vectors(buffer, &sample_buffer2); // 3.5 us
+
+
+			ch0_volt[rec_counter]=sample_buffer2[0];
+			ch1_volt[rec_counter]=sample_buffer2[1];
+			ch0_int[rec_counter]=sample_buffer2[2];
+			ch1_int[rec_counter]=sample_buffer2[3];
+			rec_counter++;                              // 1us
+
+			if (rec_counter>RES_VAR_LEN-1) {
+				while (1) {
+					printk("\nfinito\n");
+					k_sleep(K_MSEC(1000));
+				};
+			}
+
+
+		}//	gpio_pin_set_dt(&led0, 0);
+
+    }
+
+
 		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
 		if (err < 0)
 		{
@@ -308,7 +586,7 @@ do_connect:
 			LOG_ERR("POLLNVAL");
 			break;
 		}
-	}
+	
 
 	LOG_INF("Disconnecting MQTT client");
 
@@ -320,5 +598,10 @@ do_connect:
 	goto do_connect;
 
 	/* This is never reached */
+
+
 	return 0;
-}
+
+
+   }
+
