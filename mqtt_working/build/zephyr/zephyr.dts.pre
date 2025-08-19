@@ -1098,4 +1098,34 @@ arduino_spi: &spi3 {
  status = "okay";
 };
 # 0 "<command-line>" 2
+# 1 "C:/ADWITECH/nRF9160_Examples/mqtt_working/nrf9161dk_nrf9161_ns.overlay" 1
+# 14 "C:/ADWITECH/nRF9160_Examples/mqtt_working/nrf9161dk_nrf9161_ns.overlay"
+/ {
+ zephyr,user {
+  io-channels = <&adc 0 &adc 1 &adc 2 &adc 3 &adc 4 &adc 5 &adc 6>;
+ };
+};
+
+
+&uart0_default {
+ group1 {
+  psels = <((((((0) * 32U) + (27)) & 0x7FU) << 0U) | ((0U & 0xFFFFU) << 16U))>;
+ };
+
+ group2 {
+  psels = <((((((0) * 32U) + (26)) & 0x7FU) << 0U) | ((1U & 0xFFFFU) << 16U))>;
+ };
+};
+
+
+&uart0 {
+ current-speed = <921600>;
+};
+
+
+
+&arduino_adc {
+ io-channel-map = <0 &adc 1>, <1 &adc 2>, <2 &adc 3>, <3 &adc 4>, <4 &adc 5>, <5 &adc 6>;
+};
+# 0 "<command-line>" 2
 # 1 "C:/ncs/v2.6.0/zephyr/misc/empty_file.c"

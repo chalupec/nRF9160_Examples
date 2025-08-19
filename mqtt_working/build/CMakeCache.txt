@@ -29,9 +29,6 @@ BOARD_DIR:PATH=C:/ncs/v2.6.0/zephyr/boards/arm/nrf9161dk_nrf9161
 //Support board extensions
 BOARD_EXTENSIONS:BOOL=ON
 
-//No help, variable specified on the command line.
-BOARD_ROOT:UNINITIALIZED=c:/ncs/v2.6.0/zephyr/samples/drivers/spi_flash;c:/ncs/v2.6.0/zephyr/samples/drivers/adc;c:/ncs/v2.6.0/nrf/applications/serial_lte_modem;c:/ncs/v2.6.0/zephyr/samples/net/mqtt_publisher
-
 //Path to a program.
 BOSSAC:FILEPATH=BOSSAC-NOTFOUND
 
@@ -319,7 +316,7 @@ DTC:FILEPATH=C:/ncs/toolchains/cf2149caf2/opt/bin/dtc.exe
 // parameter. These settings will override the settings in the
 // board's .dts file. Multiple files may be listed, e.g. DTC_OVERLAY_FILE="dts1.overlay
 // dts2.overlay"
-DTC_OVERLAY_FILE:STRING=
+DTC_OVERLAY_FILE:STRING=C:/ADWITECH/nRF9160_Examples/mqtt_working/nrf9161dk_nrf9161_ns.overlay
 
 //Linker BFD compatibility (compiler reported)
 GNULD_LINKER_IS_BFD:BOOL=ON

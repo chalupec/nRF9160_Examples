@@ -47,7 +47,7 @@
 #define TIMER_INST_IDX 0
 
 /** @brief Symbol specifying time in milliseconds to wait for handler execution. */
-#define TIME_TO_WAIT_US 1000UL
+#define TIME_TO_WAIT_US 20000UL
 
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
 volatile uint8_t index = 0;
@@ -356,12 +356,15 @@ void average_of_vectors(int16_t array[BUFFER_LENGTH][BUFFER_WIDTH], int16_t aver
 	}
 }
 
-uint32_t record_cnt = 1780;
+
 
 int main(void)
 {
 	int err;
+	
 	uint32_t connect_attempt = 0;
+
+	uint32_t record_cnt = 1780;
 
 	nrfx_err_t status;
 	(void)status;
@@ -404,6 +407,15 @@ int main(void)
 	adc_channel_setup(adc_dev, &channel_cfg_3);
 	adc_channel_setup(adc_dev, &channel_cfg_4);
 
+	printk("\nstarting timer\n");
+	k_sleep(K_MSEC(1000));
+	nrfx_timer_enable(&timer_inst);
+	
+
+
+
+
+
 	if (dk_leds_init() != 0)
 	{
 		LOG_ERR("Failed to initialize the LED library");
@@ -428,6 +440,10 @@ int main(void)
 		return 0;
 	}
 
+
+
+
+
 do_connect:
 	if (connect_attempt++ > 0)
 	{
@@ -450,22 +466,13 @@ do_connect:
 		return 0;
 	}
 
-	if (record_cnt > 500)
-	{
-		send_multiple_packets(5);
-		record_cnt = 0;
-	}
-	else
-	{
-		record_cnt++;
-		k_sleep(K_MSEC(100));
-	}
 
+
+	rec_counter = 0;
+	int16_t sample_print = 0;
+	int16_t sample_buffer2[4] = {0};
 	while (1)
 	{
-
-		rec_counter = 0;
-		int16_t sample_buffer2[4] = {0};
 
 		// gpio_pin_set_dt(&led0, 1);
 		// gpio_pin_toggle_dt(&led0);
@@ -478,64 +485,106 @@ do_connect:
 			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
 			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
 
-			ch0_volt[rec_counter] = sample_buffer2[0];
-			ch1_volt[rec_counter] = sample_buffer2[1];
-			ch0_int[rec_counter] = sample_buffer2[2];
-			ch1_int[rec_counter] = sample_buffer2[3];
-			rec_counter++; // 1us
+			//    printk("\nfinito\n");
 
-			if (rec_counter > RES_VAR_LEN - 1)
+			/*
+			ch0_volt[rec_counter]=sample_buffer2[0];
+			ch1_volt[rec_counter]=sample_buffer2[1];
+			ch0_int[rec_counter]=sample_buffer2[2];
+			ch1_int[rec_counter]=sample_buffer2[3];
+			rec_counter++;                              // 1us
+				*/
+
+			if (sample_print >= 4)
 			{
-				while (1)
-				{
-					printk("\nfinito\n");
-					k_sleep(K_MSEC(1000));
-				};
+				sample_print = 0;
+
+				printk("%d, %d, %d, %d\n",
+						sample_buffer2[0],
+						sample_buffer2[1],
+						sample_buffer2[2],
+						sample_buffer2[3]);
 			}
+			sample_print++;
 
-		} //	gpio_pin_set_dt(&led0, 0);
-	}
-
-
+		}
 
 
 
-/*
+	
+	
 
-	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
-	if (err < 0)
-	{
-		LOG_ERR("Error in poll(): %d", errno);
-		break;
-	}
 
-	err = mqtt_live(&client);
-	if ((err != 0) && (err != -EAGAIN))
-	{
-		LOG_ERR("Error in mqtt_live: %d", err);
-		break;
-	}
 
-	if ((fds.revents & POLLIN) == POLLIN)
-	{
-		err = mqtt_input(&client);
-		if (err != 0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
+		if (err < 0)
 		{
-			LOG_ERR("Error in mqtt_input: %d", err);
+			LOG_ERR("Error in poll(): %d", errno);
 			break;
 		}
-	}
 
-	if ((fds.revents & POLLERR) == POLLERR)
-	{
-		LOG_ERR("POLLERR");
-		break;
-	}
+		err = mqtt_live(&client);
+		if ((err != 0) && (err != -EAGAIN))
+		{
+			LOG_ERR("Error in mqtt_live: %d", err);
+			break;
+		}
 
-	if ((fds.revents & POLLNVAL) == POLLNVAL)
-	{
-		LOG_ERR("POLLNVAL");
-		break;
+		if ((fds.revents & POLLIN) == POLLIN)
+		{
+			err = mqtt_input(&client);
+			if (err != 0)
+			{
+				LOG_ERR("Error in mqtt_input: %d", err);
+				break;
+			}
+		}
+
+		if ((fds.revents & POLLERR) == POLLERR)
+		{
+			LOG_ERR("POLLERR");
+			break;
+		}
+
+		if ((fds.revents & POLLNVAL) == POLLNVAL)
+		{
+			LOG_ERR("POLLNVAL");
+			break;
+		}
 	}
 
 	LOG_INF("Disconnecting MQTT client");
@@ -546,9 +595,172 @@ do_connect:
 		LOG_ERR("Could not disconnect MQTT client: %d", err);
 	}
 	goto do_connect;
-*/
 
-	/* This is never reached */
+
 
 	return 0;
 }
+
+
+	/*
+
+
+
+		if (!device_is_ready(adc_dev))
+		{
+			printk("ADC not ready\n");
+			return;
+		}
+
+		// adc_channel_setup(adc_dev, &channel_cfg_0);
+		adc_channel_setup(adc_dev, &channel_cfg_1);
+		adc_channel_setup(adc_dev, &channel_cfg_2);
+		adc_channel_setup(adc_dev, &channel_cfg_3);
+		adc_channel_setup(adc_dev, &channel_cfg_4);
+
+		if (dk_leds_init() != 0)
+		{
+			LOG_ERR("Failed to initialize the LED library");
+		}
+
+		err = modem_configure();
+		if (err)
+		{
+			LOG_ERR("Failed to configure the modem");
+			return 0;
+		}
+
+		if (dk_buttons_init(button_handler) != 0)
+		{
+			LOG_ERR("Failed to initialize the buttons library");
+		}
+
+		err = client_init(&client);
+		if (err)
+		{
+			LOG_ERR("Failed to initialize MQTT client: %d", err);
+			return 0;
+		}
+
+	do_connect:
+		if (connect_attempt++ > 0)
+		{
+			LOG_INF("Reconnecting in %d seconds...",
+					CONFIG_MQTT_RECONNECT_DELAY_S);
+			k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
+		}
+
+		err = mqtt_connect(&client);
+		if (err)
+		{
+			LOG_ERR("Error in mqtt_connect: %d", err);
+			goto do_connect;
+		}
+
+		err = fds_init(&client, &fds);
+		if (err)
+		{
+			LOG_ERR("Error in fds_init: %d", err);
+			return 0;
+		}
+
+		if (record_cnt > 500)
+		{
+			send_multiple_packets(5);
+			record_cnt = 0;
+		}
+		else
+		{
+			record_cnt++;
+			k_sleep(K_MSEC(100));
+		}
+
+		while (1)
+		{
+
+			rec_counter = 0;
+			int16_t sample_buffer2[4] = {0};
+
+			// gpio_pin_set_dt(&led0, 1);
+			// gpio_pin_toggle_dt(&led0);
+			// adc_read(adc_dev, &sequence);
+			if (ADC_SAMPLE_FLAG == 1)
+			{
+				// gpio_pin_set_dt(&led0, 1);
+				ADC_SAMPLE_FLAG = 0;
+				adc_read(adc_dev, &sequence);				   // takes 248 us
+				add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
+				average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+
+				ch0_volt[rec_counter] = sample_buffer2[0];
+				ch1_volt[rec_counter] = sample_buffer2[1];
+				ch0_int[rec_counter] = sample_buffer2[2];
+				ch1_int[rec_counter] = sample_buffer2[3];
+				rec_counter++; // 1us
+
+				if (rec_counter > RES_VAR_LEN - 1)
+				{
+					while (1)
+					{
+						printk("\nfinito\n");
+						k_sleep(K_MSEC(1000));
+					};
+				}
+
+			} //	gpio_pin_set_dt(&led0, 0);
+		}
+
+
+
+
+
+
+
+		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
+		if (err < 0)
+		{
+			LOG_ERR("Error in poll(): %d", errno);
+			break;
+		}
+
+		err = mqtt_live(&client);
+		if ((err != 0) && (err != -EAGAIN))
+		{
+			LOG_ERR("Error in mqtt_live: %d", err);
+			break;
+		}
+
+		if ((fds.revents & POLLIN) == POLLIN)
+		{
+			err = mqtt_input(&client);
+			if (err != 0)
+			{
+				LOG_ERR("Error in mqtt_input: %d", err);
+				break;
+			}
+		}
+
+		if ((fds.revents & POLLERR) == POLLERR)
+		{
+			LOG_ERR("POLLERR");
+			break;
+		}
+
+		if ((fds.revents & POLLNVAL) == POLLNVAL)
+		{
+			LOG_ERR("POLLNVAL");
+			break;
+		}
+
+		LOG_INF("Disconnecting MQTT client");
+
+		err = mqtt_disconnect(&client);
+		if (err)
+		{
+			LOG_ERR("Could not disconnect MQTT client: %d", err);
+		}
+		goto do_connect;
+	*/
+
+	/* This is never reached */
+

@@ -27,4 +27,5 @@ empty_file.o: C:/ncs/v2.6.0/zephyr/misc/empty_file.c \
  C:/ncs/v2.6.0/zephyr/dts/arm/nordic/nrf91_peripherals.dtsi \
  C:/ncs/v2.6.0/zephyr/boards/arm/nrf9161dk_nrf9161/nrf9161dk_nrf9161_common.dtsi \
  C:/ncs/v2.6.0/zephyr/boards/arm/nrf9161dk_nrf9161/nrf9161dk_nrf9161_common-pinctrl.dtsi \
- C:/ncs/v2.6.0/zephyr/boards/arm/nrf9161dk_nrf9161/nrf9161dk_nrf9161_partition_conf.dtsi
+ C:/ncs/v2.6.0/zephyr/boards/arm/nrf9161dk_nrf9161/nrf9161dk_nrf9161_partition_conf.dtsi \
+ C:/ADWITECH/nRF9160_Examples/mqtt_working/nrf9161dk_nrf9161_ns.overlay

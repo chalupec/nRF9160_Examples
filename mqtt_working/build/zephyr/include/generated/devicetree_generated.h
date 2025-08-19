@@ -1819,53 +1819,61 @@
 /* Generic property macros: */
 #define DT_N_S_zephyr_user_P_io_channels_IDX_0_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_0_PH DT_N_S_soc_S_peripheral_40000000_S_adc_e000
-#define DT_N_S_zephyr_user_P_io_channels_IDX_0_VAL_input 1
+#define DT_N_S_zephyr_user_P_io_channels_IDX_0_VAL_input 0
 #define DT_N_S_zephyr_user_P_io_channels_IDX_0_VAL_input_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_1_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_1_PH DT_N_S_soc_S_peripheral_40000000_S_adc_e000
-#define DT_N_S_zephyr_user_P_io_channels_IDX_1_VAL_input 2
+#define DT_N_S_zephyr_user_P_io_channels_IDX_1_VAL_input 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_1_VAL_input_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_2_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_2_PH DT_N_S_soc_S_peripheral_40000000_S_adc_e000
-#define DT_N_S_zephyr_user_P_io_channels_IDX_2_VAL_input 3
+#define DT_N_S_zephyr_user_P_io_channels_IDX_2_VAL_input 2
 #define DT_N_S_zephyr_user_P_io_channels_IDX_2_VAL_input_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_3_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_3_PH DT_N_S_soc_S_peripheral_40000000_S_adc_e000
-#define DT_N_S_zephyr_user_P_io_channels_IDX_3_VAL_input 4
+#define DT_N_S_zephyr_user_P_io_channels_IDX_3_VAL_input 3
 #define DT_N_S_zephyr_user_P_io_channels_IDX_3_VAL_input_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_4_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_4_PH DT_N_S_soc_S_peripheral_40000000_S_adc_e000
-#define DT_N_S_zephyr_user_P_io_channels_IDX_4_VAL_input 5
+#define DT_N_S_zephyr_user_P_io_channels_IDX_4_VAL_input 4
 #define DT_N_S_zephyr_user_P_io_channels_IDX_4_VAL_input_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_5_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_IDX_5_PH DT_N_S_soc_S_peripheral_40000000_S_adc_e000
-#define DT_N_S_zephyr_user_P_io_channels_IDX_5_VAL_input 6
+#define DT_N_S_zephyr_user_P_io_channels_IDX_5_VAL_input 5
 #define DT_N_S_zephyr_user_P_io_channels_IDX_5_VAL_input_EXISTS 1
+#define DT_N_S_zephyr_user_P_io_channels_IDX_6_EXISTS 1
+#define DT_N_S_zephyr_user_P_io_channels_IDX_6_PH DT_N_S_soc_S_peripheral_40000000_S_adc_e000
+#define DT_N_S_zephyr_user_P_io_channels_IDX_6_VAL_input 6
+#define DT_N_S_zephyr_user_P_io_channels_IDX_6_VAL_input_EXISTS 1
 #define DT_N_S_zephyr_user_P_io_channels_FOREACH_PROP_ELEM(fn) fn(DT_N_S_zephyr_user, io_channels, 0) \
 	fn(DT_N_S_zephyr_user, io_channels, 1) \
 	fn(DT_N_S_zephyr_user, io_channels, 2) \
 	fn(DT_N_S_zephyr_user, io_channels, 3) \
 	fn(DT_N_S_zephyr_user, io_channels, 4) \
-	fn(DT_N_S_zephyr_user, io_channels, 5)
+	fn(DT_N_S_zephyr_user, io_channels, 5) \
+	fn(DT_N_S_zephyr_user, io_channels, 6)
 #define DT_N_S_zephyr_user_P_io_channels_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_zephyr_user, io_channels, 0) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 1) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 2) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 3) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 4) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_zephyr_user, io_channels, 5)
+	fn(DT_N_S_zephyr_user, io_channels, 5) DT_DEBRACKET_INTERNAL sep \
+	fn(DT_N_S_zephyr_user, io_channels, 6)
 #define DT_N_S_zephyr_user_P_io_channels_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_zephyr_user, io_channels, 0, __VA_ARGS__) \
 	fn(DT_N_S_zephyr_user, io_channels, 1, __VA_ARGS__) \
 	fn(DT_N_S_zephyr_user, io_channels, 2, __VA_ARGS__) \
 	fn(DT_N_S_zephyr_user, io_channels, 3, __VA_ARGS__) \
 	fn(DT_N_S_zephyr_user, io_channels, 4, __VA_ARGS__) \
-	fn(DT_N_S_zephyr_user, io_channels, 5, __VA_ARGS__)
+	fn(DT_N_S_zephyr_user, io_channels, 5, __VA_ARGS__) \
+	fn(DT_N_S_zephyr_user, io_channels, 6, __VA_ARGS__)
 #define DT_N_S_zephyr_user_P_io_channels_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_zephyr_user, io_channels, 0, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 1, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 2, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 3, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_zephyr_user, io_channels, 4, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_zephyr_user, io_channels, 5, __VA_ARGS__)
-#define DT_N_S_zephyr_user_P_io_channels_LEN 6
+	fn(DT_N_S_zephyr_user, io_channels, 5, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
+	fn(DT_N_S_zephyr_user, io_channels, 6, __VA_ARGS__)
+#define DT_N_S_zephyr_user_P_io_channels_LEN 7
 #define DT_N_S_zephyr_user_P_io_channels_EXISTS 1
 
 /*
@@ -4027,20 +4035,14 @@
 #define DT_N_S_pin_controller_S_uart0_default_S_group1_PINCTRL_NUM 0
 
 /* Generic property macros: */
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels {27 /* 0x1b */, 131086 /* 0x2000e */}
+#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels {27 /* 0x1b */}
 #define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_IDX_0 27
 #define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_IDX_0_EXISTS 1
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_IDX_1 131086
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_IDX_1_EXISTS 1
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM(fn) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0) \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 1)
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 1)
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0, __VA_ARGS__) \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 1, __VA_ARGS__)
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 1, __VA_ARGS__)
-#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_LEN 2
+#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM(fn) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0)
+#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0)
+#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0, __VA_ARGS__)
+#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group1, psels, 0, __VA_ARGS__)
+#define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_LEN 1
 #define DT_N_S_pin_controller_S_uart0_default_S_group1_P_psels_EXISTS 1
 #define DT_N_S_pin_controller_S_uart0_default_S_group1_P_nordic_drive_mode 0
 #define DT_N_S_pin_controller_S_uart0_default_S_group1_P_nordic_drive_mode_EXISTS 1
@@ -4111,20 +4113,14 @@
 #define DT_N_S_pin_controller_S_uart0_default_S_group2_PINCTRL_NUM 0
 
 /* Generic property macros: */
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels {65562 /* 0x1001a */, 196623 /* 0x3000f */}
+#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels {65562 /* 0x1001a */}
 #define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_IDX_0 65562
 #define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_IDX_0_EXISTS 1
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_IDX_1 196623
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_IDX_1_EXISTS 1
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM(fn) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0) \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 1)
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 1)
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0, __VA_ARGS__) \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 1, __VA_ARGS__)
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 1, __VA_ARGS__)
-#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_LEN 2
+#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM(fn) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0)
+#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0)
+#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0, __VA_ARGS__)
+#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_pin_controller_S_uart0_default_S_group2, psels, 0, __VA_ARGS__)
+#define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_LEN 1
 #define DT_N_S_pin_controller_S_uart0_default_S_group2_P_psels_EXISTS 1
 #define DT_N_S_pin_controller_S_uart0_default_S_group2_P_nordic_drive_mode 0
 #define DT_N_S_pin_controller_S_uart0_default_S_group2_P_nordic_drive_mode_EXISTS 1
@@ -8821,9 +8817,9 @@
 #define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_pinctrl_0_EXISTS 1
 #define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_disable_rx 0
 #define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_disable_rx_EXISTS 1
-#define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_current_speed 115200
-#define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_current_speed_ENUM_IDX 12
-#define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_current_speed_ENUM_VAL_115200_EXISTS 1
+#define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_current_speed 921600
+#define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_current_speed_ENUM_IDX 16
+#define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_current_speed_ENUM_VAL_921600_EXISTS 1
 #define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_current_speed_EXISTS 1
 #define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_hw_flow_control 0
 #define DT_N_S_soc_S_peripheral_40000000_S_uart_8000_P_hw_flow_control_EXISTS 1

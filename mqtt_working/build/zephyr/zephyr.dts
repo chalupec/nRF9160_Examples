@@ -191,7 +191,7 @@
 				reg = < 0x8000 0x1000 >;
 				interrupts = < 0x8 0x1 >;
 				status = "okay";
-				current-speed = < 0x1c200 >;
+				current-speed = < 0xe1000 >;
 				pinctrl-0 = < &uart0_default >;
 				pinctrl-1 = < &uart0_sleep >;
 				pinctrl-names = "default", "sleep";
@@ -463,10 +463,10 @@
 		uart0_default: uart0_default {
 			phandle = < 0x2 >;
 			group1 {
-				psels = < 0x1b >, < 0x2000e >;
+				psels = < 0x1b >;
 			};
 			group2 {
-				psels = < 0x1001a >, < 0x3000f >;
+				psels = < 0x1001a >;
 				bias-pull-up;
 			};
 		};
@@ -647,6 +647,6 @@
 		};
 	};
 	zephyr,user {
-		io-channels = < &adc 0x1 &adc 0x2 &adc 0x3 &adc 0x4 &adc 0x5 &adc 0x6 >;
+		io-channels = < &adc 0x0 &adc 0x1 &adc 0x2 &adc 0x3 &adc 0x4 &adc 0x5 &adc 0x6 >;
 	};
 };
