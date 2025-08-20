@@ -772,7 +772,7 @@ set_target_properties(devicetree_target PROPERTIES "DT_REG|/pin-controller/uart0
 set_target_properties(devicetree_target PROPERTIES "DT_REG|/pin-controller/uart0_sleep|ADDR" "")
 set_target_properties(devicetree_target PROPERTIES "DT_REG|/pin-controller/uart0_sleep|SIZE" "")
 set_target_properties(devicetree_target PROPERTIES "DT_NODE|/pin-controller/uart0_sleep/group1" TRUE)
-set_target_properties(devicetree_target PROPERTIES "DT_PROP|/pin-controller/uart0_sleep/group1|psels" "27;65562;131086;196623;")
+set_target_properties(devicetree_target PROPERTIES "DT_PROP|/pin-controller/uart0_sleep/group1|psels" "27;65562;")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/pin-controller/uart0_sleep/group1|nordic,drive-mode" "0")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/pin-controller/uart0_sleep/group1|nordic,invert" "False")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/pin-controller/uart0_sleep/group1|bias-disable" "False")

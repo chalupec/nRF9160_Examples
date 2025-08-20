@@ -47,7 +47,7 @@
 #define TIMER_INST_IDX 0
 
 /** @brief Symbol specifying time in milliseconds to wait for handler execution. */
-#define TIME_TO_WAIT_US 20000UL
+#define TIME_TO_WAIT_US 2000UL
 
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
 volatile uint8_t index = 0;
@@ -369,9 +369,9 @@ int main(void)
 	nrfx_err_t status;
 	(void)status;
 
-#if defined(__ZEPHYR__)
+ #if defined(__ZEPHYR__)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
-#endif
+ #endif
 
 	int handle = 0;
 	int ret = 0;
@@ -395,20 +395,27 @@ int main(void)
 
 	printk("\nSAMPLE APP STARTS\n");
 
+	
+	if (dk_leds_init() != 0)
+	{
+		LOG_ERR("Failed to initialize the LED library");
+	}
+	
 	if (!device_is_ready(adc_dev))
 	{
 		printk("ADC not ready\n");
 		return;
 	}
 
-	// adc_channel_setup(adc_dev, &channel_cfg_0);
+
+	adc_channel_setup(adc_dev, &channel_cfg_0);
 	adc_channel_setup(adc_dev, &channel_cfg_1);
 	adc_channel_setup(adc_dev, &channel_cfg_2);
 	adc_channel_setup(adc_dev, &channel_cfg_3);
 	adc_channel_setup(adc_dev, &channel_cfg_4);
 
 	printk("\nstarting timer\n");
-	k_sleep(K_MSEC(1000));
+	k_sleep(K_MSEC(100));
 	nrfx_timer_enable(&timer_inst);
 	
 
@@ -416,10 +423,80 @@ int main(void)
 
 
 
-	if (dk_leds_init() != 0)
+
+
+
+
+
+
+
+	rec_counter = 0;
+	int16_t sample_print = 0;
+	int16_t sample_buffer2[4] = {0};
+	while (1)
 	{
-		LOG_ERR("Failed to initialize the LED library");
+
+		// gpio_pin_set_dt(&led0, 1);
+		// gpio_pin_toggle_dt(&led0);
+		// adc_read(adc_dev, &sequence);
+		if (ADC_SAMPLE_FLAG == 1)
+		{
+			// gpio_pin_set_dt(&led0, 1);
+			ADC_SAMPLE_FLAG = 0;
+			adc_read(adc_dev, &sequence);				   // takes 248 us
+			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
+			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+
+			//    printk("\nfinito\n");
+
+			/*
+			ch0_volt[rec_counter]=sample_buffer2[0];
+			ch1_volt[rec_counter]=sample_buffer2[1];
+			ch0_int[rec_counter]=sample_buffer2[2];
+			ch1_int[rec_counter]=sample_buffer2[3];
+			rec_counter++;                              // 1us
+				*/
+
+			if (sample_print >= 4)
+			{
+				sample_print = 0;
+
+				printk("%d, %d, %d, %d\n",
+						sample_buffer2[0],
+						sample_buffer2[1],
+						sample_buffer2[2],
+						sample_buffer2[3]);
+			}
+			sample_print++;
+
+		}
+
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	err = modem_configure();
 	if (err)
@@ -469,8 +546,6 @@ do_connect:
 
 
 	rec_counter = 0;
-	int16_t sample_print = 0;
-	int16_t sample_buffer2[4] = {0};
 	while (1)
 	{
 

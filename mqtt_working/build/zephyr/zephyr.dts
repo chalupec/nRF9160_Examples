@@ -461,19 +461,20 @@
 	pinctrl: pin-controller {
 		compatible = "nordic,nrf-pinctrl";
 		uart0_default: uart0_default {
+			hw-flow-control = "false";
 			phandle = < 0x2 >;
 			group1 {
-				psels = < 0x1b >;
+				psels = < 0x1b >, < 0x1001a >;
 			};
 			group2 {
-				psels = < 0x1001a >;
+				psels = < 0x1001a >, < 0x3000f >;
 				bias-pull-up;
 			};
 		};
 		uart0_sleep: uart0_sleep {
 			phandle = < 0x3 >;
 			group1 {
-				psels = < 0x1b >, < 0x1001a >, < 0x2000e >, < 0x3000f >;
+				psels = < 0x1b >, < 0x1001a >;
 				low-power-enable;
 			};
 		};

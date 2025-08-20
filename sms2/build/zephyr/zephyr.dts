@@ -473,7 +473,7 @@
 		uart0_sleep: uart0_sleep {
 			phandle = < 0x3 >;
 			group1 {
-				psels = < 0x1b >, < 0x1001a >, < 0x2000e >, < 0x3000f >;
+				psels = < 0x1b >, < 0x1001a >;
 				low-power-enable;
 			};
 		};

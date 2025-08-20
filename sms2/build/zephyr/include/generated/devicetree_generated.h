@@ -4251,32 +4251,20 @@
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_PINCTRL_NUM 0
 
 /* Generic property macros: */
-#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels {27 /* 0x1b */, 65562 /* 0x1001a */, 131086 /* 0x2000e */, 196623 /* 0x3000f */}
+#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels {27 /* 0x1b */, 65562 /* 0x1001a */}
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_0 27
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_0_EXISTS 1
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_1 65562
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_1_EXISTS 1
-#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_2 131086
-#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_2_EXISTS 1
-#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_3 196623
-#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_IDX_3_EXISTS 1
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_FOREACH_PROP_ELEM(fn) fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 0) \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1) \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 2) \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 3)
+	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1)
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 0) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 2) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 3)
+	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1)
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 0, __VA_ARGS__) \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1, __VA_ARGS__) \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 2, __VA_ARGS__) \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 3, __VA_ARGS__)
+	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1, __VA_ARGS__)
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 0, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 2, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 3, __VA_ARGS__)
-#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_LEN 4
+	fn(DT_N_S_pin_controller_S_uart0_sleep_S_group1, psels, 1, __VA_ARGS__)
+#define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_LEN 2
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_psels_EXISTS 1
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_nordic_drive_mode 0
 #define DT_N_S_pin_controller_S_uart0_sleep_S_group1_P_nordic_drive_mode_EXISTS 1
