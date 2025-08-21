@@ -28,12 +28,22 @@
 
 #include <math.h>
 
-//#define SAMPLE_PRINTING_ENABLED
+// #define SAMPLE_PRINTING_ENABLED
+//#define CIRC_BUFF_STAMP_VALUE_ADD
+
+#define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
+#define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
+
+#define RMS_BUFFER_SIZE 100
+
+#define RES_VAR_LEN 16000
 
 #define WAVE_SAMPLE_LEN 1024
 
+#define CRCLR_BUFF_SIZE 1024
+
 /** @brief Symbol specifying time in milliseconds to wait for handler execution. */
-#define TIME_TO_WAIT_US 4000UL
+#define TIME_TO_WAIT_US 2000UL
 
 #define DAQ_TIME_US 40
 
@@ -48,13 +58,30 @@
 #define BUFFER_WIDTH 4
 #define BUFFER_LENGTH 5
 
-#define CIRCULAR_BUFFER_SIZE 1024
-
 // nt buffer[BUFFER_SIZE] = {0};
 // int index = 0;
 
 /** @brief Symbol specifying timer instance to be used. */
 #define TIMER_INST_IDX 0
+
+int32_t rms_value[4] = {0};
+
+int32_t buffer_rms_ch0[RMS_BUFFER_SIZE] = {0};
+int32_t buffer_rms_ch1[RMS_BUFFER_SIZE] = {0};
+int32_t buffer_rms_ch2[RMS_BUFFER_SIZE] = {0};
+int32_t buffer_rms_ch3[RMS_BUFFER_SIZE] = {0};
+
+int32_t ch0_off_value;
+int32_t ch1_off_value;
+int32_t ch2_off_value;
+int32_t ch3_off_value;
+
+size_t indexx = 0;
+int64_t sum_squares_ch0 = 0;
+int64_t sum_squares_ch1 = 0;
+int64_t sum_squares_ch2 = 0;
+int64_t sum_squares_ch3 = 0;
+volatile uint16_t last_circ_buff_record = 0;
 
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
 volatile uint8_t index = 0;
@@ -76,10 +103,10 @@ struct __attribute__((__packed__)) data_packet_t
 	uint32_t total_sample_count;
 	uint16_t train_counter;
 
-	uint16_t chan_0_vlt[WAVE_SAMPLE_LEN];
-	uint16_t chan_0_int[WAVE_SAMPLE_LEN];
-	uint16_t chan_1_vlt[WAVE_SAMPLE_LEN];
-	uint16_t chan_1_int[WAVE_SAMPLE_LEN];
+	int16_t chan_0_vlt[WAVE_SAMPLE_LEN];
+	int16_t chan_0_int[WAVE_SAMPLE_LEN];
+	int16_t chan_1_vlt[WAVE_SAMPLE_LEN];
+	int16_t chan_1_int[WAVE_SAMPLE_LEN];
 
 	uint16_t CRC;
 };
@@ -120,8 +147,6 @@ static const nrfx_timer_t timer = NRFX_TIMER_INSTANCE(0);
 volatile uint8_t ADC_SAMPLE_FLAG = 0;
 
 int16_t sample_buffer[4];
-
-#define RES_VAR_LEN 16000
 
 uint16_t rec_counter = 0;
 
@@ -363,40 +388,35 @@ void average_of_vectors(int16_t array[BUFFER_LENGTH][BUFFER_WIDTH], int16_t aver
 	}
 }
 
-#define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
-#define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
-
 int32_t exponential_filter(int32_t previous_filtered, int32_t new_sample)
 {
 	return (ALPHA_NUM * new_sample + (ALPHA_DEN - ALPHA_NUM) * previous_filtered) / ALPHA_DEN;
 }
 
-#define BUFFER_SIZE 100
-
-int32_t update_rms(int32_t *buffer, size_t *index, int64_t *sum_squares, int32_t new_sample)
+int32_t update_rms(int32_t *buffer, size_t *indexx, int64_t *sum_squares, int32_t new_sample)
 {
 	// Remove the oldest sample's square from the sum
-	int32_t old_sample = buffer[*index];
+	int32_t old_sample = buffer[*indexx];
 	*sum_squares -= (int64_t)old_sample * old_sample;
 
 	// Add the new sample's square to the sum
-	buffer[*index] = new_sample;
+	buffer[*indexx] = new_sample;
 	*sum_squares += (int64_t)new_sample * new_sample;
 
 	// Update index
-	*index = (*index + 1) % BUFFER_SIZE;
+	*indexx = (*indexx + 1) % RMS_BUFFER_SIZE;
 
 	// Calculate RMS
-	int32_t mean_square = *sum_squares / BUFFER_SIZE;
+	int32_t mean_square = *sum_squares / RMS_BUFFER_SIZE;
 	return (int32_t)sqrt((double)mean_square);
 }
 
-#define CRCLR_BUFF_SIZE 1024
 int16_t circ_buff_ch0[CRCLR_BUFF_SIZE] = {0};
 int16_t circ_buff_ch1[CRCLR_BUFF_SIZE] = {0};
 int16_t circ_buff_ch2[CRCLR_BUFF_SIZE] = {0};
 int16_t circ_buff_ch3[CRCLR_BUFF_SIZE] = {0};
 uint16_t buff_head = 0;
+uint8_t circ_buff_overflow = 0;
 
 uint16_t add_value_to_buffer(int16_t value0, int16_t value1, int16_t value2, int16_t value3)
 {
@@ -411,6 +431,7 @@ uint16_t add_value_to_buffer(int16_t value0, int16_t value1, int16_t value2, int
 	else
 	{
 		buff_head = 0;
+		circ_buff_overflow = 1;
 		circ_buff_ch0[buff_head] = value0;
 		circ_buff_ch1[buff_head] = value1;
 		circ_buff_ch2[buff_head] = value2;
@@ -424,6 +445,45 @@ uint16_t add_value_to_buffer(int16_t value0, int16_t value1, int16_t value2, int
 void clear_buffer(int16_t *buffer, size_t length)
 {
 	memset(buffer, 0, length * sizeof(int16_t));
+}
+
+void saturate_channel_values(void)
+{
+	if (ch0_off_value > 32750)
+	{
+		ch0_off_value = 32750;
+	}
+	if (ch0_off_value < -32750)
+	{
+		ch0_off_value = -32750;
+	}
+
+	if (ch1_off_value > 32750)
+	{
+		ch1_off_value = 32750;
+	}
+	if (ch1_off_value < -32750)
+	{
+		ch1_off_value = -32750;
+	}
+
+	if (ch2_off_value > 32750)
+	{
+		ch2_off_value = 32750;
+	}
+	if (ch2_off_value < -32750)
+	{
+		ch2_off_value = -32750;
+	}
+
+	if (ch3_off_value > 32750)
+	{
+		ch3_off_value = 32750;
+	}
+	if (ch3_off_value < -32750)
+	{
+		ch3_off_value = -32750;
+	}
 }
 
 int main(void)
@@ -529,27 +589,7 @@ int main(void)
 	offsets[2] = filtered_value_array[2];
 	offsets[3] = filtered_value_array[3];
 
-	int32_t rms_value[4] = {0};
-
-	int32_t buffer_rms_ch0[BUFFER_SIZE] = {0};
-	int32_t buffer_rms_ch1[BUFFER_SIZE] = {0};
-	int32_t buffer_rms_ch2[BUFFER_SIZE] = {0};
-	int32_t buffer_rms_ch3[BUFFER_SIZE] = {0};
-
-	int32_t ch0_off_value;
-	int32_t ch1_off_value;
-	int32_t ch2_off_value;
-	int32_t ch3_off_value;
-
-	size_t index = 0;
-	int64_t sum_squares_ch0 = 0;
-	int64_t sum_squares_ch1 = 0;
-	int64_t sum_squares_ch2 = 0;
-	int64_t sum_squares_ch3 = 0;
-	uint16_t last_circ_buff_record = 0;
-
-
-
+	buff_head = 0;
 	while (1) // waiting for trigger
 	{
 
@@ -563,55 +603,21 @@ int main(void)
 
 			new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
 			ch0_off_value = new_sample;
-			rms_value[0] = update_rms(buffer_rms_ch0, &index, &sum_squares_ch0, new_sample);
+			rms_value[0] = update_rms(buffer_rms_ch0, &indexx, &sum_squares_ch0, new_sample);
 
 			new_sample = sample_buffer2[1] - offsets[1]; // Replace with actual sensor/ADC reading
 			ch1_off_value = new_sample;
-			rms_value[1] = update_rms(buffer_rms_ch1, &index, &sum_squares_ch1, new_sample);
+			rms_value[1] = update_rms(buffer_rms_ch1, &indexx, &sum_squares_ch1, new_sample);
 
 			new_sample = sample_buffer2[2] - offsets[2]; // Replace with actual sensor/ADC reading
 			ch2_off_value = new_sample;
-			rms_value[2] = update_rms(buffer_rms_ch2, &index, &sum_squares_ch2, new_sample);
+			rms_value[2] = update_rms(buffer_rms_ch2, &indexx, &sum_squares_ch2, new_sample);
 
 			new_sample = sample_buffer2[3] - offsets[3]; // Replace with actual sensor/ADC reading
 			ch3_off_value = new_sample;
-			rms_value[3] = update_rms(buffer_rms_ch3, &index, &sum_squares_ch3, new_sample);
+			rms_value[3] = update_rms(buffer_rms_ch3, &indexx, &sum_squares_ch3, new_sample);
 
-			if (ch0_off_value > 32750)
-			{
-				ch0_off_value = 32750;
-			}
-			if (ch0_off_value < -32750)
-			{
-				ch0_off_value = -32750;
-			}
-
-			if (ch1_off_value > 32750)
-			{
-				ch1_off_value = 32750;
-			}
-			if (ch1_off_value < -32750)
-			{
-				ch1_off_value = -32750;
-			}
-
-			if (ch2_off_value > 32750)
-			{
-				ch2_off_value = 32750;
-			}
-			if (ch2_off_value < -32750)
-			{
-				ch2_off_value = -32750;
-			}
-
-			if (ch3_off_value > 32750)
-			{
-				ch3_off_value = 32750;
-			}
-			if (ch3_off_value < -32750)
-			{
-				ch3_off_value = -32750;
-			}
+			saturate_channel_values();
 
 			last_circ_buff_record = add_value_to_buffer(ch0_off_value, ch1_off_value, ch2_off_value, ch3_off_value);
 
@@ -632,17 +638,25 @@ int main(void)
 
 		if ((rms_value[0] > 500) || (rms_value[2] > 500))
 		{
-		//	last_circ_buff_record = add_value_to_buffer(10000, 10000, 10000, 10000); //FIXME JEN PRO FLAG
+			//	last_circ_buff_record = add_value_to_buffer(10000, 10000, 10000, 10000); //FIXME JEN PRO FLAG
 
+			uint16_t sample_cntr = 0;
 
-			uint16_t sample_cntr=0;
-			sample_cntr=last_circ_buff_record;
+			if (circ_buff_overflow == 1)
+			{
+				sample_cntr = CRCLR_BUFF_SIZE;
+			}
+			else
+			{
+
+				sample_cntr = last_circ_buff_record;
+			}
+
 			while (1)
 			{
 
 				if (ADC_SAMPLE_FLAG == 1)
 				{
-
 
 					// gpio_pin_set_dt(&led0, 1);
 					ADC_SAMPLE_FLAG = 0;
@@ -652,72 +666,33 @@ int main(void)
 
 					new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
 					ch0_off_value = new_sample;
-					rms_value[0] = update_rms(buffer_rms_ch0, &index, &sum_squares_ch0, new_sample);
+					rms_value[0] = update_rms(buffer_rms_ch0, &indexx, &sum_squares_ch0, new_sample);
 
 					new_sample = sample_buffer2[1] - offsets[1]; // Replace with actual sensor/ADC reading
 					ch1_off_value = new_sample;
-					rms_value[1] = update_rms(buffer_rms_ch1, &index, &sum_squares_ch1, new_sample);
+					rms_value[1] = update_rms(buffer_rms_ch1, &indexx, &sum_squares_ch1, new_sample);
 
 					new_sample = sample_buffer2[2] - offsets[2]; // Replace with actual sensor/ADC reading
 					ch2_off_value = new_sample;
-					rms_value[2] = update_rms(buffer_rms_ch2, &index, &sum_squares_ch2, new_sample);
+					rms_value[2] = update_rms(buffer_rms_ch2, &indexx, &sum_squares_ch2, new_sample);
 
 					new_sample = sample_buffer2[3] - offsets[3]; // Replace with actual sensor/ADC reading
 					ch3_off_value = new_sample;
-					rms_value[3] = update_rms(buffer_rms_ch3, &index, &sum_squares_ch3, new_sample);
+					rms_value[3] = update_rms(buffer_rms_ch3, &indexx, &sum_squares_ch3, new_sample);
 
-					if (ch0_off_value > 32750)
-					{
-						ch0_off_value = 32750;
-					}
-					if (ch0_off_value < -32750)
-					{
-						ch0_off_value = -32750;
-					}
+					saturate_channel_values();
 
-					if (ch1_off_value > 32750)
-					{
-						ch1_off_value = 32750;
-					}
-					if (ch1_off_value < -32750)
-					{
-						ch1_off_value = -32750;
-					}
+					ch0_volt[sample_cntr] = ch0_off_value;
+					ch0_int[sample_cntr] = ch1_off_value;
+					ch1_volt[sample_cntr] = ch2_off_value;
+					ch1_int[sample_cntr] = ch3_off_value;
 
-					if (ch2_off_value > 32750)
-					{
-						ch2_off_value = 32750;
-					}
-					if (ch2_off_value < -32750)
-					{
-						ch2_off_value = -32750;
-					}
-
-					if (ch3_off_value > 32750)
-					{
-						ch3_off_value = 32750;
-					}
-					if (ch3_off_value < -32750)
-					{
-						ch3_off_value = -32750;
-					}
-
-
-					ch0_volt[sample_cntr]=ch0_off_value;
-					ch0_int[sample_cntr]=ch1_off_value;
-					ch1_volt[sample_cntr]=ch2_off_value;
-					ch1_int[sample_cntr]=ch3_off_value;
-				
-				
 					sample_cntr++;
 
-
-					if (sample_cntr>3000) {
+					if (sample_cntr > 2000)
+					{
 						break;
 					}
-
-
-
 				}
 			}
 
@@ -731,16 +706,56 @@ int main(void)
 			}
 			else
 			{
+				uint16_t loc_circ_buf_cntr = 0;
+				uint16_t mcnt = 0;
+				uint16_t samples_to_store_from_circ_buff = 0;
 
-				memcpy(ch0_volt, &circ_buff_ch0[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-				memcpy(ch0_int, &circ_buff_ch1[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-				memcpy(ch1_volt, &circ_buff_ch2[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-				memcpy(ch1_int, &circ_buff_ch3[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+				if (circ_buff_overflow == 1)
+				{
+					samples_to_store_from_circ_buff = CRCLR_BUFF_SIZE;
+					loc_circ_buf_cntr = last_circ_buff_record;
+				}
+				else
+				{
+					samples_to_store_from_circ_buff = last_circ_buff_record;
+					loc_circ_buf_cntr = 0;
+				}
 
-				memcpy(&ch0_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch0, last_circ_buff_record * 2);
-				memcpy(&ch0_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch1, last_circ_buff_record * 2);
-				memcpy(&ch1_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch2, last_circ_buff_record * 2);
-				memcpy(&ch1_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch3, last_circ_buff_record * 2);
+				while (mcnt < samples_to_store_from_circ_buff)
+				{
+					if (loc_circ_buf_cntr < CRCLR_BUFF_SIZE)
+					{
+						ch0_volt[mcnt] = circ_buff_ch0[loc_circ_buf_cntr];
+						ch0_int[mcnt] = circ_buff_ch1[loc_circ_buf_cntr];
+						ch1_volt[mcnt] = circ_buff_ch2[loc_circ_buf_cntr];
+						ch1_int[mcnt] = circ_buff_ch3[loc_circ_buf_cntr];
+						loc_circ_buf_cntr++;
+						mcnt++;
+					}
+					else
+					{
+						loc_circ_buf_cntr = 0;
+					}
+				}
+#ifdef CIRC_BUFF_STAMP_VALUE_ADD
+				ch0_volt[samples_to_store_from_circ_buff] = ch0_volt[samples_to_store_from_circ_buff] + 5000;
+				ch0_int[samples_to_store_from_circ_buff] = ch0_int[samples_to_store_from_circ_buff] + 5000;
+				ch1_volt[samples_to_store_from_circ_buff] = ch1_volt[samples_to_store_from_circ_buff] + 5000;
+				ch1_int[samples_to_store_from_circ_buff] = ch1_int[samples_to_store_from_circ_buff] + 5000;
+#endif
+
+				/*
+								memcpy(ch0_volt, &circ_buff_ch0[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+								memcpy(ch0_int, &circ_buff_ch1[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+								memcpy(ch1_volt, &circ_buff_ch2[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+								memcpy(ch1_int, &circ_buff_ch3[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+
+								memcpy(&ch0_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch0, last_circ_buff_record * 2);
+								memcpy(&ch0_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch1, last_circ_buff_record * 2);
+								memcpy(&ch1_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch2, last_circ_buff_record * 2);
+								memcpy(&ch1_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch3, last_circ_buff_record * 2);
+
+								*/
 			}
 
 			clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
@@ -749,16 +764,29 @@ int main(void)
 			clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
 
 			uint16_t prntcnt = 0;
-			while (prntcnt < 4000)
+			while (prntcnt < 2500)
 			{
+
+				/*printk("%d, %d, %d, %d\n",
+									   ch0_volt[prntcnt],
+									   ch0_int[prntcnt],
+									   ch1_volt[prntcnt],
+									   ch1_int[prntcnt]);
+							*/
 				printk("%d, %d, %d, %d\n",
 					   ch0_volt[prntcnt],
-					   ch0_int[prntcnt],
-					   ch1_volt[prntcnt],
-					   ch1_int[prntcnt]);
+					   0,
+					   0,
+					   0);
+
 				k_sleep(K_USEC(1000));
 
 				prntcnt++;
+			}
+
+			while (1)
+			{
+				// FIXME
 			}
 		}
 	}
