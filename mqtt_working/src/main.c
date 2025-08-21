@@ -29,7 +29,7 @@
 #include <math.h>
 
 // #define SAMPLE_PRINTING_ENABLED
-//#define CIRC_BUFF_STAMP_VALUE_ADD
+// #define CIRC_BUFF_STAMP_VALUE_ADD
 
 #define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
@@ -154,6 +154,13 @@ int16_t ch0_volt[RES_VAR_LEN];
 int16_t ch1_volt[RES_VAR_LEN];
 int16_t ch0_int[RES_VAR_LEN];
 int16_t ch1_int[RES_VAR_LEN];
+
+int16_t circ_buff_ch0[CRCLR_BUFF_SIZE] = {0};
+int16_t circ_buff_ch1[CRCLR_BUFF_SIZE] = {0};
+int16_t circ_buff_ch2[CRCLR_BUFF_SIZE] = {0};
+int16_t circ_buff_ch3[CRCLR_BUFF_SIZE] = {0};
+uint16_t buff_head = 0;
+uint8_t circ_buff_overflow = 0;
 
 static const struct adc_sequence sequence = {
 	.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
@@ -411,13 +418,6 @@ int32_t update_rms(int32_t *buffer, size_t *indexx, int64_t *sum_squares, int32_
 	return (int32_t)sqrt((double)mean_square);
 }
 
-int16_t circ_buff_ch0[CRCLR_BUFF_SIZE] = {0};
-int16_t circ_buff_ch1[CRCLR_BUFF_SIZE] = {0};
-int16_t circ_buff_ch2[CRCLR_BUFF_SIZE] = {0};
-int16_t circ_buff_ch3[CRCLR_BUFF_SIZE] = {0};
-uint16_t buff_head = 0;
-uint8_t circ_buff_overflow = 0;
-
 uint16_t add_value_to_buffer(int16_t value0, int16_t value1, int16_t value2, int16_t value3)
 {
 	if (buff_head < CRCLR_BUFF_SIZE)
@@ -638,7 +638,6 @@ int main(void)
 
 		if ((rms_value[0] > 500) || (rms_value[2] > 500))
 		{
-			//	last_circ_buff_record = add_value_to_buffer(10000, 10000, 10000, 10000); //FIXME JEN PRO FLAG
 
 			uint16_t sample_cntr = 0;
 
@@ -696,67 +695,56 @@ int main(void)
 				}
 			}
 
-			// FIXME CHECKNOUT OKRAJOVE PODMINKY atd
-			if ((last_circ_buff_record == 0) || (last_circ_buff_record == (CRCLR_BUFF_SIZE - 1)))
+			uint16_t loc_circ_buf_cntr = 0;
+			uint16_t mcnt = 0;
+			uint16_t samples_to_store_from_circ_buff = 0;
+
+			if (circ_buff_overflow == 1)
 			{
-				memcpy(ch0_volt, circ_buff_ch0, CRCLR_BUFF_SIZE * 2);
-				memcpy(ch0_int, circ_buff_ch2, CRCLR_BUFF_SIZE * 2);
-				memcpy(ch1_volt, circ_buff_ch1, CRCLR_BUFF_SIZE * 2);
-				memcpy(ch1_int, circ_buff_ch3, CRCLR_BUFF_SIZE * 2);
+				samples_to_store_from_circ_buff = CRCLR_BUFF_SIZE;
+				loc_circ_buf_cntr = last_circ_buff_record;
 			}
 			else
 			{
-				uint16_t loc_circ_buf_cntr = 0;
-				uint16_t mcnt = 0;
-				uint16_t samples_to_store_from_circ_buff = 0;
+				samples_to_store_from_circ_buff = last_circ_buff_record;
+				loc_circ_buf_cntr = 0;
+			}
 
-				if (circ_buff_overflow == 1)
+			while (mcnt < samples_to_store_from_circ_buff)
+			{
+				if (loc_circ_buf_cntr < CRCLR_BUFF_SIZE)
 				{
-					samples_to_store_from_circ_buff = CRCLR_BUFF_SIZE;
-					loc_circ_buf_cntr = last_circ_buff_record;
+					ch0_volt[mcnt] = circ_buff_ch0[loc_circ_buf_cntr];
+					ch0_int[mcnt] = circ_buff_ch1[loc_circ_buf_cntr];
+					ch1_volt[mcnt] = circ_buff_ch2[loc_circ_buf_cntr];
+					ch1_int[mcnt] = circ_buff_ch3[loc_circ_buf_cntr];
+					loc_circ_buf_cntr++;
+					mcnt++;
 				}
 				else
 				{
-					samples_to_store_from_circ_buff = last_circ_buff_record;
 					loc_circ_buf_cntr = 0;
 				}
-
-				while (mcnt < samples_to_store_from_circ_buff)
-				{
-					if (loc_circ_buf_cntr < CRCLR_BUFF_SIZE)
-					{
-						ch0_volt[mcnt] = circ_buff_ch0[loc_circ_buf_cntr];
-						ch0_int[mcnt] = circ_buff_ch1[loc_circ_buf_cntr];
-						ch1_volt[mcnt] = circ_buff_ch2[loc_circ_buf_cntr];
-						ch1_int[mcnt] = circ_buff_ch3[loc_circ_buf_cntr];
-						loc_circ_buf_cntr++;
-						mcnt++;
-					}
-					else
-					{
-						loc_circ_buf_cntr = 0;
-					}
-				}
+			}
 #ifdef CIRC_BUFF_STAMP_VALUE_ADD
-				ch0_volt[samples_to_store_from_circ_buff] = ch0_volt[samples_to_store_from_circ_buff] + 5000;
-				ch0_int[samples_to_store_from_circ_buff] = ch0_int[samples_to_store_from_circ_buff] + 5000;
-				ch1_volt[samples_to_store_from_circ_buff] = ch1_volt[samples_to_store_from_circ_buff] + 5000;
-				ch1_int[samples_to_store_from_circ_buff] = ch1_int[samples_to_store_from_circ_buff] + 5000;
+			ch0_volt[samples_to_store_from_circ_buff] = ch0_volt[samples_to_store_from_circ_buff] + 5000;
+			ch0_int[samples_to_store_from_circ_buff] = ch0_int[samples_to_store_from_circ_buff] + 5000;
+			ch1_volt[samples_to_store_from_circ_buff] = ch1_volt[samples_to_store_from_circ_buff] + 5000;
+			ch1_int[samples_to_store_from_circ_buff] = ch1_int[samples_to_store_from_circ_buff] + 5000;
 #endif
 
-				/*
-								memcpy(ch0_volt, &circ_buff_ch0[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-								memcpy(ch0_int, &circ_buff_ch1[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-								memcpy(ch1_volt, &circ_buff_ch2[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-								memcpy(ch1_int, &circ_buff_ch3[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+			/*
+							memcpy(ch0_volt, &circ_buff_ch0[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+							memcpy(ch0_int, &circ_buff_ch1[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+							memcpy(ch1_volt, &circ_buff_ch2[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+							memcpy(ch1_int, &circ_buff_ch3[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
 
-								memcpy(&ch0_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch0, last_circ_buff_record * 2);
-								memcpy(&ch0_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch1, last_circ_buff_record * 2);
-								memcpy(&ch1_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch2, last_circ_buff_record * 2);
-								memcpy(&ch1_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch3, last_circ_buff_record * 2);
+							memcpy(&ch0_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch0, last_circ_buff_record * 2);
+							memcpy(&ch0_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch1, last_circ_buff_record * 2);
+							memcpy(&ch1_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch2, last_circ_buff_record * 2);
+							memcpy(&ch1_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch3, last_circ_buff_record * 2);
 
-								*/
-			}
+							*/
 
 			clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
 			clear_buffer(circ_buff_ch1, CRCLR_BUFF_SIZE);
@@ -766,25 +754,27 @@ int main(void)
 			uint16_t prntcnt = 0;
 			while (prntcnt < 2500)
 			{
-
-				/*printk("%d, %d, %d, %d\n",
-									   ch0_volt[prntcnt],
-									   ch0_int[prntcnt],
-									   ch1_volt[prntcnt],
-									   ch1_int[prntcnt]);
-							*/
-				printk("%d, %d, %d, %d\n",
-					   ch0_volt[prntcnt],
-					   0,
-					   0,
-					   0);
-
+				if (1)
+				{
+					printk("%d, %d, %d, %d\n",
+						   ch0_volt[prntcnt],
+						   ch0_int[prntcnt],
+						   ch1_volt[prntcnt],
+						   ch1_int[prntcnt]);
+				}
+				else
+				{
+					printk("%d, %d, %d, %d\n",
+						   ch0_volt[prntcnt],
+						   0,
+						   0,
+						   0);
+				}				
 				k_sleep(K_USEC(1000));
-
 				prntcnt++;
 			}
 
-			while (1)
+			while (0)
 			{
 				// FIXME
 			}
