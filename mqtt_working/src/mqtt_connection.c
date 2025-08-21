@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <ncs_version.h>
 
 #include <zephyr/logging/log.h>
@@ -19,10 +20,32 @@ static uint8_t rx_buffer[MQTT_BUFFER_SIZE];
 static uint8_t tx_buffer[MQTT_BUFFER_SIZE];
 static uint8_t payload_buf[MQTT_BUFFER_SIZE];
 
+extern uint8_t jumpto_measurement_start_enabled;
+extern uint8_t mqtt_trigger_reset;
+
 /* MQTT Broker details. */
 static struct sockaddr_storage broker;
 
 LOG_MODULE_DECLARE(Lesson4_Exercise1);
+
+
+
+
+bool compare_buffer_to_text(const unsigned char buffer[2048], const char *static_text) {
+    char temp[4];  // 3 characters + null terminator
+
+    // Copy buffer to temp and null-terminate
+    memcpy(temp, buffer, 3);
+    temp[3] = '\0';
+
+    // Compare using strcmp
+    return strcmp(temp, static_text) == 0;
+}
+
+
+
+
+
 
 /**@brief Function to get the payload of recived data.
  */
@@ -167,6 +190,24 @@ void mqtt_evt_handler(struct mqtt_client *const c,
 		/* STEP 6.2 - On successful extraction of data */
 		if (err >= 0) {
 			data_print("Received: ", payload_buf, p->message.payload.len);
+			LOG_INF("TOPIC RCVD...");
+
+			//compare_buffer_to_text(payload_buf,"kuk")
+
+
+			if (compare_buffer_to_text(payload_buf,"JMP")) {
+				LOG_INF("JMP RCVD...");
+				jumpto_measurement_start_enabled=1;
+			}
+
+		    if (compare_buffer_to_text(payload_buf,"RST")) {
+				LOG_INF("RST RCVD...");
+				mqtt_trigger_reset=1;
+			}
+
+			
+
+
 			// Control the LED 
 			if(strncmp(payload_buf,CONFIG_TURN_LED_ON_CMD,sizeof(CONFIG_TURN_LED_ON_CMD)-1) == 0){
 				dk_set_led_on(LED_CONTROL_OVER_MQTT);

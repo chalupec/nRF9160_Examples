@@ -26,6 +26,9 @@
 #include <hal/nrf_saadc.h>
 #include <nrfx_timer.h>
 
+#include <zephyr/sys/reboot.h>
+
+
 #include <math.h>
 
 // #define SAMPLE_PRINTING_ENABLED
@@ -34,16 +37,20 @@
 #define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
+#define RMS_TRIG_TRESHOLD 500
+
 #define RMS_BUFFER_SIZE 100
 
-#define RES_VAR_LEN 12000
+#define NR_OF_SAMPLES_TO_MEASURE 13500
+
+#define RES_VAR_LEN 15000
 
 #define WAVE_SAMPLE_LEN 1024
 
 #define CRCLR_BUFF_SIZE 1024
 
 /** @brief Symbol specifying time in milliseconds to wait for handler execution. */
-#define TIME_TO_WAIT_US 2000UL
+#define TIME_TO_WAIT_US 500UL
 
 #define DAQ_TIME_US 40
 
@@ -63,6 +70,11 @@
 
 /** @brief Symbol specifying timer instance to be used. */
 #define TIMER_INST_IDX 0
+
+
+uint8_t jumpto_measurement_start_enabled=0;
+uint8_t mqtt_trigger_reset=0;
+
 
 int32_t rms_value[4] = {0};
 
@@ -136,9 +148,6 @@ struct __attribute__((__packed__)) servis_packet_t
 
 static struct data_packet_t seed_packet;
 uint16_t train_counter = 0;
-
-uint16_t chan_dat[64] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-uint16_t chan_dat_128[128] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
 static const struct device *adc_dev = DEVICE_DT_GET(ADC_NODE);
 
@@ -281,12 +290,12 @@ void send_multiple_packets(uint16_t total_packet_to_send)
 		seed_packet.train_counter = train_counter;
 
 		seed_packet.CRC = 0xABCD;
-
+/*
 		memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
 		memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
 		memcpy(seed_packet.chan_0_int, chan_dat_128, 128);
 		memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
-
+*/
 		uint16_t sizestruct = sizeof(seed_packet);
 		LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
@@ -372,11 +381,11 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 			train_counter++;
 			seed_packet.CRC = 0xABCD;
 
-			memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
+			/*memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
 			memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
 			memcpy(&seed_packet.chan_0_int[5], chan_dat_128, 128);
 			memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
-
+*/
 			uint16_t sizestruct = sizeof(seed_packet);
 			LOG_INF("size of struct is: %d", sizestruct);
 			uint8_t *byte_ptr = (uint8_t *)&seed_packet;
@@ -608,6 +617,10 @@ int main(void)
 	uint8_t chsel = 0;
 
 	uint16_t offset_gather_cnt = 200;
+	do_measurement:
+	offset_gather_cnt = 200;
+
+
 	while (offset_gather_cnt--)
 	{
 		while (ADC_SAMPLE_FLAG == 0)
@@ -637,6 +650,9 @@ int main(void)
 	offsets[1] = filtered_value_array[1];
 	offsets[2] = filtered_value_array[2];
 	offsets[3] = filtered_value_array[3];
+
+
+
 
 	buff_head = 0;
 	total_recorded_samples = 0;
@@ -687,7 +703,7 @@ int main(void)
 #endif
 		}
 
-		if ((rms_value[0] > 500) || (rms_value[2] > 500))
+		if ((rms_value[0] > RMS_TRIG_TRESHOLD) || (rms_value[2] > RMS_TRIG_TRESHOLD))
 		{
 
 			uint16_t sample_cntr = 0;
@@ -742,7 +758,7 @@ int main(void)
 					sample_cntr++;
 					total_recorded_samples++;
 
-					if (sample_cntr > 2000)
+					if (sample_cntr > NR_OF_SAMPLES_TO_MEASURE)
 					{
 						break;
 					}
@@ -831,6 +847,7 @@ int main(void)
 		}
 	}
 
+if (jumpto_measurement_start_enabled==0) {	
 	err = modem_configure();
 	if (err)
 	{
@@ -871,6 +888,11 @@ do_connect:
 		LOG_ERR("Error in fds_init: %d", err);
 		return 0;
 	}
+
+
+}else {
+	jumpto_measurement_start_enabled=0;
+}
 
 	rec_counter = 0;
 	while (1)
@@ -917,11 +939,28 @@ do_connect:
 			data_ready_to_send = 0;
 			printk("pause\n");
 			k_sleep(K_MSEC(2000));
-			//printk("pause 2 sec end\n");
-			//send_multiple_packets(5);
-			// send_multiple_packets(5);
 			send_measured_train_data_with_multiple_packets();
 		}
+
+
+		if (mqtt_trigger_reset==1) {
+			mqtt_trigger_reset=0;
+			printk("trigger reset in progress\n");
+			k_sleep(K_MSEC(600));
+			sys_reboot(SYS_REBOOT_COLD);
+		}
+
+
+		if (jumpto_measurement_start_enabled==1) {
+			
+			goto do_measurement;
+
+		}
+
+
+
+
+
 
 		}
 
