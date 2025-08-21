@@ -5,6 +5,7 @@
  * - mereni a ukladani hodnot
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <ncs_version.h>
 #include <zephyr/kernel.h>
@@ -25,7 +26,14 @@
 #include <hal/nrf_saadc.h>
 #include <nrfx_timer.h>
 
+#include <math.h>
+
+//#define SAMPLE_PRINTING_ENABLED
+
 #define WAVE_SAMPLE_LEN 1024
+
+/** @brief Symbol specifying time in milliseconds to wait for handler execution. */
+#define TIME_TO_WAIT_US 4000UL
 
 #define DAQ_TIME_US 40
 
@@ -40,14 +48,13 @@
 #define BUFFER_WIDTH 4
 #define BUFFER_LENGTH 5
 
+#define CIRCULAR_BUFFER_SIZE 1024
+
 // nt buffer[BUFFER_SIZE] = {0};
 // int index = 0;
 
 /** @brief Symbol specifying timer instance to be used. */
 #define TIMER_INST_IDX 0
-
-/** @brief Symbol specifying time in milliseconds to wait for handler execution. */
-#define TIME_TO_WAIT_US 2000UL
 
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
 volatile uint8_t index = 0;
@@ -118,10 +125,10 @@ int16_t sample_buffer[4];
 
 uint16_t rec_counter = 0;
 
-uint16_t ch0_volt[RES_VAR_LEN];
-uint16_t ch1_volt[RES_VAR_LEN];
-uint16_t ch0_int[RES_VAR_LEN];
-uint16_t ch1_int[RES_VAR_LEN];
+int16_t ch0_volt[RES_VAR_LEN];
+int16_t ch1_volt[RES_VAR_LEN];
+int16_t ch0_int[RES_VAR_LEN];
+int16_t ch1_int[RES_VAR_LEN];
 
 static const struct adc_sequence sequence = {
 	.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
@@ -356,12 +363,73 @@ void average_of_vectors(int16_t array[BUFFER_LENGTH][BUFFER_WIDTH], int16_t aver
 	}
 }
 
+#define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
+#define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
+int32_t exponential_filter(int32_t previous_filtered, int32_t new_sample)
+{
+	return (ALPHA_NUM * new_sample + (ALPHA_DEN - ALPHA_NUM) * previous_filtered) / ALPHA_DEN;
+}
+
+#define BUFFER_SIZE 100
+
+int32_t update_rms(int32_t *buffer, size_t *index, int64_t *sum_squares, int32_t new_sample)
+{
+	// Remove the oldest sample's square from the sum
+	int32_t old_sample = buffer[*index];
+	*sum_squares -= (int64_t)old_sample * old_sample;
+
+	// Add the new sample's square to the sum
+	buffer[*index] = new_sample;
+	*sum_squares += (int64_t)new_sample * new_sample;
+
+	// Update index
+	*index = (*index + 1) % BUFFER_SIZE;
+
+	// Calculate RMS
+	int32_t mean_square = *sum_squares / BUFFER_SIZE;
+	return (int32_t)sqrt((double)mean_square);
+}
+
+#define CRCLR_BUFF_SIZE 1024
+int16_t circ_buff_ch0[CRCLR_BUFF_SIZE] = {0};
+int16_t circ_buff_ch1[CRCLR_BUFF_SIZE] = {0};
+int16_t circ_buff_ch2[CRCLR_BUFF_SIZE] = {0};
+int16_t circ_buff_ch3[CRCLR_BUFF_SIZE] = {0};
+uint16_t buff_head = 0;
+
+uint16_t add_value_to_buffer(int16_t value0, int16_t value1, int16_t value2, int16_t value3)
+{
+	if (buff_head < CRCLR_BUFF_SIZE)
+	{
+		circ_buff_ch0[buff_head] = value0;
+		circ_buff_ch1[buff_head] = value1;
+		circ_buff_ch2[buff_head] = value2;
+		circ_buff_ch3[buff_head] = value3;
+		buff_head++;
+	}
+	else
+	{
+		buff_head = 0;
+		circ_buff_ch0[buff_head] = value0;
+		circ_buff_ch1[buff_head] = value1;
+		circ_buff_ch2[buff_head] = value2;
+		circ_buff_ch3[buff_head] = value3;
+		buff_head++;
+	}
+	return (buff_head);
+}
+
+// Clears a buffer of int16_t values
+void clear_buffer(int16_t *buffer, size_t length)
+{
+	memset(buffer, 0, length * sizeof(int16_t));
+}
 
 int main(void)
 {
 	int err;
-	
+
 	uint32_t connect_attempt = 0;
 
 	uint32_t record_cnt = 1780;
@@ -369,9 +437,9 @@ int main(void)
 	nrfx_err_t status;
 	(void)status;
 
- #if defined(__ZEPHYR__)
+#if defined(__ZEPHYR__)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
- #endif
+#endif
 
 	int handle = 0;
 	int ret = 0;
@@ -395,18 +463,16 @@ int main(void)
 
 	printk("\nSAMPLE APP STARTS\n");
 
-	
 	if (dk_leds_init() != 0)
 	{
 		LOG_ERR("Failed to initialize the LED library");
 	}
-	
+
 	if (!device_is_ready(adc_dev))
 	{
 		printk("ADC not ready\n");
 		return;
 	}
-
 
 	adc_channel_setup(adc_dev, &channel_cfg_0);
 	adc_channel_setup(adc_dev, &channel_cfg_1);
@@ -417,28 +483,28 @@ int main(void)
 	printk("\nstarting timer\n");
 	k_sleep(K_MSEC(100));
 	nrfx_timer_enable(&timer_inst);
-	
-
-
-
-
-
-
-
-
-
-
-
 
 	rec_counter = 0;
 	int16_t sample_print = 0;
 	int16_t sample_buffer2[4] = {0};
-	while (1)
-	{
 
-		// gpio_pin_set_dt(&led0, 1);
-		// gpio_pin_toggle_dt(&led0);
-		// adc_read(adc_dev, &sequence);
+	int16_t sample_solve_rms = 0;
+
+	int32_t filtered_value_array[4] = {5200, 5200, 5200, 5200};
+	int32_t filtered_value = 5200;
+	int32_t temp_value = 5200;
+	int32_t new_sample;
+
+	int16_t offsets[4];
+	uint8_t chsel = 0;
+
+	uint16_t offset_gather_cnt = 200;
+	while (offset_gather_cnt--)
+	{
+		while (ADC_SAMPLE_FLAG == 0)
+		{
+			// wait
+		}
 		if (ADC_SAMPLE_FLAG == 1)
 		{
 			// gpio_pin_set_dt(&led0, 1);
@@ -447,56 +513,255 @@ int main(void)
 			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
 			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
 
-			//    printk("\nfinito\n");
+			chsel = 0;
+			while (chsel < 4)
+			{
+				filtered_value = filtered_value_array[chsel];
+				temp_value = sample_buffer2[chsel];
+				filtered_value = exponential_filter(filtered_value, temp_value);
+				filtered_value_array[chsel] = filtered_value;
+				chsel++;
+			}
+		}
+	}
+	offsets[0] = filtered_value_array[0];
+	offsets[1] = filtered_value_array[1];
+	offsets[2] = filtered_value_array[2];
+	offsets[3] = filtered_value_array[3];
 
-			/*
-			ch0_volt[rec_counter]=sample_buffer2[0];
-			ch1_volt[rec_counter]=sample_buffer2[1];
-			ch0_int[rec_counter]=sample_buffer2[2];
-			ch1_int[rec_counter]=sample_buffer2[3];
-			rec_counter++;                              // 1us
-				*/
+	int32_t rms_value[4] = {0};
 
-			if (sample_print >= 4)
+	int32_t buffer_rms_ch0[BUFFER_SIZE] = {0};
+	int32_t buffer_rms_ch1[BUFFER_SIZE] = {0};
+	int32_t buffer_rms_ch2[BUFFER_SIZE] = {0};
+	int32_t buffer_rms_ch3[BUFFER_SIZE] = {0};
+
+	int32_t ch0_off_value;
+	int32_t ch1_off_value;
+	int32_t ch2_off_value;
+	int32_t ch3_off_value;
+
+	size_t index = 0;
+	int64_t sum_squares_ch0 = 0;
+	int64_t sum_squares_ch1 = 0;
+	int64_t sum_squares_ch2 = 0;
+	int64_t sum_squares_ch3 = 0;
+	uint16_t last_circ_buff_record = 0;
+
+
+
+	while (1) // waiting for trigger
+	{
+
+		if (ADC_SAMPLE_FLAG == 1)
+		{
+			// gpio_pin_set_dt(&led0, 1);
+			ADC_SAMPLE_FLAG = 0;
+			adc_read(adc_dev, &sequence);				   // takes 248 us
+			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
+			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+
+			new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
+			ch0_off_value = new_sample;
+			rms_value[0] = update_rms(buffer_rms_ch0, &index, &sum_squares_ch0, new_sample);
+
+			new_sample = sample_buffer2[1] - offsets[1]; // Replace with actual sensor/ADC reading
+			ch1_off_value = new_sample;
+			rms_value[1] = update_rms(buffer_rms_ch1, &index, &sum_squares_ch1, new_sample);
+
+			new_sample = sample_buffer2[2] - offsets[2]; // Replace with actual sensor/ADC reading
+			ch2_off_value = new_sample;
+			rms_value[2] = update_rms(buffer_rms_ch2, &index, &sum_squares_ch2, new_sample);
+
+			new_sample = sample_buffer2[3] - offsets[3]; // Replace with actual sensor/ADC reading
+			ch3_off_value = new_sample;
+			rms_value[3] = update_rms(buffer_rms_ch3, &index, &sum_squares_ch3, new_sample);
+
+			if (ch0_off_value > 32750)
+			{
+				ch0_off_value = 32750;
+			}
+			if (ch0_off_value < -32750)
+			{
+				ch0_off_value = -32750;
+			}
+
+			if (ch1_off_value > 32750)
+			{
+				ch1_off_value = 32750;
+			}
+			if (ch1_off_value < -32750)
+			{
+				ch1_off_value = -32750;
+			}
+
+			if (ch2_off_value > 32750)
+			{
+				ch2_off_value = 32750;
+			}
+			if (ch2_off_value < -32750)
+			{
+				ch2_off_value = -32750;
+			}
+
+			if (ch3_off_value > 32750)
+			{
+				ch3_off_value = 32750;
+			}
+			if (ch3_off_value < -32750)
+			{
+				ch3_off_value = -32750;
+			}
+
+			last_circ_buff_record = add_value_to_buffer(ch0_off_value, ch1_off_value, ch2_off_value, ch3_off_value);
+
+#ifdef SAMPLE_PRINTING_ENABLED
+			if (sample_print >= 3)
 			{
 				sample_print = 0;
 
 				printk("%d, %d, %d, %d\n",
-						sample_buffer2[0],
-						sample_buffer2[1],
-						sample_buffer2[2],
-						sample_buffer2[3]);
+					   ch0_off_value,
+					   ch1_off_value,
+					   ch2_off_value,
+					   ch3_off_value);
 			}
 			sample_print++;
-
+#endif
 		}
 
+		if ((rms_value[0] > 500) || (rms_value[2] > 500))
+		{
+		//	last_circ_buff_record = add_value_to_buffer(10000, 10000, 10000, 10000); //FIXME JEN PRO FLAG
+
+
+			uint16_t sample_cntr=0;
+			sample_cntr=last_circ_buff_record;
+			while (1)
+			{
+
+				if (ADC_SAMPLE_FLAG == 1)
+				{
+
+
+					// gpio_pin_set_dt(&led0, 1);
+					ADC_SAMPLE_FLAG = 0;
+					adc_read(adc_dev, &sequence);				   // takes 248 us
+					add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
+					average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+
+					new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
+					ch0_off_value = new_sample;
+					rms_value[0] = update_rms(buffer_rms_ch0, &index, &sum_squares_ch0, new_sample);
+
+					new_sample = sample_buffer2[1] - offsets[1]; // Replace with actual sensor/ADC reading
+					ch1_off_value = new_sample;
+					rms_value[1] = update_rms(buffer_rms_ch1, &index, &sum_squares_ch1, new_sample);
+
+					new_sample = sample_buffer2[2] - offsets[2]; // Replace with actual sensor/ADC reading
+					ch2_off_value = new_sample;
+					rms_value[2] = update_rms(buffer_rms_ch2, &index, &sum_squares_ch2, new_sample);
+
+					new_sample = sample_buffer2[3] - offsets[3]; // Replace with actual sensor/ADC reading
+					ch3_off_value = new_sample;
+					rms_value[3] = update_rms(buffer_rms_ch3, &index, &sum_squares_ch3, new_sample);
+
+					if (ch0_off_value > 32750)
+					{
+						ch0_off_value = 32750;
+					}
+					if (ch0_off_value < -32750)
+					{
+						ch0_off_value = -32750;
+					}
+
+					if (ch1_off_value > 32750)
+					{
+						ch1_off_value = 32750;
+					}
+					if (ch1_off_value < -32750)
+					{
+						ch1_off_value = -32750;
+					}
+
+					if (ch2_off_value > 32750)
+					{
+						ch2_off_value = 32750;
+					}
+					if (ch2_off_value < -32750)
+					{
+						ch2_off_value = -32750;
+					}
+
+					if (ch3_off_value > 32750)
+					{
+						ch3_off_value = 32750;
+					}
+					if (ch3_off_value < -32750)
+					{
+						ch3_off_value = -32750;
+					}
+
+
+					ch0_volt[sample_cntr]=ch0_off_value;
+					ch0_int[sample_cntr]=ch1_off_value;
+					ch1_volt[sample_cntr]=ch2_off_value;
+					ch1_int[sample_cntr]=ch3_off_value;
+				
+				
+					sample_cntr++;
+
+
+					if (sample_cntr>3000) {
+						break;
+					}
+
+
+
+				}
+			}
+
+			// FIXME CHECKNOUT OKRAJOVE PODMINKY atd
+			if ((last_circ_buff_record == 0) || (last_circ_buff_record == (CRCLR_BUFF_SIZE - 1)))
+			{
+				memcpy(ch0_volt, circ_buff_ch0, CRCLR_BUFF_SIZE * 2);
+				memcpy(ch0_int, circ_buff_ch2, CRCLR_BUFF_SIZE * 2);
+				memcpy(ch1_volt, circ_buff_ch1, CRCLR_BUFF_SIZE * 2);
+				memcpy(ch1_int, circ_buff_ch3, CRCLR_BUFF_SIZE * 2);
+			}
+			else
+			{
+
+				memcpy(ch0_volt, &circ_buff_ch0[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+				memcpy(ch0_int, &circ_buff_ch1[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+				memcpy(ch1_volt, &circ_buff_ch2[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+				memcpy(ch1_int, &circ_buff_ch3[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
+
+				memcpy(&ch0_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch0, last_circ_buff_record * 2);
+				memcpy(&ch0_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch1, last_circ_buff_record * 2);
+				memcpy(&ch1_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch2, last_circ_buff_record * 2);
+				memcpy(&ch1_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch3, last_circ_buff_record * 2);
+			}
+
+			clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
+			clear_buffer(circ_buff_ch1, CRCLR_BUFF_SIZE);
+			clear_buffer(circ_buff_ch2, CRCLR_BUFF_SIZE);
+			clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
+
+			uint16_t prntcnt = 0;
+			while (prntcnt < 4000)
+			{
+				printk("%d, %d, %d, %d\n",
+					   ch0_volt[prntcnt],
+					   ch0_int[prntcnt],
+					   ch1_volt[prntcnt],
+					   ch1_int[prntcnt]);
+				k_sleep(K_USEC(1000));
+
+				prntcnt++;
+			}
+		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	err = modem_configure();
 	if (err)
@@ -516,10 +781,6 @@ int main(void)
 		LOG_ERR("Failed to initialize MQTT client: %d", err);
 		return 0;
 	}
-
-
-
-
 
 do_connect:
 	if (connect_attempt++ > 0)
@@ -543,8 +804,6 @@ do_connect:
 		return 0;
 	}
 
-
-
 	rec_counter = 0;
 	while (1)
 	{
@@ -575,55 +834,13 @@ do_connect:
 				sample_print = 0;
 
 				printk("%d, %d, %d, %d\n",
-						sample_buffer2[0],
-						sample_buffer2[1],
-						sample_buffer2[2],
-						sample_buffer2[3]);
+					   sample_buffer2[0],
+					   sample_buffer2[1],
+					   sample_buffer2[2],
+					   sample_buffer2[3]);
 			}
 			sample_print++;
-
 		}
-
-
-
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
 		if (err < 0)
@@ -671,171 +888,167 @@ do_connect:
 	}
 	goto do_connect;
 
-
-
 	return 0;
 }
 
-
-	/*
-
-
-
-		if (!device_is_ready(adc_dev))
-		{
-			printk("ADC not ready\n");
-			return;
-		}
-
-		// adc_channel_setup(adc_dev, &channel_cfg_0);
-		adc_channel_setup(adc_dev, &channel_cfg_1);
-		adc_channel_setup(adc_dev, &channel_cfg_2);
-		adc_channel_setup(adc_dev, &channel_cfg_3);
-		adc_channel_setup(adc_dev, &channel_cfg_4);
-
-		if (dk_leds_init() != 0)
-		{
-			LOG_ERR("Failed to initialize the LED library");
-		}
-
-		err = modem_configure();
-		if (err)
-		{
-			LOG_ERR("Failed to configure the modem");
-			return 0;
-		}
-
-		if (dk_buttons_init(button_handler) != 0)
-		{
-			LOG_ERR("Failed to initialize the buttons library");
-		}
-
-		err = client_init(&client);
-		if (err)
-		{
-			LOG_ERR("Failed to initialize MQTT client: %d", err);
-			return 0;
-		}
-
-	do_connect:
-		if (connect_attempt++ > 0)
-		{
-			LOG_INF("Reconnecting in %d seconds...",
-					CONFIG_MQTT_RECONNECT_DELAY_S);
-			k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
-		}
-
-		err = mqtt_connect(&client);
-		if (err)
-		{
-			LOG_ERR("Error in mqtt_connect: %d", err);
-			goto do_connect;
-		}
-
-		err = fds_init(&client, &fds);
-		if (err)
-		{
-			LOG_ERR("Error in fds_init: %d", err);
-			return 0;
-		}
-
-		if (record_cnt > 500)
-		{
-			send_multiple_packets(5);
-			record_cnt = 0;
-		}
-		else
-		{
-			record_cnt++;
-			k_sleep(K_MSEC(100));
-		}
-
-		while (1)
-		{
-
-			rec_counter = 0;
-			int16_t sample_buffer2[4] = {0};
-
-			// gpio_pin_set_dt(&led0, 1);
-			// gpio_pin_toggle_dt(&led0);
-			// adc_read(adc_dev, &sequence);
-			if (ADC_SAMPLE_FLAG == 1)
-			{
-				// gpio_pin_set_dt(&led0, 1);
-				ADC_SAMPLE_FLAG = 0;
-				adc_read(adc_dev, &sequence);				   // takes 248 us
-				add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
-				average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
-
-				ch0_volt[rec_counter] = sample_buffer2[0];
-				ch1_volt[rec_counter] = sample_buffer2[1];
-				ch0_int[rec_counter] = sample_buffer2[2];
-				ch1_int[rec_counter] = sample_buffer2[3];
-				rec_counter++; // 1us
-
-				if (rec_counter > RES_VAR_LEN - 1)
-				{
-					while (1)
-					{
-						printk("\nfinito\n");
-						k_sleep(K_MSEC(1000));
-					};
-				}
-
-			} //	gpio_pin_set_dt(&led0, 0);
-		}
+/*
 
 
 
+	if (!device_is_ready(adc_dev))
+	{
+		printk("ADC not ready\n");
+		return;
+	}
 
+	// adc_channel_setup(adc_dev, &channel_cfg_0);
+	adc_channel_setup(adc_dev, &channel_cfg_1);
+	adc_channel_setup(adc_dev, &channel_cfg_2);
+	adc_channel_setup(adc_dev, &channel_cfg_3);
+	adc_channel_setup(adc_dev, &channel_cfg_4);
 
+	if (dk_leds_init() != 0)
+	{
+		LOG_ERR("Failed to initialize the LED library");
+	}
 
+	err = modem_configure();
+	if (err)
+	{
+		LOG_ERR("Failed to configure the modem");
+		return 0;
+	}
 
-		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
-		if (err < 0)
-		{
-			LOG_ERR("Error in poll(): %d", errno);
-			break;
-		}
+	if (dk_buttons_init(button_handler) != 0)
+	{
+		LOG_ERR("Failed to initialize the buttons library");
+	}
 
-		err = mqtt_live(&client);
-		if ((err != 0) && (err != -EAGAIN))
-		{
-			LOG_ERR("Error in mqtt_live: %d", err);
-			break;
-		}
+	err = client_init(&client);
+	if (err)
+	{
+		LOG_ERR("Failed to initialize MQTT client: %d", err);
+		return 0;
+	}
 
-		if ((fds.revents & POLLIN) == POLLIN)
-		{
-			err = mqtt_input(&client);
-			if (err != 0)
-			{
-				LOG_ERR("Error in mqtt_input: %d", err);
-				break;
-			}
-		}
+do_connect:
+	if (connect_attempt++ > 0)
+	{
+		LOG_INF("Reconnecting in %d seconds...",
+				CONFIG_MQTT_RECONNECT_DELAY_S);
+		k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
+	}
 
-		if ((fds.revents & POLLERR) == POLLERR)
-		{
-			LOG_ERR("POLLERR");
-			break;
-		}
-
-		if ((fds.revents & POLLNVAL) == POLLNVAL)
-		{
-			LOG_ERR("POLLNVAL");
-			break;
-		}
-
-		LOG_INF("Disconnecting MQTT client");
-
-		err = mqtt_disconnect(&client);
-		if (err)
-		{
-			LOG_ERR("Could not disconnect MQTT client: %d", err);
-		}
+	err = mqtt_connect(&client);
+	if (err)
+	{
+		LOG_ERR("Error in mqtt_connect: %d", err);
 		goto do_connect;
-	*/
+	}
 
-	/* This is never reached */
+	err = fds_init(&client, &fds);
+	if (err)
+	{
+		LOG_ERR("Error in fds_init: %d", err);
+		return 0;
+	}
 
+	if (record_cnt > 500)
+	{
+		send_multiple_packets(5);
+		record_cnt = 0;
+	}
+	else
+	{
+		record_cnt++;
+		k_sleep(K_MSEC(100));
+	}
+
+	while (1)
+	{
+
+		rec_counter = 0;
+		int16_t sample_buffer2[4] = {0};
+
+		// gpio_pin_set_dt(&led0, 1);
+		// gpio_pin_toggle_dt(&led0);
+		// adc_read(adc_dev, &sequence);
+		if (ADC_SAMPLE_FLAG == 1)
+		{
+			// gpio_pin_set_dt(&led0, 1);
+			ADC_SAMPLE_FLAG = 0;
+			adc_read(adc_dev, &sequence);				   // takes 248 us
+			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
+			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+
+			ch0_volt[rec_counter] = sample_buffer2[0];
+			ch1_volt[rec_counter] = sample_buffer2[1];
+			ch0_int[rec_counter] = sample_buffer2[2];
+			ch1_int[rec_counter] = sample_buffer2[3];
+			rec_counter++; // 1us
+
+			if (rec_counter > RES_VAR_LEN - 1)
+			{
+				while (1)
+				{
+					printk("\nfinito\n");
+					k_sleep(K_MSEC(1000));
+				};
+			}
+
+		} //	gpio_pin_set_dt(&led0, 0);
+	}
+
+
+
+
+
+
+
+	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
+	if (err < 0)
+	{
+		LOG_ERR("Error in poll(): %d", errno);
+		break;
+	}
+
+	err = mqtt_live(&client);
+	if ((err != 0) && (err != -EAGAIN))
+	{
+		LOG_ERR("Error in mqtt_live: %d", err);
+		break;
+	}
+
+	if ((fds.revents & POLLIN) == POLLIN)
+	{
+		err = mqtt_input(&client);
+		if (err != 0)
+		{
+			LOG_ERR("Error in mqtt_input: %d", err);
+			break;
+		}
+	}
+
+	if ((fds.revents & POLLERR) == POLLERR)
+	{
+		LOG_ERR("POLLERR");
+		break;
+	}
+
+	if ((fds.revents & POLLNVAL) == POLLNVAL)
+	{
+		LOG_ERR("POLLNVAL");
+		break;
+	}
+
+	LOG_INF("Disconnecting MQTT client");
+
+	err = mqtt_disconnect(&client);
+	if (err)
+	{
+		LOG_ERR("Could not disconnect MQTT client: %d", err);
+	}
+	goto do_connect;
+*/
+
+/* This is never reached */
