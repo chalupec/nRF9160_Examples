@@ -36,7 +36,7 @@
 
 #define RMS_BUFFER_SIZE 100
 
-#define RES_VAR_LEN 16000
+#define RES_VAR_LEN 12000
 
 #define WAVE_SAMPLE_LEN 1024
 
@@ -154,6 +154,7 @@ int16_t ch0_volt[RES_VAR_LEN];
 int16_t ch1_volt[RES_VAR_LEN];
 int16_t ch0_int[RES_VAR_LEN];
 int16_t ch1_int[RES_VAR_LEN];
+int32_t total_recorded_samples = 0;
 
 int16_t circ_buff_ch0[CRCLR_BUFF_SIZE] = {0};
 int16_t circ_buff_ch1[CRCLR_BUFF_SIZE] = {0};
@@ -305,6 +306,54 @@ void send_multiple_packets(uint16_t total_packet_to_send)
 	train_counter++;
 }
 
+void send_measured_train_data_with_multiple_packets(void)
+{
+	uint16_t pckt_cnt = 1;
+	uint16_t total_packet_to_send = 0;
+	uint16_t array_offset = 0;
+
+	total_packet_to_send = total_recorded_samples / WAVE_SAMPLE_LEN;
+	total_packet_to_send++;
+
+	while (pckt_cnt <= total_packet_to_send)
+	{
+		seed_packet.packet_header = 0xBEEF;
+		seed_packet.packet_version = 0x0101;
+		seed_packet.actual_packet_nr = pckt_cnt++;
+		seed_packet.total_packet_nr = total_packet_to_send;
+
+		seed_packet.timestamp = 1748277406;
+		seed_packet.train_counter = train_counter;
+
+		seed_packet.CRC = 0xABCD;
+
+		memcpy(seed_packet.chan_0_vlt, &ch0_volt[array_offset], WAVE_SAMPLE_LEN*2);
+		memcpy(seed_packet.chan_1_vlt, &ch1_volt[array_offset], WAVE_SAMPLE_LEN*2);
+		memcpy(seed_packet.chan_0_int, &ch0_int[array_offset], WAVE_SAMPLE_LEN*2);
+		memcpy(seed_packet.chan_1_int, &ch1_int[array_offset], WAVE_SAMPLE_LEN*2);
+
+		array_offset = array_offset + WAVE_SAMPLE_LEN;
+
+		uint16_t sizestruct = sizeof(seed_packet);
+		LOG_INF("size of struct is: %d", sizestruct);
+		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
+
+		int err = 0;
+		//	err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
+		//						   byte_ptr, sizestruct);
+
+		err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
+						   byte_ptr, sizestruct);
+
+		if (err)
+		{
+			LOG_INF("Failed to send message, %d", err);
+			return;
+		}
+	}
+	train_counter++;
+}
+
 static void button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	switch (has_changed)
@@ -348,7 +397,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	case DK_BTN2_MSK:
 		if (button_state & DK_BTN2_MSK)
 		{
-			send_multiple_packets(50);
+			send_multiple_packets(5);
 		}
 		break;
 
@@ -590,6 +639,8 @@ int main(void)
 	offsets[3] = filtered_value_array[3];
 
 	buff_head = 0;
+	total_recorded_samples = 0;
+	uint8_t data_ready_to_send = 0;
 	while (1) // waiting for trigger
 	{
 
@@ -651,6 +702,8 @@ int main(void)
 				sample_cntr = last_circ_buff_record;
 			}
 
+			total_recorded_samples = sample_cntr;
+
 			while (1)
 			{
 
@@ -687,6 +740,7 @@ int main(void)
 					ch1_int[sample_cntr] = ch3_off_value;
 
 					sample_cntr++;
+					total_recorded_samples++;
 
 					if (sample_cntr > 2000)
 					{
@@ -733,51 +787,47 @@ int main(void)
 			ch1_int[samples_to_store_from_circ_buff] = ch1_int[samples_to_store_from_circ_buff] + 5000;
 #endif
 
-			/*
-							memcpy(ch0_volt, &circ_buff_ch0[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-							memcpy(ch0_int, &circ_buff_ch1[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-							memcpy(ch1_volt, &circ_buff_ch2[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-							memcpy(ch1_int, &circ_buff_ch3[last_circ_buff_record], (CRCLR_BUFF_SIZE - last_circ_buff_record) * 2);
-
-							memcpy(&ch0_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch0, last_circ_buff_record * 2);
-							memcpy(&ch0_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch1, last_circ_buff_record * 2);
-							memcpy(&ch1_volt[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch2, last_circ_buff_record * 2);
-							memcpy(&ch1_int[CRCLR_BUFF_SIZE - last_circ_buff_record], circ_buff_ch3, last_circ_buff_record * 2);
-
-							*/
-
+			data_ready_to_send = 1;
 			clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
 			clear_buffer(circ_buff_ch1, CRCLR_BUFF_SIZE);
 			clear_buffer(circ_buff_ch2, CRCLR_BUFF_SIZE);
 			clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
 
-			uint16_t prntcnt = 0;
-			while (prntcnt < 2500)
+			if (0)
 			{
-				if (1)
+				uint16_t prntcnt = 0;
+				while (prntcnt < 2500)
 				{
-					printk("%d, %d, %d, %d\n",
-						   ch0_volt[prntcnt],
-						   ch0_int[prntcnt],
-						   ch1_volt[prntcnt],
-						   ch1_int[prntcnt]);
+					if (1)
+					{
+						printk("%d, %d, %d, %d\n",
+							   ch0_volt[prntcnt],
+							   ch0_int[prntcnt],
+							   ch1_volt[prntcnt],
+							   ch1_int[prntcnt]);
+					}
+					else
+					{
+						printk("%d, %d, %d, %d\n",
+							   ch0_volt[prntcnt],
+							   0,
+							   0,
+							   0);
+					}
+					k_sleep(K_USEC(1000));
+					prntcnt++;
 				}
-				else
-				{
-					printk("%d, %d, %d, %d\n",
-						   ch0_volt[prntcnt],
-						   0,
-						   0,
-						   0);
-				}				
-				k_sleep(K_USEC(1000));
-				prntcnt++;
 			}
 
 			while (0)
 			{
 				// FIXME
 			}
+		}
+
+		if (data_ready_to_send == 1)
+		{
+			break;
 		}
 	}
 
@@ -826,40 +876,6 @@ do_connect:
 	while (1)
 	{
 
-		// gpio_pin_set_dt(&led0, 1);
-		// gpio_pin_toggle_dt(&led0);
-		// adc_read(adc_dev, &sequence);
-		if (ADC_SAMPLE_FLAG == 1)
-		{
-			// gpio_pin_set_dt(&led0, 1);
-			ADC_SAMPLE_FLAG = 0;
-			adc_read(adc_dev, &sequence);				   // takes 248 us
-			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
-			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
-
-			//    printk("\nfinito\n");
-
-			/*
-			ch0_volt[rec_counter]=sample_buffer2[0];
-			ch1_volt[rec_counter]=sample_buffer2[1];
-			ch0_int[rec_counter]=sample_buffer2[2];
-			ch1_int[rec_counter]=sample_buffer2[3];
-			rec_counter++;                              // 1us
-				*/
-
-			if (sample_print >= 4)
-			{
-				sample_print = 0;
-
-				printk("%d, %d, %d, %d\n",
-					   sample_buffer2[0],
-					   sample_buffer2[1],
-					   sample_buffer2[2],
-					   sample_buffer2[3]);
-			}
-			sample_print++;
-		}
-
 		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
 		if (err < 0)
 		{
@@ -895,7 +911,19 @@ do_connect:
 			LOG_ERR("POLLNVAL");
 			break;
 		}
-	}
+
+		if (data_ready_to_send == 1)
+		{
+			data_ready_to_send = 0;
+			printk("pause\n");
+			k_sleep(K_MSEC(2000));
+			//printk("pause 2 sec end\n");
+			//send_multiple_packets(5);
+			// send_multiple_packets(5);
+			send_measured_train_data_with_multiple_packets();
+		}
+
+		}
 
 	LOG_INF("Disconnecting MQTT client");
 
