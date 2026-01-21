@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "mqtt_working"
+		}
+	],
+	"settings": {
+		"nrf-connect.applications": [],
+		"files.associations": {
+			"type_traits": "c",
+			"utility": "c",
+			"mqtt_connection.h": "c"
+		}
+	}
+}
