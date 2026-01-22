@@ -5,7 +5,7 @@
 #define EXTERNAL_FLASH_MEMORY_USED
 #endif
 
-#include <Arduino.h>
+#include <nrfx_spim.h>
 
 //******************* Instruction Set ************// 
 #define SPI_FLASH_JEDEC_ID 	0x9f
@@ -27,8 +27,13 @@
 
 #define SPI_FLASH_ULBPR  	0x98
 
-#define SPI_FLASH_CS_SET_LOW  digitalWrite(BCM27, 0);
-#define SPI_FLASH_CS_SET_HIGH  digitalWrite(BCM27, 1);
+//#define SPI_FLASH_CS_SET_LOW  digitalWrite(BCM27, 0);
+//#define SPI_FLASH_CS_SET_HIGH  digitalWrite(BCM27, 1);
+
+
+
+extern nrfx_spim_t spim_inst;
+
 
 //unsigned char SPI_BYTE_RW(unsigned char value);
 
