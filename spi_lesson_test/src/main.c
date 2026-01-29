@@ -23,23 +23,25 @@ LOG_MODULE_REGISTER(PGM, LOG_LEVEL_INF);
 #define SPIM_INST_IDX 1
 
 /** @brief Symbol specifying pin number for MOSI. */
-#define MOSI_PIN 17
+#define MOSI_PIN 4
 
 /** @brief Symbol specifying pin number for MISO. */
-#define MISO_PIN 19
+#define MISO_PIN 1
 
 /** @brief Symbol specifying pin number for SCK. */
-#define SCK_PIN 16
+#define SCK_PIN 5
+
+#define MEM_CS_PIN 0
 
 /** @brief Symbol specifying message to be sent via SPIM data transfer. */
 #define MSG_TO_SEND "Nordic Semiconductor"
 
 
 /** @brief Transmit buffer initialized with the specified message ( @ref MSG_TO_SEND ). */
-uint8_t m_tx_buffer[30];
+uint8_t m_tx_buffer[64];
 
 /** @brief Receive buffer defined with the size to store specified message ( @ref MSG_TO_SEND ). */
-uint8_t m_rx_buffer[30];
+uint8_t m_rx_buffer[64];
 
 
 const struct gpio_dt_spec ledspec = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpios);
@@ -52,7 +54,7 @@ const struct gpio_dt_spec ledspec = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpios);
 #else
 static const struct gpio_dt_spec MEM_CS = {
     .port = DEVICE_DT_GET(DT_NODELABEL(gpio0)),
-    .pin  = 18,
+    .pin  = MEM_CS_PIN,
     .dt_flags = GPIO_ACTIVE_LOW,
 };
 
@@ -88,7 +90,7 @@ int main(void)
 nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
                                                               MOSI_PIN,
                                                               MISO_PIN,
-                                                              18);
+                                                              MEM_CS_PIN);
 
 #else
 
@@ -106,7 +108,7 @@ nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
     
 
     
-    spim_config.frequency=8000000;
+    spim_config.frequency=1000000;
 
     status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
     NRFX_ASSERT(status == NRFX_SUCCESS);
@@ -138,10 +140,11 @@ uint8_t cntr=0;
 
 while (cntr<32) {
     wr_buff[cntr]=cntr+cntradd;
+   // wr_buff[cntr]=cntr;
     cntr++;
 }
 cntradd+=0x30;
-//FLASH_MEMORY_WRITE_BYTE_ARRAY(0, wr_buff, 32);
+FLASH_MEMORY_WRITE_BYTE_ARRAY(0, wr_buff, 32);
 
 k_msleep(1000);
 
@@ -152,11 +155,11 @@ k_msleep(1000);
  LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
  LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
  LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-  LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
  LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
  LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
  LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-k_msleep(10000);
+ LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+k_msleep(1000);
 
 }
 
