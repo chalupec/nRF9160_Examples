@@ -473,7 +473,7 @@ set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@4000
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|reg" "0;")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|wakeup-source" "False")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|zephyr,pm-device-runtime-auto" "False")
-set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|spi-max-frequency" "1000000")
+set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|spi-max-frequency" "8000000")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|duplex" "0")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|frame-format" "0")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/peripheral@40000000/spi@9000/spi_config@0|spi-cpol" "False")

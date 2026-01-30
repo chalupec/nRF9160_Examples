@@ -108,7 +108,7 @@ nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
     
 
     
-    spim_config.frequency=1000000;
+    spim_config.frequency=8000000;
 
     status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
     NRFX_ASSERT(status == NRFX_SUCCESS);
@@ -146,7 +146,7 @@ while (cntr<32) {
 cntradd+=0x30;
 FLASH_MEMORY_WRITE_BYTE_ARRAY(0, wr_buff, 32);
 
-k_msleep(1000);
+k_msleep(2);
 
 
  FLASH_MEMORY_READ_DATA(0, rd_buff, 32) ;

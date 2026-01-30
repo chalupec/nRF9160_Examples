@@ -296,7 +296,7 @@
 				spi_config: spi_config@0 {
 					compatible = "bosch,bme280";
 					reg = < 0x0 >;
-					spi-max-frequency = < 0xf4240 >;
+					spi-max-frequency = < 0x7a1200 >;
 				};
 			};
 			spi2: spi@a000 {
