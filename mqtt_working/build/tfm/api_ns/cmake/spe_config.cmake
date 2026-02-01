@@ -55,7 +55,7 @@ set(PSA_FRAMEWORK_HAS_MM_IOVEC             OFF     CACHE BOOL   "Enable the MM-I
 set(TFM_ISOLATION_LEVEL                    1            CACHE STRING "The TFM isolation level")
 
 set(PLATFORM_DEFAULT_CRYPTO_KEYS           FALSE   CACHE BOOL   "Use the default crypto keys")
-set(PLATFORM_DEFAULT_UART_STDOUT           ON   CACHE BOOL   "Use default uart stdout implementation.")
+set(PLATFORM_DEFAULT_UART_STDOUT           OFF   CACHE BOOL   "Use default uart stdout implementation.")
 
 # Testing related options.
 

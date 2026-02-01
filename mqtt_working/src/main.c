@@ -26,10 +26,26 @@
 #include <hal/nrf_saadc.h>
 #include <nrfx_timer.h>
 
+
+
+
+#include <nrfx_spim.h>
+#include "../include/drivers/APS6404L.h"
+
+
+
 #include <zephyr/sys/reboot.h>
-
-
 #include <math.h>
+
+
+
+#define SPIM_INST_IDX 1
+#define MOSI_PIN 4
+#define MISO_PIN 1
+#define SCK_PIN 5
+#define MEM_CS_PIN 0
+
+
 
 // #define SAMPLE_PRINTING_ENABLED
 // #define CIRC_BUFF_STAMP_VALUE_ADD
@@ -70,7 +86,6 @@
 
 /** @brief Symbol specifying timer instance to be used. */
 #define TIMER_INST_IDX 0
-
 
 uint8_t jumpto_measurement_start_enabled=0;
 uint8_t mqtt_trigger_reset=0;
@@ -152,6 +167,8 @@ uint16_t train_counter = 0;
 static const struct device *adc_dev = DEVICE_DT_GET(ADC_NODE);
 
 static const nrfx_timer_t timer = NRFX_TIMER_INSTANCE(0);
+
+nrfx_spim_t spim_inst = NRFX_SPIM_INSTANCE(SPIM_INST_IDX);
 
 volatile uint8_t ADC_SAMPLE_FLAG = 0;
 
@@ -555,9 +572,76 @@ int main(void)
 	nrfx_err_t status;
 	(void)status;
 
+
+	k_sleep(K_MSEC(2000));
+printk("\nSAMPLE APP STARTS\n");
+	k_sleep(K_MSEC(2000));
+
+
 #if defined(__ZEPHYR__)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
 #endif
+
+
+	k_sleep(K_MSEC(1000));
+printk("SPIM INIT\n");
+	k_sleep(K_MSEC(1000));
+
+	nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
+                                                              MOSI_PIN,
+                                                              MISO_PIN,
+                                                              MEM_CS_PIN);
+
+ 	spim_config.frequency=8000000;
+
+    status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
+   // NRFX_ASSERT(status == NRFX_SUCCESS);
+
+
+	k_sleep(K_MSEC(100));
+printk("SPIM INIT finished\n");
+	k_sleep(K_MSEC(1000));
+
+ uint8_t wr_buff[32];
+    uint8_t rd_buff[32];
+    uint8_t cntradd=0;
+
+while (1) {
+uint8_t cntr=0;
+
+while (cntr<32) {
+    wr_buff[cntr]=cntr+cntradd;
+   // wr_buff[cntr]=cntr;
+    cntr++;
+}
+cntradd+=0x30;
+FLASH_MEMORY_WRITE_BYTE_ARRAY(0, wr_buff, 32);
+
+k_msleep(2);
+
+ FLASH_MEMORY_READ_DATA(0, rd_buff, 32) ;
+ uint8_t dcnt=0;
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+k_msleep(1000);
+
+}
+
+
+
+
+
+
+
+
+
+
 
 	int handle = 0;
 	int ret = 0;
@@ -579,7 +663,7 @@ int main(void)
 
 	k_sleep(K_MSEC(500));
 
-	printk("\nSAMPLE APP STARTS\n");
+	//printk("\nSAMPLE APP STARTS\n");
 
 	if (dk_leds_init() != 0)
 	{
@@ -705,7 +789,7 @@ int main(void)
 
 		if ((rms_value[0] > RMS_TRIG_TRESHOLD) || (rms_value[2] > RMS_TRIG_TRESHOLD))
 		{
-
+			LOG_INF("treshold crossed");
 			uint16_t sample_cntr = 0;
 
 			if (circ_buff_overflow == 1)

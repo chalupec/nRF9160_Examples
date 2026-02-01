@@ -100,8 +100,6 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/cmsis/mp
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/cmsis/mpu_armv8.h
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/cmsis/pac_armv81.h
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/cmsis/pmu_armv8.h
-C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/common/uart_stdout.c
-C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/common/uart_stdout.h
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/include/boot_hal.h
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/include/cmsis_override.h
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/include/exception_info.h

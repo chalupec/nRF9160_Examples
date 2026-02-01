@@ -338,21 +338,6 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/common/uart_stdout.c;C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/common/uart_stdout.h")
-  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
-    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
-  endif()
-  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
-    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
-  endif()
-  file(INSTALL DESTINATION "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/ext/common" TYPE FILE MESSAGE_NEVER FILES
-    "C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/platform/ext/common/uart_stdout.c"
-    "C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/platform/ext/common/uart_stdout.h"
-    )
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
    "C:/ADWITECH/nRF9160_Examples/mqtt_working/build/tfm/api_ns/platform/include")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")

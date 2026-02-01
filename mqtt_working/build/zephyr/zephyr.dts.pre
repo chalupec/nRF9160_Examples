@@ -1107,6 +1107,12 @@ arduino_spi: &spi3 {
 };
 
 
+
+&i2c0 { status = "disabled";};
+&spi0 { status = "disabled";};
+&i2c1 { status = "disabled";};
+
+
 &uart0_default {
  hw-flow-control = "false";
 
@@ -1118,7 +1124,7 @@ arduino_spi: &spi3 {
 
 
 &uart0 {
- current-speed = <921600>;
+ current-speed = <250000>;
 };
 
 
@@ -1132,6 +1138,41 @@ arduino_spi: &spi3 {
 &uart0_sleep {
  group1 {
   psels = <((((((0) * 32U) + (27)) & 0x7FU) << 0U) | ((0U & 0xFFFFU) << 16U))>, <((((((0) * 32U) + (26)) & 0x7FU) << 0U) | ((1U & 0xFFFFU) << 16U))>;
+ };
+};
+
+
+&spi1 {
+    compatible = "nordic,nrf-spim";
+ status = "okay";
+ pinctrl-0 = <&spi1_default>;
+ pinctrl-1 = <&spi1_sleep>;
+ pinctrl-names = "default", "sleep";
+ cs-gpios = <&gpio0 0 (1 << 0)>;
+ spi_config: spi_config@0 {
+  compatible = "bosch,bme280";
+  reg = <0>;
+  spi-max-frequency = <8000000>;
+ };
+};
+
+
+&pinctrl {
+ spi1_default: spi1_default {
+  group1 {
+    psels = <((((((0) * 32U) + (5)) & 0x7FU) << 0U) | ((4U & 0xFFFFU) << 16U))>,
+      <((((((0) * 32U) + (4)) & 0x7FU) << 0U) | ((5U & 0xFFFFU) << 16U))>,
+      <((((((0) * 32U) + (1)) & 0x7FU) << 0U) | ((6U & 0xFFFFU) << 16U))>;
+  };
+ };
+
+ spi1_sleep: spi1_sleep {
+  group1 {
+    psels = <((((((0) * 32U) + (5)) & 0x7FU) << 0U) | ((4U & 0xFFFFU) << 16U))>,
+      <((((((0) * 32U) + (4)) & 0x7FU) << 0U) | ((5U & 0xFFFFU) << 16U))>,
+      <((((((0) * 32U) + (1)) & 0x7FU) << 0U) | ((6U & 0xFFFFU) << 16U))>;
+    low-power-enable;
+  };
  };
 };
 # 0 "<command-line>" 2

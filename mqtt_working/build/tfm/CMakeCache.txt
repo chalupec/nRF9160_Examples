@@ -313,7 +313,7 @@ CONFIG_TFM_ENABLE_MVE_FP:BOOL=OFF
 CONFIG_TFM_ENABLE_PROFILING:BOOL=OFF
 
 //On fatal errors in the secure firmware, halt instead of rebooting.
-CONFIG_TFM_HALT_ON_CORE_PANIC:BOOL=
+CONFIG_TFM_HALT_ON_CORE_PANIC:BOOL=y
 
 //Enable/disable lazy stacking
 CONFIG_TFM_LAZY_STACKING:BOOL=OFF
@@ -512,7 +512,7 @@ PLATFORM_DEFAULT_ROTPK:BOOL=OFF
 PLATFORM_DEFAULT_SYSTEM_RESET_HALT:BOOL=OFF
 
 //Use default uart stdout implementation.
-PLATFORM_DEFAULT_UART_STDOUT:BOOL=ON
+PLATFORM_DEFAULT_UART_STDOUT:BOOL=OFF
 
 //Path to platform directory
 PLATFORM_DIR:PATH=C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/platform
@@ -555,7 +555,7 @@ PYTHON_PREFER:UNINITIALIZED=C:/ncs/toolchains/cf2149caf2/opt/bin/python.exe
 Python3_EXECUTABLE:UNINITIALIZED=C:/ncs/toolchains/cf2149caf2/opt/bin/python.exe
 
 //Enable secure UART1
-SECURE_UART1:BOOL=y
+SECURE_UART1:BOOL=
 
 //Use symmetric crypto for inital attestation
 SYMMETRIC_INITIAL_ATTESTATION:BOOL=OFF
@@ -684,7 +684,7 @@ TFM_PROFILE:STRING=
 TFM_PXN_ENABLE:BOOL=OFF
 
 //Set minsizerel SPM log level as Silence level
-TFM_SPM_LOG_LEVEL:STRING=TFM_SPM_LOG_LEVEL_INFO
+TFM_SPM_LOG_LEVEL:STRING=TFM_SPM_LOG_LEVEL_SILENCE
 
 //Path to TFM compiler toolchain file
 TFM_TOOLCHAIN_FILE:FILEPATH=C:/ncs/v2.6.0/modules/tee/tf-m/trusted-firmware-m/toolchain_GNUARM.cmake
