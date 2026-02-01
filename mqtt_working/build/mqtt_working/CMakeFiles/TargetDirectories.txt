@@ -177,6 +177,8 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/l
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/utils/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/utils/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/sntp/CMakeFiles/edit_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/sntp/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/mqtt/CMakeFiles/subsys__net__lib__mqtt.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/mqtt/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/mqtt/CMakeFiles/rebuild_cache.dir
@@ -265,6 +267,9 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/fla
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/flash_patch/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/fatal_error/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/fatal_error/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/date_time/CMakeFiles/..__nrf__lib__date_time.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/date_time/CMakeFiles/edit_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/date_time/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/modem_antenna/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/modem_antenna/CMakeFiles/..__nrf__lib__modem_antenna.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/modem_antenna/CMakeFiles/rebuild_cache.dir

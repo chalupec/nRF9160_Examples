@@ -1,4 +1,4 @@
-# Install script for directory: C:/ncs/v2.9.0/zephyr/subsys/net/lib
+# Install script for directory: C:/ncs/v2.9.0/nrf/lib/date_time
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,25 +35,5 @@ endif()
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
   set(CMAKE_OBJDUMP "C:/ncs/toolchains/b620d30767/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump.exe")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/utils/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/sntp/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/mqtt/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/net/lib/sockets/cmake_install.cmake")
 endif()
 
