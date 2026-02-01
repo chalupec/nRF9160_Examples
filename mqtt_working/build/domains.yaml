@@ -1,0 +1,7 @@
+default: mqtt_working
+build_dir: C:/ADWITECH/nRF9160_Examples/mqtt_working/build
+domains:
+  - name: mqtt_working
+    build_dir: C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working
+flash_order:
+  - mqtt_working

@@ -573,9 +573,9 @@ int main(void)
 	(void)status;
 
 
-	k_sleep(K_MSEC(2000));
+	k_sleep(K_MSEC(500));
 printk("\nSAMPLE APP STARTS\n");
-	k_sleep(K_MSEC(2000));
+	k_sleep(K_MSEC(500));
 
 
 #if defined(__ZEPHYR__)
@@ -583,9 +583,9 @@ printk("\nSAMPLE APP STARTS\n");
 #endif
 
 
-	k_sleep(K_MSEC(1000));
+	k_sleep(K_MSEC(500));
 printk("SPIM INIT\n");
-	k_sleep(K_MSEC(1000));
+	k_sleep(K_MSEC(500));
 
 	nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
                                                               MOSI_PIN,
@@ -598,15 +598,17 @@ printk("SPIM INIT\n");
    // NRFX_ASSERT(status == NRFX_SUCCESS);
 
 
-	k_sleep(K_MSEC(100));
+	k_sleep(K_MSEC(500));
 printk("SPIM INIT finished\n");
-	k_sleep(K_MSEC(1000));
+	k_sleep(K_MSEC(500));
 
  uint8_t wr_buff[32];
     uint8_t rd_buff[32];
     uint8_t cntradd=0;
 
-while (1) {
+
+	uint8_t demowrite=2;
+while (demowrite--) {
 uint8_t cntr=0;
 
 while (cntr<32) {

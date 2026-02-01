@@ -1,10 +1,10 @@
 {
-  "toolchainPath": "c:\\ncs\\toolchains\\cf2149caf2",
-  "sdkPath": "c:\\ncs\\v2.6.0",
-  "board": "nrf9161dk_nrf9161_ns",
-  "boardDir": "c:/ncs/v2.6.0/zephyr/boards/arm/nrf9161dk_nrf9161",
+  "toolchainPath": "c:\\ncs\\toolchains\\b620d30767",
+  "sdkPath": "c:\\ncs\\v2.9.0",
+  "board": "nrf9161dk/nrf9161/ns",
+  "boardDir": "c:\\ncs\\v2.9.0\\zephyr\\boards\\nordic\\nrf9161dk",
   "boardDirs": [
-    "c:/ncs/v2.6.0/zephyr/boards/arm/nrf9161dk_nrf9161"
+    "c:\\ncs\\v2.9.0\\zephyr\\boards\\nordic\\nrf9161dk"
   ],
   "optimizations": "none",
   "cmakeArgs": [],
