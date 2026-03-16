@@ -780,14 +780,14 @@ int main(void)
 
 		FLASH_MEMORY_READ_DATA(0, rd_buff, 32);
 		uint8_t dcnt = 0;
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-//	LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
+		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
 		k_msleep(1000);
 	}
 
