@@ -26,7 +26,7 @@ extern uint8_t mqtt_trigger_reset;
 /* MQTT Broker details. */
 static struct sockaddr_storage broker;
 
-LOG_MODULE_DECLARE(Lesson4_Exercise1);
+LOG_MODULE_DECLARE(LIS); //Lesson4_Exercise1
 
 
 
@@ -135,7 +135,7 @@ int data_publish(struct mqtt_client *c, enum mqtt_qos qos,
 	param.dup_flag = 0;
 	param.retain_flag = 0;
 
-	data_print("Publishing: ", data, len);
+	//data_print("Publishing: ", data, len);
 	LOG_INF("to topic: %s len: %u",
 		CONFIG_MQTT_PUB_TOPIC,
 		(unsigned int)strlen(CONFIG_MQTT_PUB_TOPIC));

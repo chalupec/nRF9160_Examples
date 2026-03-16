@@ -1,6 +1,6 @@
 /*
  * TODO
- * 
+ *
  * - rozliseni pomoci define na ruzne jednotky and topics NRF/01/UP_STREAM
  * - jak ukoncit mereni rms check? skrz detekci prujezdu? ale spis skrz napeti pulsy
  */
@@ -26,20 +26,16 @@
 #include <hal/nrf_saadc.h>
 #include <nrfx_timer.h>
 
-
 #include <date_time.h>
 
 #include <nrfx_spim.h>
 #include "../include/drivers/APS6404L.h"
 
-
-
 #include <zephyr/sys/reboot.h>
 #include <math.h>
-//#include <clock.h>
+// #include <clock.h>
 
 #include <sys/_types.h>
-
 
 #define SPIM_INST_IDX 1
 #define MOSI_PIN 4
@@ -47,28 +43,27 @@
 #define SCK_PIN 5
 #define MEM_CS_PIN 0
 
-
-
 // #define SAMPLE_PRINTING_ENABLED
 // #define CIRC_BUFF_STAMP_VALUE_ADD
 
 #define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
-#define RMS_TRIG_TRESHOLD 500
+#define RMS_TRIG_TRESHOLD 1000
+#define END_RMS_TRIG_TRESHOLD 100
+#define RMS_LOW_SAMPLES_TO_TRIGGER_END 3000 // cca 1,5 sec
 
 #define RMS_BUFFER_SIZE 100
 
-#define NR_OF_SAMPLES_TO_MEASURE 13500
+#define NR_OF_SAMPLES_TO_MEASURE 27000 // 13500
 
 #define RES_VAR_LEN 15000
 
-#define WAVE_SAMPLE_LEN 1024   // MUST BE SAME AS CRCLR_BUFF_SIZE
+#define WAVE_SAMPLE_LEN 1024 // MUST BE SAME AS CRCLR_BUFF_SIZE
 
-#define CRCLR_BUFF_SIZE 1024	// MUST BE SAME AS WAVE_SAMPLE_LEN
+#define CRCLR_BUFF_SIZE 1024 // MUST BE SAME AS WAVE_SAMPLE_LEN
 
-
-#define FLASH_BYTE_READ_OUT_LEN 32   // POZOR OMEZENI VE FCI FLASH READ v driver knihovne, na max 32
+#define FLASH_BYTE_READ_OUT_LEN 32 // POZOR OMEZENI VE FCI FLASH READ v driver knihovne, na max 32
 
 /** @brief Symbol specifying time in milliseconds to wait for handler execution. */
 #define TIME_TO_WAIT_US 500UL
@@ -92,9 +87,8 @@
 /** @brief Symbol specifying timer instance to be used. */
 #define TIMER_INST_IDX 0
 
-uint8_t jumpto_measurement_start_enabled=0;
-uint8_t mqtt_trigger_reset=0;
-
+uint8_t jumpto_measurement_start_enabled = 0;
+uint8_t mqtt_trigger_reset = 0;
 
 int32_t rms_value[4] = {0};
 
@@ -116,11 +110,6 @@ int64_t sum_squares_ch3 = 0;
 volatile uint16_t last_circ_buff_record = 0;
 
 uint32_t record_unix_time_s;
-
-
-
-
-
 
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
 volatile uint8_t index = 0;
@@ -188,6 +177,10 @@ int16_t sample_buffer[4];
 
 uint16_t rec_counter = 0;
 
+uint16_t rms_low_counter_to_end = 0;
+
+uint8_t trigger_measurement_end = 0;
+
 int16_t ch0_volt[RES_VAR_LEN];
 int16_t ch1_volt[RES_VAR_LEN];
 int16_t ch0_int[RES_VAR_LEN];
@@ -201,12 +194,12 @@ int16_t circ_buff_ch3[CRCLR_BUFF_SIZE] = {0};
 uint16_t buff_head = 0;
 uint8_t circ_buff_overflow = 0;
 
-uint32_t flash_address_write=0;
-uint32_t flash_address_read=0;
+uint32_t flash_address_write = 0;
+uint32_t flash_address_read = 0;
 uint8_t flash_write_buffer_byte[FLASH_BYTE_READ_OUT_LEN + 32];
 uint8_t flash_read_buffer_byte[FLASH_BYTE_READ_OUT_LEN + 32];
 
-
+int16_t snd_cnt = 0;
 
 static const struct adc_sequence sequence = {
 	.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
@@ -259,7 +252,7 @@ static void timer_handler(nrf_timer_event_t event_type, void *p_context)
 	}
 }
 
-LOG_MODULE_REGISTER(Lesson4_Exercise1, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(LIS, LOG_LEVEL_INF); // Lesson4_Exercise1
 
 static void lte_handler(const struct lte_lc_evt *const evt)
 {
@@ -326,14 +319,14 @@ void send_multiple_packets(uint16_t total_packet_to_send)
 		seed_packet.train_counter = train_counter;
 
 		seed_packet.CRC = 0xABCD;
-/*
-		memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
-		memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
-		memcpy(seed_packet.chan_0_int, chan_dat_128, 128);
-		memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
-*/
+		/*
+				memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
+				memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
+				memcpy(seed_packet.chan_0_int, chan_dat_128, 128);
+				memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
+		*/
 		uint16_t sizestruct = sizeof(seed_packet);
-	//	LOG_INF("size of struct is: %d", sizestruct);
+		//	LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
 		//	int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
@@ -350,8 +343,6 @@ void send_multiple_packets(uint16_t total_packet_to_send)
 	}
 	train_counter++;
 }
-
-
 
 void send_measured_train_data_with_multiple_packets(void)
 {
@@ -374,15 +365,15 @@ void send_measured_train_data_with_multiple_packets(void)
 
 		seed_packet.CRC = 0xABCD;
 
-		memcpy(seed_packet.chan_0_vlt, &ch0_volt[array_offset], WAVE_SAMPLE_LEN*2);
-		memcpy(seed_packet.chan_1_vlt, &ch1_volt[array_offset], WAVE_SAMPLE_LEN*2);
-		memcpy(seed_packet.chan_0_int, &ch0_int[array_offset], WAVE_SAMPLE_LEN*2);
-		memcpy(seed_packet.chan_1_int, &ch1_int[array_offset], WAVE_SAMPLE_LEN*2);
+		memcpy(seed_packet.chan_0_vlt, &ch0_volt[array_offset], WAVE_SAMPLE_LEN * 2);
+		memcpy(seed_packet.chan_1_vlt, &ch1_volt[array_offset], WAVE_SAMPLE_LEN * 2);
+		memcpy(seed_packet.chan_0_int, &ch0_int[array_offset], WAVE_SAMPLE_LEN * 2);
+		memcpy(seed_packet.chan_1_int, &ch1_int[array_offset], WAVE_SAMPLE_LEN * 2);
 
 		array_offset = array_offset + WAVE_SAMPLE_LEN;
 
 		uint16_t sizestruct = sizeof(seed_packet);
-	//	LOG_INF("size of struct is: %d", sizestruct);
+		//	LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
 		int err = 0;
@@ -406,15 +397,16 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 	uint16_t pckt_cnt = 1;
 	uint16_t total_packet_to_send = 0;
 	uint16_t array_offset = 0;
-	uint16_t samples_to_load_cntr=0;
-	uint16_t fl_buff_bcnt=0;
+	uint16_t samples_to_load_cntr = 0;
+	uint16_t fl_buff_bcnt = 0;
 
 	total_packet_to_send = total_recorded_samples / WAVE_SAMPLE_LEN;
-	if (circ_buff_overflow==1) {
+	if (circ_buff_overflow == 1)
+	{
 		total_packet_to_send++;
 	}
 
-	flash_address_read=0;
+	flash_address_read = 0;
 	while (pckt_cnt <= total_packet_to_send)
 	{
 		seed_packet.packet_header = 0xBEEF;
@@ -424,9 +416,10 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 		seed_packet.timestamp = record_unix_time_s;
 		seed_packet.train_counter = train_counter;
 		seed_packet.CRC = 0xABCD;
-	
-		if (circ_buff_overflow==1) {  //circ_buff_overflow occured then use buffered data, than use psram data
-			circ_buff_overflow=0;
+
+		if (circ_buff_overflow == 1)
+		{ // circ_buff_overflow occured then use buffered data, than use psram data
+			circ_buff_overflow = 0;
 
 			uint16_t temp_head;
 			uint16_t temp_tail;
@@ -437,50 +430,106 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 			LOG_INF("cicr buff ovrflw, aligning result");
 			LOG_INF("buff head: %d, tail: %d", temp_head, temp_tail);
 
-			if (temp_tail==0) {
-				memcpy(seed_packet.chan_0_vlt, circ_buff_ch0, CRCLR_BUFF_SIZE*2);
-				memcpy(seed_packet.chan_0_int, circ_buff_ch1, CRCLR_BUFF_SIZE*2);
-				memcpy(seed_packet.chan_1_vlt, circ_buff_ch2, CRCLR_BUFF_SIZE*2);
-				memcpy(seed_packet.chan_1_int, circ_buff_ch3, CRCLR_BUFF_SIZE*2);
-			} else {
-				memcpy(seed_packet.chan_0_vlt, &circ_buff_ch0[temp_head], temp_tail*2);
-				memcpy(seed_packet.chan_0_int, &circ_buff_ch1[temp_head], temp_tail*2);
-				memcpy(seed_packet.chan_1_vlt, &circ_buff_ch2[temp_head], temp_tail*2);
-				memcpy(seed_packet.chan_1_int, &circ_buff_ch3[temp_head], temp_tail*2);
-
-				memcpy(&seed_packet.chan_0_vlt[temp_tail], circ_buff_ch0, temp_head*2);
-				memcpy(&seed_packet.chan_0_int[temp_tail], circ_buff_ch1, temp_head*2);
-				memcpy(&seed_packet.chan_1_vlt[temp_tail], circ_buff_ch2, temp_head*2);
-				memcpy(&seed_packet.chan_1_int[temp_tail], circ_buff_ch3, temp_head*2);
+			if (temp_tail == 0)
+			{
+				memcpy(seed_packet.chan_0_vlt, circ_buff_ch0, CRCLR_BUFF_SIZE * 2);
+				memcpy(seed_packet.chan_0_int, circ_buff_ch1, CRCLR_BUFF_SIZE * 2);
+				memcpy(seed_packet.chan_1_vlt, circ_buff_ch2, CRCLR_BUFF_SIZE * 2);
+				memcpy(seed_packet.chan_1_int, circ_buff_ch3, CRCLR_BUFF_SIZE * 2);
 			}
+			else
+			{
+				memcpy(seed_packet.chan_0_vlt, &circ_buff_ch0[temp_head], temp_tail * 2);
+				memcpy(seed_packet.chan_0_int, &circ_buff_ch1[temp_head], temp_tail * 2);
+				memcpy(seed_packet.chan_1_vlt, &circ_buff_ch2[temp_head], temp_tail * 2);
+				memcpy(seed_packet.chan_1_int, &circ_buff_ch3[temp_head], temp_tail * 2);
 
-		} else {
-			samples_to_load_cntr=0;
-			while (samples_to_load_cntr<WAVE_SAMPLE_LEN) {
-				fl_buff_bcnt=0;
-				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, FLASH_BYTE_READ_OUT_LEN) ;
-				flash_address_read+=FLASH_BYTE_READ_OUT_LEN;
-
-				fl_buff_bcnt=0;
-				while (fl_buff_bcnt<FLASH_BYTE_READ_OUT_LEN) {
-					seed_packet.chan_0_vlt[samples_to_load_cntr]=flash_read_buffer_byte[fl_buff_bcnt++]<<8;
-					seed_packet.chan_0_vlt[samples_to_load_cntr]|=flash_read_buffer_byte[fl_buff_bcnt++];
-
-					seed_packet.chan_0_int[samples_to_load_cntr]=flash_read_buffer_byte[fl_buff_bcnt++]<<8;
-					seed_packet.chan_0_int[samples_to_load_cntr]|=flash_read_buffer_byte[fl_buff_bcnt++];
-
-					seed_packet.chan_1_vlt[samples_to_load_cntr]=flash_read_buffer_byte[fl_buff_bcnt++]<<8;
-					seed_packet.chan_1_vlt[samples_to_load_cntr]|=flash_read_buffer_byte[fl_buff_bcnt++];
-
-					seed_packet.chan_1_int[samples_to_load_cntr]=flash_read_buffer_byte[fl_buff_bcnt++]<<8;
-					seed_packet.chan_1_int[samples_to_load_cntr]|=flash_read_buffer_byte[fl_buff_bcnt++];
+				memcpy(&seed_packet.chan_0_vlt[temp_tail], circ_buff_ch0, temp_head * 2);
+				memcpy(&seed_packet.chan_0_int[temp_tail], circ_buff_ch1, temp_head * 2);
+				memcpy(&seed_packet.chan_1_vlt[temp_tail], circ_buff_ch2, temp_head * 2);
+				memcpy(&seed_packet.chan_1_int[temp_tail], circ_buff_ch3, temp_head * 2);
+			}
+		}
+		else
+		{
+			samples_to_load_cntr = 0;
+			while (samples_to_load_cntr < WAVE_SAMPLE_LEN)
+			{
+				fl_buff_bcnt = 0;
+				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, FLASH_BYTE_READ_OUT_LEN);
+				k_sleep(K_MSEC(1));
+				flash_address_read += FLASH_BYTE_READ_OUT_LEN;
+				fl_buff_bcnt = 0;
+				while (fl_buff_bcnt < FLASH_BYTE_READ_OUT_LEN)
+				{
+					seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+					seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+					seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+					seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+					seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+					seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+					seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+					seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
 					samples_to_load_cntr++;
 				}
+
+
+/*
+				fl_buff_bcnt = 0;
+				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
+				flash_address_read += 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				samples_to_load_cntr++;
+
+				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
+				flash_address_read += 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				samples_to_load_cntr++;
+				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
+				flash_address_read += 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				samples_to_load_cntr++;
+				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
+				flash_address_read += 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
+				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
+				samples_to_load_cntr++;
+*/
+
+
+
 			}
 		}
 
 		uint16_t sizestruct = sizeof(seed_packet);
-		//LOG_INF("size of struct is: %d", sizestruct);
+		// LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
 		int err = 0;
@@ -496,8 +545,6 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 	}
 	train_counter++;
 }
-
-
 
 static void button_handler(uint32_t button_state, uint32_t has_changed)
 {
@@ -612,15 +659,15 @@ int32_t update_rms(int32_t *buffer, size_t *indexx, int64_t *sum_squares, int32_
 	return (int32_t)sqrt((double)mean_square);
 }
 
-
-void circular_buffer_init(void) {
+void circular_buffer_init(void)
+{
 	buff_head = 0;
 	circ_buff_overflow = 1;
 	clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
 	clear_buffer(circ_buff_ch1, CRCLR_BUFF_SIZE);
 	clear_buffer(circ_buff_ch2, CRCLR_BUFF_SIZE);
 	clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
-	}
+}
 
 uint16_t circular_buffer_add_value(int16_t value0, int16_t value1, int16_t value2, int16_t value3)
 {
@@ -690,35 +737,31 @@ void saturate_channel_values(void)
 	}
 }
 
-
-
-
 void get_time_procedure(void)
 {
-    int err = date_time_update_async(NULL);
-    if (err) {
-        printk("date_time_update_async error: %d\n", err);
-    }
+	int err = date_time_update_async(NULL);
+	if (err)
+	{
+		printk("date_time_update_async error: %d\n", err);
+	}
 
-    struct tm timeinfo;
-    int64_t unix_time_ms;
+	struct tm timeinfo;
+	int64_t unix_time_ms;
 
-    if (date_time_now(&unix_time_ms)) {
-        printk("Failed to get time\n");
-        return;
-    }
+	if (date_time_now(&unix_time_ms))
+	{
+		printk("Failed to get time\n");
+		return;
+	}
 
-    time_t unix_time_s = unix_time_ms / 1000;
+	time_t unix_time_s = unix_time_ms / 1000;
 
-	record_unix_time_s=unix_time_ms / 1000;
+	record_unix_time_s = unix_time_ms / 1000;
 
+	gmtime_r(&unix_time_s, &timeinfo);
 
-    gmtime_r(&unix_time_s, &timeinfo);
-
-    printk("Current UTC time: %s", asctime(&timeinfo));
+	printk("Current UTC time: %s", asctime(&timeinfo));
 }
-
-
 
 int main(void)
 {
@@ -749,6 +792,7 @@ int main(void)
 															  MEM_CS_PIN);
 
 	spim_config.frequency = 8000000;
+	//spim_config.irq_priority   = 2;
 
 	status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
 	// NRFX_ASSERT(status == NRFX_SUCCESS);
@@ -761,35 +805,233 @@ int main(void)
 	uint8_t rd_buff[32];
 	uint8_t cntradd = 0;
 
-	uint8_t demowrite = 0;
+	uint32_t demowrite = 160000;
+	int16_t smpl = 0;
+	uint32_t adrrr = 0;
+	uint8_t cntr = 0;
 	while (demowrite--)
 	{
-		uint8_t cntr = 0;
 
-		while (cntr < 32)
+		if (smpl == 5000)
 		{
-			wr_buff[cntr] = cntr + cntradd;
-			// wr_buff[cntr]=cntr;
-			cntr++;
+			smpl = -5000;
 		}
-		cntradd += 0x30;
+		cntr = 0;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		cntr = 0;
+		//	LOG_INF("%d\t%d\t%d\t%d\t %d\t%d\t%d\t%d", wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++]);
 
-		FLASH_MEMORY_WRITE_BYTE_ARRAY(0, wr_buff, 32);
-
-		k_msleep(2);
-
-		FLASH_MEMORY_READ_DATA(0, rd_buff, 32);
-		uint8_t dcnt = 0;
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		LOG_INF("%02hhx %02hhx %02hhx %02hhx", rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++], rd_buff[dcnt++]);
-		k_msleep(1000);
+		FLASH_MEMORY_WRITE_BYTE_ARRAY(adrrr, wr_buff, 8);
+		//	k_msleep(2000);
+		adrrr = adrrr + 8;
+		smpl++;
 	}
+
+	k_msleep(2);
+
+	demowrite = 50000;
+	adrrr = 0;
+	int16_t res[4] = {0};
+	smpl = 0;
+	uint16_t errcnt = 0;
+	while (demowrite--)
+	{
+		FLASH_MEMORY_READ_DATA(adrrr, rd_buff, 8);
+		adrrr = adrrr + 8;
+		cntr = 0;
+		res[0] = (int16_t)rd_buff[cntr++] << 8;
+		res[0] |= rd_buff[cntr++] & 0xff;
+
+		res[1] = (int16_t)rd_buff[cntr++] << 8;
+		res[1] |= rd_buff[cntr++] & 0xff;
+
+		res[2] = (int16_t)rd_buff[cntr++] << 8;
+		res[2] |= rd_buff[cntr++] & 0xff;
+
+		res[3] = (int16_t)rd_buff[cntr++] << 8;
+		res[3] |= rd_buff[cntr++] & 0xff;
+
+		if (smpl == 5000)
+		{
+			smpl = -5000;
+		}
+
+		if ((smpl == res[0]) && (smpl == res[1]) && (smpl == res[2]) && (smpl == res[3]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+
+		smpl++;
+
+		// LOG_INF("%d\t%d\t%d\t%d", res[0], res[1], res[2], res[3]);
+
+		// k_msleep(3);
+	}
+
+	LOG_INF("error samples 8rd  count %d", errcnt);
+
+	k_msleep(200);
+
+
+
+	demowrite = 20000;
+	adrrr = 0;
+	smpl = 0;
+	errcnt = 0;
+	int16_t ress[16]={0};
+	uint16_t ancnt=0;
+	while (demowrite--)
+	{
+		FLASH_MEMORY_READ_DATA(adrrr, rd_buff, 32);
+
+
+
+		adrrr = adrrr + 32;
+		cntr = 0;
+		ancnt=0;
+		while (ancnt<16) {
+			ress[ancnt] = (int16_t)rd_buff[cntr++] << 8;
+			ress[ancnt++] |= rd_buff[cntr++] & 0xff;
+		}
+
+	
+
+	    if (smpl == 5000)
+		{
+			smpl = -5000;
+		}
+		
+
+		if ((smpl == ress[0]) && (smpl == ress[1]) && (smpl == ress[2]) && (smpl == ress[3]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+
+
+		if ((smpl == ress[4]) && (smpl == ress[5]) && (smpl == ress[6]) && (smpl == ress[7]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+
+
+	    if ((smpl == ress[8]) && (smpl == ress[9]) && (smpl == ress[10]) && (smpl == ress[11]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+
+
+		if ((smpl == ress[12]) && (smpl == ress[13]) && (smpl == ress[14]) && (smpl == ress[15]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+		
+	//	ancnt=0;
+	//	while (ancnt<16) {
+	//		LOG_INF("%d\t%d\t%d\t%d", ress[ancnt++], ress[ancnt++], ress[ancnt++], ress[ancnt++]);
+	//		k_msleep(3);
+	//	}
+
+		
+
+
+
+	}
+
+
+
+	LOG_INF("error samples 32 rd count %d", errcnt);
+
+	k_msleep(200);
+
+
+	while (0)
+	{
+		k_msleep(20);
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	while (1)
+//	{
+//		k_msleep(20);
+//	};
+
+	//	flash_address_write = 0;
+	//	uint16_t wrtsmp = 20000;
+	//	int16_t scnt = 0;
+	//	while (wrtsmp--)
+	//	{
+	//		scnt++;
+	//
+	//		if (scnt == 4000)
+	//		{
+	//			scnt = -4000;
+	//		}
+	//		flash_write_buffer_byte[0] = scnt >> 8;
+	//		flash_write_buffer_byte[1] = scnt & 0xff;
+	//
+	//		flash_write_buffer_byte[2] = scnt >> 8;
+	//		flash_write_buffer_byte[3] = scnt & 0xff;
+	//
+	//		flash_write_buffer_byte[4] = scnt >> 8;
+	//		flash_write_buffer_byte[5] = scnt & 0xff;
+	//
+	//		flash_write_buffer_byte[6] = scnt >> 8;
+	//		flash_write_buffer_byte[7] = scnt & 0xff;
+	//		FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
+	//		flash_address_write = flash_address_write + 8;
+	//		k_msleep(1);
+	//
+	//	}
 
 	int handle = 0;
 	int ret = 0;
@@ -811,7 +1053,7 @@ int main(void)
 
 	k_sleep(K_MSEC(500));
 
-	//printk("\nSAMPLE APP STARTS\n");
+	// printk("\nSAMPLE APP STARTS\n");
 
 	if (dk_leds_init() != 0)
 	{
@@ -849,10 +1091,9 @@ int main(void)
 	uint8_t chsel = 0;
 
 	uint16_t offset_gather_cnt = 200;
-	do_measurement:
+do_measurement:
 	offset_gather_cnt = 200;
-
-
+	printk("gathering offsets\n");
 	while (offset_gather_cnt--)
 	{
 		while (ADC_SAMPLE_FLAG == 0)
@@ -883,17 +1124,15 @@ int main(void)
 	offsets[2] = filtered_value_array[2];
 	offsets[3] = filtered_value_array[3];
 
-
-
-
 	buff_head = 0;
 	total_recorded_samples = 0;
 	uint8_t data_ready_to_send = 0;
 
+	int16_t cntrval = 0;
 
-	int16_t cntrval=0;
-
+	printk("circular buffer init\n");
 	circular_buffer_init();
+	printk("entering trigger waiting loop\n");
 	while (1) // waiting for trigger
 	{
 
@@ -925,7 +1164,6 @@ int main(void)
 
 			last_circ_buff_record = circular_buffer_add_value(ch0_off_value, ch1_off_value, ch2_off_value, ch3_off_value);
 
-
 #ifdef SAMPLE_PRINTING_ENABLED
 			if (sample_print >= 3)
 			{
@@ -952,15 +1190,16 @@ int main(void)
 			}
 			else
 			{
-
 				sample_cntr = last_circ_buff_record;
 			}
 
 			total_recorded_samples = sample_cntr;
 
+			flash_address_write = 0;
 
-			flash_address_write=0;
+			rms_low_counter_to_end = 0;
 
+			trigger_measurement_end = 0;
 
 			while (1)
 			{
@@ -992,34 +1231,90 @@ int main(void)
 
 					saturate_channel_values();
 
-					flash_write_buffer_byte[0]=ch0_off_value>>8;
-					flash_write_buffer_byte[1]=ch0_off_value&0xff;
+					flash_write_buffer_byte[0] = ch0_off_value >> 8;
+					flash_write_buffer_byte[1] = ch0_off_value & 0xff;
 
-					flash_write_buffer_byte[2]=ch1_off_value>>8;
-					flash_write_buffer_byte[3]=ch1_off_value&0xff;
+					flash_write_buffer_byte[2] = ch1_off_value >> 8;
+					flash_write_buffer_byte[3] = ch1_off_value & 0xff;
 
-					flash_write_buffer_byte[4]=ch2_off_value>>8;
-					flash_write_buffer_byte[5]=ch2_off_value&0xff;
+					flash_write_buffer_byte[4] = ch2_off_value >> 8;
+					flash_write_buffer_byte[5] = ch2_off_value & 0xff;
 
-					flash_write_buffer_byte[6]=ch3_off_value>>8;
-					flash_write_buffer_byte[7]=ch3_off_value&0xff;
+					flash_write_buffer_byte[6] = ch3_off_value >> 8;
+					flash_write_buffer_byte[7] = ch3_off_value & 0xff;
+					// FIXME
+					////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
+					flash_write_buffer_byte[2] = rms_value[0] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
+					flash_write_buffer_byte[3] = rms_value[0] & 0xff; // FIXME ONLY FOR OBSERVING RMS
+					flash_write_buffer_byte[6] = rms_value[2] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
+					flash_write_buffer_byte[7] = rms_value[2] & 0xff; // FIXME ONLY FOR OBSERVING RMS
 
-					flash_write_buffer_byte[6]=rms_value[0]>>8;   // FIXME ONLY FOR OBSERVING RMS
-					flash_write_buffer_byte[7]=rms_value[0]&0xff; // FIXME ONLY FOR OBSERVING RMS
-		
-					FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8);  // cca 20-40 us?
-					flash_address_write+=8;
+					//	scnt++;
+					//
+					//	if (scnt == 4000)
+					//	{
+					//		scnt = -4000;
+					//	}
+					//	flash_write_buffer_byte[0] = scnt >> 8;
+					//	flash_write_buffer_byte[1] = scnt & 0xff;
+					//
+					//	flash_write_buffer_byte[2] = scnt >> 8;
+					//	flash_write_buffer_byte[3] = scnt & 0xff;
+					//
+					//	flash_write_buffer_byte[4] = scnt >> 8;
+					//	flash_write_buffer_byte[5] = scnt & 0xff;
+					//
+					//	flash_write_buffer_byte[6] = scnt >> 8;
+					//	flash_write_buffer_byte[7] = scnt & 0xff;
 
+					// FIXME
+					////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
+					//	FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
+					flash_address_write += 8;
 
 					sample_cntr++;
 					total_recorded_samples++;
 
+					if ((rms_value[0] < END_RMS_TRIG_TRESHOLD) && (rms_value[2] < END_RMS_TRIG_TRESHOLD))
+					{
+						rms_low_counter_to_end++;
+					}
+					else
+					{
+						rms_low_counter_to_end = 0;
+					}
+
+					if (rms_low_counter_to_end > RMS_LOW_SAMPLES_TO_TRIGGER_END)
+					{
+						LOG_INF("end trigger - rms low");
+						trigger_measurement_end = 1;
+					}
+
 					if (sample_cntr > NR_OF_SAMPLES_TO_MEASURE)
+					{
+						LOG_INF("end trigger - sample limit");
+						trigger_measurement_end = 1;
+					}
+
+					if (trigger_measurement_end == 1)
 					{
 						break;
 					}
 				}
 			}
+
+
+			nrfx_timer_uninit(&timer_inst);
+
+
+			// FIXME
+			//			uint16_t memclr_cnt = 1000;
+			//			while (memclr_cnt--)
+			//			{
+			//				k_sleep(K_MSEC(1));
+			//				FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
+			//				flash_address_write += 8;
+			//			}
 
 			uint16_t loc_circ_buf_cntr = 0;
 			uint16_t mcnt = 0;
@@ -1060,10 +1355,10 @@ int main(void)
 #endif
 
 			data_ready_to_send = 1;
-		//	clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
-		//	clear_buffer(circ_buff_ch1, CRCLR_BUFF_SIZE);
-		//	clear_buffer(circ_buff_ch2, CRCLR_BUFF_SIZE);
-		//clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
+			//	clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
+			//	clear_buffer(circ_buff_ch1, CRCLR_BUFF_SIZE);
+			//	clear_buffer(circ_buff_ch2, CRCLR_BUFF_SIZE);
+			//  clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
 
 			if (0)
 			{
@@ -1090,11 +1385,6 @@ int main(void)
 					prntcnt++;
 				}
 			}
-
-			while (0)
-			{
-				// FIXME
-			}
 		}
 
 		if (data_ready_to_send == 1)
@@ -1103,52 +1393,53 @@ int main(void)
 		}
 	}
 
-if (jumpto_measurement_start_enabled==0) {	
-	err = modem_configure();
-	if (err)
+	if (jumpto_measurement_start_enabled == 0)
 	{
-		LOG_ERR("Failed to configure the modem");
-		return 0;
-	}
+		err = modem_configure();
+		if (err)
+		{
+			LOG_ERR("Failed to configure the modem");
+			return 0;
+		}
 
-	if (dk_buttons_init(button_handler) != 0)
+		if (dk_buttons_init(button_handler) != 0)
+		{
+			LOG_ERR("Failed to initialize the buttons library");
+		}
+
+		err = client_init(&client);
+		if (err)
+		{
+			LOG_ERR("Failed to initialize MQTT client: %d", err);
+			return 0;
+		}
+
+	do_connect:
+		if (connect_attempt++ > 0)
+		{
+			LOG_INF("Reconnecting in %d seconds...",
+					CONFIG_MQTT_RECONNECT_DELAY_S);
+			k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
+		}
+
+		err = mqtt_connect(&client);
+		if (err)
+		{
+			LOG_ERR("Error in mqtt_connect: %d", err);
+			goto do_connect;
+		}
+
+		err = fds_init(&client, &fds);
+		if (err)
+		{
+			LOG_ERR("Error in fds_init: %d", err);
+			return 0;
+		}
+	}
+	else
 	{
-		LOG_ERR("Failed to initialize the buttons library");
+		jumpto_measurement_start_enabled = 0;
 	}
-
-	err = client_init(&client);
-	if (err)
-	{
-		LOG_ERR("Failed to initialize MQTT client: %d", err);
-		return 0;
-	}
-
-do_connect:
-	if (connect_attempt++ > 0)
-	{
-		LOG_INF("Reconnecting in %d seconds...",
-				CONFIG_MQTT_RECONNECT_DELAY_S);
-		k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
-	}
-
-	err = mqtt_connect(&client);
-	if (err)
-	{
-		LOG_ERR("Error in mqtt_connect: %d", err);
-		goto do_connect;
-	}
-
-	err = fds_init(&client, &fds);
-	if (err)
-	{
-		LOG_ERR("Error in fds_init: %d", err);
-		return 0;
-	}
-
-
-}else {
-	jumpto_measurement_start_enabled=0;
-}
 
 	rec_counter = 0;
 	while (1)
@@ -1195,31 +1486,28 @@ do_connect:
 			data_ready_to_send = 0;
 			printk("pause\n");
 
-
-
-
 			k_sleep(K_MSEC(2000));
 
-			//send_measured_train_data_with_multiple_packets_from_flash
-			//clock_gettime(CLOCK_REALTIME, &timer_record);
-			//timer_record->tv
+			// send_measured_train_data_with_multiple_packets_from_flash
+			// clock_gettime(CLOCK_REALTIME, &timer_record);
+			// timer_record->tv
 			get_time_procedure();
 
-
-			 LOG_INF("timestamp gathered from modem %" PRIu32,record_unix_time_s);
-			//send_measured_train_data_with_multiple_packets();
+			LOG_INF("timestamp gathered from modem %" PRIu32, record_unix_time_s);
+			// send_measured_train_data_with_multiple_packets();
 			send_measured_train_data_with_multiple_packets_from_flash();
 		}
 
-
-		if (mqtt_trigger_reset==1) {
-			mqtt_trigger_reset=0;
+		if (mqtt_trigger_reset == 1)
+		{
+			mqtt_trigger_reset = 0;
 			LOG_INF("trigger reset in progress\n");
 			k_sleep(K_MSEC(1000));
 			LOG_INF("endup mqtt client connection\n");
 			int8_t errrno;
-						errrno = mqtt_disconnect(&client);
-			if (errrno) {
+			errrno = mqtt_disconnect(&client);
+			if (errrno)
+			{
 				LOG_ERR("Could not disconnect: %d", errrno);
 			}
 			k_sleep(K_MSEC(1000));
@@ -1233,19 +1521,12 @@ do_connect:
 			sys_reboot(SYS_REBOOT_COLD);
 		}
 
+		if (jumpto_measurement_start_enabled == 1)
+		{
 
-		if (jumpto_measurement_start_enabled==1) {
-			
 			goto do_measurement;
-
 		}
-
-
-
-
-
-
-		}
+	}
 
 	LOG_INF("Disconnecting MQTT client");
 
