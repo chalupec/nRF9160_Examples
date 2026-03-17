@@ -1,0 +1,142 @@
+	uint32_t demowrite = 320000;
+	int16_t smpl = 0;
+	uint32_t adrrr = 0;
+	uint8_t cntr = 0;
+	while (demowrite--)
+	{
+
+		if (smpl == 5000)
+		{
+			smpl = -5000;
+		}
+		cntr = 0;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		wr_buff[cntr++] = smpl >> 8;
+		wr_buff[cntr++] = smpl & 0xff;
+		cntr = 0;
+		//	LOG_INF("%d\t%d\t%d\t%d\t %d\t%d\t%d\t%d", wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++]);
+
+		FLASH_MEMORY_WRITE_BYTE_ARRAY(adrrr, wr_buff, 8);
+		//	k_msleep(2000);
+		adrrr = adrrr + 8;
+		smpl++;
+	}
+
+	k_msleep(2);
+
+	
+	uint16_t errcnt = 0;
+	
+	demowrite = 20000;
+	adrrr = 0;
+	smpl = 0;
+	errcnt = 0;
+	int16_t ress[16] = {0};
+	uint16_t ancnt = 0;
+	while (demowrite--)
+	{
+		FLASH_MEMORY_READ_DATA(adrrr, rd_buff, 32);
+
+		adrrr = adrrr + 32;
+		cntr = 0;
+		ancnt = 0;
+		while (ancnt < 16)
+		{
+			ress[ancnt] = (int16_t)rd_buff[cntr++] << 8;
+			ress[ancnt++] |= rd_buff[cntr++] & 0xff;
+		}
+
+		if (smpl == 5000)
+		{
+			smpl = -5000;
+		}
+
+		if ((smpl == ress[0]) && (smpl == ress[1]) && (smpl == ress[2]) && (smpl == ress[3]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+
+		if ((smpl == ress[4]) && (smpl == ress[5]) && (smpl == ress[6]) && (smpl == ress[7]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+
+		if ((smpl == ress[8]) && (smpl == ress[9]) && (smpl == ress[10]) && (smpl == ress[11]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+
+		if ((smpl == ress[12]) && (smpl == ress[13]) && (smpl == ress[14]) && (smpl == ress[15]))
+		{
+		}
+		else
+		{
+			errcnt++;
+		}
+		smpl++;
+
+		//	ancnt=0;
+		//	while (ancnt<16) {
+		//		LOG_INF("%d\t%d\t%d\t%d", ress[ancnt++], ress[ancnt++], ress[ancnt++], ress[ancnt++]);
+		//		k_msleep(3);
+		//	}
+	}
+
+	LOG_INF("error samples 32 rd count %d", errcnt);
+
+	k_msleep(200);
+
+	while (0)
+	{
+		k_msleep(20);
+	};
+
+	//	while (1)
+	//	{
+	//		k_msleep(20);
+	//	};
+
+	//	flash_address_write = 0;
+	//	uint16_t wrtsmp = 20000;
+	//	int16_t scnt = 0;
+	//	while (wrtsmp--)
+	//	{
+	//		scnt++;
+	//
+	//		if (scnt == 4000)
+	//		{
+	//			scnt = -4000;
+	//		}
+	//		flash_write_buffer_byte[0] = scnt >> 8;
+	//		flash_write_buffer_byte[1] = scnt & 0xff;
+	//
+	//		flash_write_buffer_byte[2] = scnt >> 8;
+	//		flash_write_buffer_byte[3] = scnt & 0xff;
+	//
+	//		flash_write_buffer_byte[4] = scnt >> 8;
+	//		flash_write_buffer_byte[5] = scnt & 0xff;
+	//
+	//		flash_write_buffer_byte[6] = scnt >> 8;
+	//		flash_write_buffer_byte[7] = scnt & 0xff;
+	//		FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
+	//		flash_address_write = flash_address_write + 8;
+	//		k_msleep(1);
+	//
+	//	}

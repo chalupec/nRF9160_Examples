@@ -201,6 +201,8 @@ uint8_t flash_read_buffer_byte[FLASH_BYTE_READ_OUT_LEN + 32];
 
 int16_t snd_cnt = 0;
 
+int16_t scnt = 0;
+
 static const struct adc_sequence sequence = {
 	.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
 	.buffer = sample_buffer,
@@ -457,7 +459,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 			{
 				fl_buff_bcnt = 0;
 				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, FLASH_BYTE_READ_OUT_LEN);
-				k_sleep(K_MSEC(1));
+				// k_sleep(K_MSEC(1));
 				flash_address_read += FLASH_BYTE_READ_OUT_LEN;
 				fl_buff_bcnt = 0;
 				while (fl_buff_bcnt < FLASH_BYTE_READ_OUT_LEN)
@@ -472,59 +474,6 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 					seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
 					samples_to_load_cntr++;
 				}
-
-
-/*
-				fl_buff_bcnt = 0;
-				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
-				flash_address_read += 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				samples_to_load_cntr++;
-
-				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
-				flash_address_read += 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				samples_to_load_cntr++;
-				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
-				flash_address_read += 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				samples_to_load_cntr++;
-				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 8);
-				flash_address_read += 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_0_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_0_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_vlt[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_vlt[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				seed_packet.chan_1_int[samples_to_load_cntr] = flash_read_buffer_byte[fl_buff_bcnt++] << 8;
-				seed_packet.chan_1_int[samples_to_load_cntr] |= flash_read_buffer_byte[fl_buff_bcnt++];
-				samples_to_load_cntr++;
-*/
-
-
-
 			}
 		}
 
@@ -792,7 +741,7 @@ int main(void)
 															  MEM_CS_PIN);
 
 	spim_config.frequency = 8000000;
-	//spim_config.irq_priority   = 2;
+	spim_config.irq_priority = 2;
 
 	status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
 	// NRFX_ASSERT(status == NRFX_SUCCESS);
@@ -804,234 +753,6 @@ int main(void)
 	uint8_t wr_buff[32];
 	uint8_t rd_buff[32];
 	uint8_t cntradd = 0;
-
-	uint32_t demowrite = 160000;
-	int16_t smpl = 0;
-	uint32_t adrrr = 0;
-	uint8_t cntr = 0;
-	while (demowrite--)
-	{
-
-		if (smpl == 5000)
-		{
-			smpl = -5000;
-		}
-		cntr = 0;
-		wr_buff[cntr++] = smpl >> 8;
-		wr_buff[cntr++] = smpl & 0xff;
-		wr_buff[cntr++] = smpl >> 8;
-		wr_buff[cntr++] = smpl & 0xff;
-		wr_buff[cntr++] = smpl >> 8;
-		wr_buff[cntr++] = smpl & 0xff;
-		wr_buff[cntr++] = smpl >> 8;
-		wr_buff[cntr++] = smpl & 0xff;
-		cntr = 0;
-		//	LOG_INF("%d\t%d\t%d\t%d\t %d\t%d\t%d\t%d", wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++],wr_buff[cntr++]);
-
-		FLASH_MEMORY_WRITE_BYTE_ARRAY(adrrr, wr_buff, 8);
-		//	k_msleep(2000);
-		adrrr = adrrr + 8;
-		smpl++;
-	}
-
-	k_msleep(2);
-
-	demowrite = 50000;
-	adrrr = 0;
-	int16_t res[4] = {0};
-	smpl = 0;
-	uint16_t errcnt = 0;
-	while (demowrite--)
-	{
-		FLASH_MEMORY_READ_DATA(adrrr, rd_buff, 8);
-		adrrr = adrrr + 8;
-		cntr = 0;
-		res[0] = (int16_t)rd_buff[cntr++] << 8;
-		res[0] |= rd_buff[cntr++] & 0xff;
-
-		res[1] = (int16_t)rd_buff[cntr++] << 8;
-		res[1] |= rd_buff[cntr++] & 0xff;
-
-		res[2] = (int16_t)rd_buff[cntr++] << 8;
-		res[2] |= rd_buff[cntr++] & 0xff;
-
-		res[3] = (int16_t)rd_buff[cntr++] << 8;
-		res[3] |= rd_buff[cntr++] & 0xff;
-
-		if (smpl == 5000)
-		{
-			smpl = -5000;
-		}
-
-		if ((smpl == res[0]) && (smpl == res[1]) && (smpl == res[2]) && (smpl == res[3]))
-		{
-		}
-		else
-		{
-			errcnt++;
-		}
-
-		smpl++;
-
-		// LOG_INF("%d\t%d\t%d\t%d", res[0], res[1], res[2], res[3]);
-
-		// k_msleep(3);
-	}
-
-	LOG_INF("error samples 8rd  count %d", errcnt);
-
-	k_msleep(200);
-
-
-
-	demowrite = 20000;
-	adrrr = 0;
-	smpl = 0;
-	errcnt = 0;
-	int16_t ress[16]={0};
-	uint16_t ancnt=0;
-	while (demowrite--)
-	{
-		FLASH_MEMORY_READ_DATA(adrrr, rd_buff, 32);
-
-
-
-		adrrr = adrrr + 32;
-		cntr = 0;
-		ancnt=0;
-		while (ancnt<16) {
-			ress[ancnt] = (int16_t)rd_buff[cntr++] << 8;
-			ress[ancnt++] |= rd_buff[cntr++] & 0xff;
-		}
-
-	
-
-	    if (smpl == 5000)
-		{
-			smpl = -5000;
-		}
-		
-
-		if ((smpl == ress[0]) && (smpl == ress[1]) && (smpl == ress[2]) && (smpl == ress[3]))
-		{
-		}
-		else
-		{
-			errcnt++;
-		}
-		smpl++;
-
-
-		if ((smpl == ress[4]) && (smpl == ress[5]) && (smpl == ress[6]) && (smpl == ress[7]))
-		{
-		}
-		else
-		{
-			errcnt++;
-		}
-		smpl++;
-
-
-	    if ((smpl == ress[8]) && (smpl == ress[9]) && (smpl == ress[10]) && (smpl == ress[11]))
-		{
-		}
-		else
-		{
-			errcnt++;
-		}
-		smpl++;
-
-
-		if ((smpl == ress[12]) && (smpl == ress[13]) && (smpl == ress[14]) && (smpl == ress[15]))
-		{
-		}
-		else
-		{
-			errcnt++;
-		}
-		smpl++;
-		
-	//	ancnt=0;
-	//	while (ancnt<16) {
-	//		LOG_INF("%d\t%d\t%d\t%d", ress[ancnt++], ress[ancnt++], ress[ancnt++], ress[ancnt++]);
-	//		k_msleep(3);
-	//	}
-
-		
-
-
-
-	}
-
-
-
-	LOG_INF("error samples 32 rd count %d", errcnt);
-
-	k_msleep(200);
-
-
-	while (0)
-	{
-		k_msleep(20);
-	};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//	while (1)
-//	{
-//		k_msleep(20);
-//	};
-
-	//	flash_address_write = 0;
-	//	uint16_t wrtsmp = 20000;
-	//	int16_t scnt = 0;
-	//	while (wrtsmp--)
-	//	{
-	//		scnt++;
-	//
-	//		if (scnt == 4000)
-	//		{
-	//			scnt = -4000;
-	//		}
-	//		flash_write_buffer_byte[0] = scnt >> 8;
-	//		flash_write_buffer_byte[1] = scnt & 0xff;
-	//
-	//		flash_write_buffer_byte[2] = scnt >> 8;
-	//		flash_write_buffer_byte[3] = scnt & 0xff;
-	//
-	//		flash_write_buffer_byte[4] = scnt >> 8;
-	//		flash_write_buffer_byte[5] = scnt & 0xff;
-	//
-	//		flash_write_buffer_byte[6] = scnt >> 8;
-	//		flash_write_buffer_byte[7] = scnt & 0xff;
-	//		FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
-	//		flash_address_write = flash_address_write + 8;
-	//		k_msleep(1);
-	//
-	//	}
 
 	int handle = 0;
 	int ret = 0;
@@ -1203,10 +924,8 @@ do_measurement:
 
 			while (1)
 			{
-
 				if (ADC_SAMPLE_FLAG == 1)
 				{
-
 					// gpio_pin_set_dt(&led0, 1);
 					ADC_SAMPLE_FLAG = 0;
 					adc_read(adc_dev, &sequence);				   // takes 248 us
@@ -1242,34 +961,17 @@ do_measurement:
 
 					flash_write_buffer_byte[6] = ch3_off_value >> 8;
 					flash_write_buffer_byte[7] = ch3_off_value & 0xff;
-					// FIXME
-					////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
-					flash_write_buffer_byte[2] = rms_value[0] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
-					flash_write_buffer_byte[3] = rms_value[0] & 0xff; // FIXME ONLY FOR OBSERVING RMS
-					flash_write_buffer_byte[6] = rms_value[2] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
-					flash_write_buffer_byte[7] = rms_value[2] & 0xff; // FIXME ONLY FOR OBSERVING RMS
+				// FIXME
+				////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
+				//	flash_write_buffer_byte[2] = rms_value[0] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
+				//	flash_write_buffer_byte[3] = rms_value[0] & 0xff; // FIXME ONLY FOR OBSERVING RMS
+				//	flash_write_buffer_byte[6] = rms_value[2] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
+				//	flash_write_buffer_byte[7] = rms_value[2] & 0xff; // FIXME ONLY FOR OBSERVING RMS
+				 // FIXME
+				 ////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
+				
 
-					//	scnt++;
-					//
-					//	if (scnt == 4000)
-					//	{
-					//		scnt = -4000;
-					//	}
-					//	flash_write_buffer_byte[0] = scnt >> 8;
-					//	flash_write_buffer_byte[1] = scnt & 0xff;
-					//
-					//	flash_write_buffer_byte[2] = scnt >> 8;
-					//	flash_write_buffer_byte[3] = scnt & 0xff;
-					//
-					//	flash_write_buffer_byte[4] = scnt >> 8;
-					//	flash_write_buffer_byte[5] = scnt & 0xff;
-					//
-					//	flash_write_buffer_byte[6] = scnt >> 8;
-					//	flash_write_buffer_byte[7] = scnt & 0xff;
-
-					// FIXME
-					////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
-					//	FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
+					FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
 					flash_address_write += 8;
 
 					sample_cntr++;
@@ -1303,18 +1005,14 @@ do_measurement:
 				}
 			}
 
-
 			nrfx_timer_uninit(&timer_inst);
 
-
-			// FIXME
-			//			uint16_t memclr_cnt = 1000;
-			//			while (memclr_cnt--)
-			//			{
-			//				k_sleep(K_MSEC(1));
-			//				FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
-			//				flash_address_write += 8;
-			//			}
+			uint16_t memclr_cnt = 1000;
+			while (memclr_cnt--)
+			{
+				FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
+				flash_address_write += 8;
+			}
 
 			uint16_t loc_circ_buf_cntr = 0;
 			uint16_t mcnt = 0;
@@ -1360,31 +1058,6 @@ do_measurement:
 			//	clear_buffer(circ_buff_ch2, CRCLR_BUFF_SIZE);
 			//  clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
 
-			if (0)
-			{
-				uint16_t prntcnt = 0;
-				while (prntcnt < 2500)
-				{
-					if (1)
-					{
-						printk("%d, %d, %d, %d\n",
-							   ch0_volt[prntcnt],
-							   ch0_int[prntcnt],
-							   ch1_volt[prntcnt],
-							   ch1_int[prntcnt]);
-					}
-					else
-					{
-						printk("%d, %d, %d, %d\n",
-							   ch0_volt[prntcnt],
-							   0,
-							   0,
-							   0);
-					}
-					k_sleep(K_USEC(1000));
-					prntcnt++;
-				}
-			}
 		}
 
 		if (data_ready_to_send == 1)
