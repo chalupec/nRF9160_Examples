@@ -10,6 +10,37 @@
 			"type_traits": "c",
 			"utility": "c",
 			"mqtt_connection.h": "c"
+		},
+		"nrf-connect.debugging.bindings": {
+			"${workspaceFolder}/build": "Launch mqtt_working/build",
+			"${workspaceFolder}/build/mqtt_working": "Launch mqtt_working/build/mqtt_working",
+			"${workspaceFolder}/build/mqtt_working/tfm": "Launch mqtt_working/build/mqtt_working/tfm"
 		}
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"type": "nrf-connect",
+				"request": "launch",
+				"name": "Launch mqtt_working/build",
+				"config": "${workspaceFolder}/build",
+				"runToEntryPoint": "main"
+			},
+			{
+				"type": "nrf-connect",
+				"request": "launch",
+				"name": "Launch mqtt_working/build/mqtt_working",
+				"config": "${workspaceFolder}/build/mqtt_working",
+				"runToEntryPoint": "main"
+			},
+			{
+				"type": "nrf-connect",
+				"request": "launch",
+				"name": "Launch mqtt_working/build/mqtt_working/tfm",
+				"config": "${workspaceFolder}/build/mqtt_working/tfm",
+				"runToEntryPoint": "main"
+			}
+		]
 	}
 }

@@ -29,7 +29,6 @@ void FLASH_MEMORY_WRITE_BYTE_ARRAY(unsigned long address, unsigned char *pBuffer
     tx[2]=((address >> 8)&0xff);
     tx[3]=(address & 0xff);
 
-    
 
 
     /* Copy src into the last 32 bytes of dest */
@@ -38,6 +37,9 @@ void FLASH_MEMORY_WRITE_BYTE_ARRAY(unsigned long address, unsigned char *pBuffer
 
     //nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_SINGLE_XFER(tx, 36,rx, 36);
     nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_SINGLE_XFER(tx, length+4,rx, length+4);
+
+    //nrfx_spim_xfer(&spim_inst, &xfer, NRFX_SPIM_FLAG_HOLD_XFER);
+    
     nrfx_spim_xfer(&spim_inst, &xfer, 0);  
 }
 
@@ -52,6 +54,8 @@ void FLASH_MEMORY_READ_DATA(unsigned long address, unsigned char *pBuffer, unsig
     //nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_SINGLE_XFER(tx, 36,rx, 36);
 nrfx_spim_xfer_desc_t xfer = NRFX_SPIM_SINGLE_XFER(tx, length+4,rx, length+4);
     nrfx_spim_xfer(&spim_inst, &xfer, 0);
+   //  nrfx_spim_xfer(&spim_inst, &xfer, NRFX_SPIM_FLAG_HOLD_XFER);
+   
    // memcpy(pBuffer, &rx[36 - 32], 32);
     memcpy(pBuffer, &rx[4], length);
 

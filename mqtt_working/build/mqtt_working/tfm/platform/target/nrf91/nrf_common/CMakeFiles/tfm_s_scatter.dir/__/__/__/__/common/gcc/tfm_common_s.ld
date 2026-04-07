@@ -151,6 +151,16 @@ SECTIONS
         . += 0x8;
     } > RAM
     __StackSeal = ADDR(.msp_stack_seal_res);
+    __heap_size__ = (0x00001000);
+    .heap ALIGN(8) :
+    {
+        __end__ = .;
+        PROVIDE(end = .);
+        __HeapBase = .;
+        . += __heap_size__;
+        __HeapLimit = .;
+        __heap_limit = .;
+    } > RAM
     . = ALIGN(32);
     Image$$TFM_APP_RW_STACK_START$$Base = .;
     .TFM_APP_ROT_LINKER_DATA ALIGN(32) :

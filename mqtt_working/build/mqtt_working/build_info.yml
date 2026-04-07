@@ -38,6 +38,7 @@ cmake:
     files:
      - C:/ncs/v2.9.0/zephyr/boards/nordic/nrf9161dk/nrf9161dk_nrf9161_ns_defconfig
      - C:/ADWITECH/nRF9160_Examples/mqtt_working/prj.conf
+     - C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/misc/generated/extra_kconfig_options.conf
      - C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/.config.sysbuild
     user-files:
      - prj.conf
