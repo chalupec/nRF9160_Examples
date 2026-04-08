@@ -8,11 +8,19 @@ menu "Cellfund Lesson 4 Exercise"
 
 config MQTT_PUB_TOPIC
 	string "MQTT publish topic"
-	default "devacademy/publish/topic"
+	default "NRF/XX/UP_STREAM"
+
+
+config MQTT_PUB_SYS_TOPIC
+    string "MQTT publish system topic"
+    default "NRF/XX/SYS_UP_STREAM"
+    help
+      MQTT topic used for system uplink messages
+
 
 config MQTT_SUB_TOPIC
 	string "MQTT subscribe topic"
-	default "devacademy/subscribe/topic"
+	default "NRF/XX/DOWN_STREAM"
 
 config MQTT_CLIENT_ID
 	string "MQTT Client ID"

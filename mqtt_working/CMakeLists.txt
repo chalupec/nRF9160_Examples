@@ -13,4 +13,5 @@ project(cellular_fundamentals)
 target_sources(app PRIVATE src/drivers/APS6404L.c)
 target_sources(app PRIVATE src/mqtt_connection.c)
 target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE src/unit_lib.c)
 # NORDIC SDK APP END

@@ -6,8 +6,6 @@
  */
 
 #include <stdint.h>
-#include <stdint.h>
-
 #include <stdio.h>
 #include <ncs_version.h>
 #include <zephyr/kernel.h>
@@ -32,6 +30,7 @@
 
 #include <nrfx_spim.h>
 #include "../include/drivers/APS6404L.h"
+#include "unit_lib.h"
 
 #include <zephyr/sys/reboot.h>
 #include <math.h>
@@ -51,7 +50,7 @@
 #define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
-#define RMS_TRIG_TRESHOLD 1000
+#define RMS_TRIG_TRESHOLD 100
 #define END_RMS_TRIG_TRESHOLD 100
 #define RMS_LOW_SAMPLES_TO_TRIGGER_END 3000 // cca 1,5 sec
 
@@ -59,7 +58,7 @@
 
 #define NR_OF_SAMPLES_TO_MEASURE 27000 // 13500
 
-#define RES_VAR_LEN 15000
+#define RES_VAR_LEN 5000
 
 #define WAVE_SAMPLE_LEN 1024 // MUST BE SAME AS CRCLR_BUFF_SIZE
 
@@ -91,6 +90,8 @@
 
 uint8_t jumpto_measurement_start_enabled = 0;
 uint8_t mqtt_trigger_reset = 0;
+uint8_t mqtt_skip_init_procedure = 0;
+uint8_t first_alive_flag = 1;
 
 int32_t rms_value[4] = {0};
 
@@ -126,8 +127,6 @@ static struct mqtt_client client;
 static struct pollfd fds;
 
 static K_SEM_DEFINE(lte_connected, 0, 1);
-
-uint16_t crc16_ccitt_jch(uint8_t *data, uint8_t length);
 
 struct __attribute__((__packed__)) data_packet_t
 {
@@ -210,6 +209,14 @@ uint8_t flash_read_buffer_byte[FLASH_BYTE_READ_OUT_LEN + 32] __attribute__((alig
 int16_t snd_cnt = 0;
 
 int16_t scnt = 0;
+
+uint8_t data_ready_to_send = 0;
+int err;
+
+uint32_t connect_attempt = 0;
+int8_t pool_retval = 0;
+
+uint32_t initial_stage_timeout_counter = 0;
 
 static const struct adc_sequence sequence = {
 	.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
@@ -474,14 +481,14 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 10);
 
 				//// FIXME TEST ONLY
-			//	if (samples_to_load_cntr == 500)
-			//	{
-			//		flash_read_buffer_byte[4] = 501;
-			//	}
-			//	if (samples_to_load_cntr == 800)
-			//	{
-			//		flash_read_buffer_byte[1] = 31;
-			//	}
+				//	if (samples_to_load_cntr == 500)
+				//	{
+				//		flash_read_buffer_byte[4] = 501;
+				//	}
+				//	if (samples_to_load_cntr == 800)
+				//	{
+				//		flash_read_buffer_byte[1] = 31;
+				//	}
 				//// FIXME
 
 				uint16_t crc_to_compare = 0;
@@ -519,8 +526,8 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 						seed_packet.chan_0_int[samples_to_load_cntr] = -32760;
 						seed_packet.chan_1_vlt[samples_to_load_cntr] = -32760;
 						seed_packet.chan_1_int[samples_to_load_cntr] = -32760;
-						LOG_INF("CRC mismatch at sample, %d", samples_to_load_cntr);
-						k_sleep(K_MSEC(3));
+						// LOG_INF("CRC mismatch at sample, %d", samples_to_load_cntr);  // DEBUG FIX
+						// k_sleep(K_MSEC(3));
 						samples_to_load_cntr++; // try another sample
 						flash_address_read += 10;
 					}
@@ -794,51 +801,6 @@ uint16_t circular_buffer_add_value(int16_t value0, int16_t value1, int16_t value
 	return (buff_head);
 }
 
-// Clears a buffer of int16_t values
-void clear_buffer(int16_t *buffer, size_t length)
-{
-	memset(buffer, 0, length * sizeof(int16_t));
-}
-
-void saturate_channel_values(void)
-{
-	if (ch0_off_value > 32750)
-	{
-		ch0_off_value = 32750;
-	}
-	if (ch0_off_value < -32750)
-	{
-		ch0_off_value = -32750;
-	}
-
-	if (ch1_off_value > 32750)
-	{
-		ch1_off_value = 32750;
-	}
-	if (ch1_off_value < -32750)
-	{
-		ch1_off_value = -32750;
-	}
-
-	if (ch2_off_value > 32750)
-	{
-		ch2_off_value = 32750;
-	}
-	if (ch2_off_value < -32750)
-	{
-		ch2_off_value = -32750;
-	}
-
-	if (ch3_off_value > 32750)
-	{
-		ch3_off_value = 32750;
-	}
-	if (ch3_off_value < -32750)
-	{
-		ch3_off_value = -32750;
-	}
-}
-
 void get_time_procedure(void)
 {
 	int err = date_time_update_async(NULL);
@@ -865,30 +827,162 @@ void get_time_procedure(void)
 	printk("Current UTC time: %s", asctime(&timeinfo));
 }
 
-uint16_t crc16_ccitt_jch(uint8_t *data, uint8_t length)
+void init_modem_and_mqtt(void)
 {
-	uint16_t crc = 0xFFFF;
-
-	for (uint8_t i = 0; i < length; i++)
+	LOG_INF("Configuring modem");
+	err = modem_configure();
+	if (err)
 	{
-		crc ^= ((uint16_t)data[i] << 8);
+		LOG_ERR("Failed to configure the modem");
+		return 0;
+	}
 
-		for (uint8_t bit = 0; bit < 8; bit++)
+	if (dk_buttons_init(button_handler) != 0)
+	{
+		LOG_ERR("Failed to initialize the buttons library");
+	}
+
+	LOG_INF("MQTT client init");
+	err = client_init(&client);
+	if (err)
+	{
+		LOG_ERR("Failed to initialize MQTT client: %d", err);
+		return 0;
+	}
+
+do_connect:
+	if (connect_attempt++ > 0)
+	{
+		LOG_INF("Reconnecting in %d seconds...",
+				CONFIG_MQTT_RECONNECT_DELAY_S);
+		k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
+	}
+
+	err = mqtt_connect(&client);
+	if (err)
+	{
+		LOG_ERR("Error in mqtt_connect: %d", err);
+		goto do_connect;
+	}
+
+	err = fds_init(&client, &fds);
+	if (err)
+	{
+		LOG_ERR("Error in fds_init: %d", err);
+		return 0;
+	}
+}
+
+int8_t mqtt_pooling_procedure(void)
+{
+
+	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
+	if (err < 0)
+	{
+		LOG_ERR("Error in poll(): %d", errno);
+		return (-1);
+	}
+
+	err = mqtt_live(&client);
+	if ((err != 0) && (err != -EAGAIN))
+	{
+		LOG_ERR("Error in mqtt_live: %d", err);
+		return (-1);
+	}
+
+	if ((fds.revents & POLLIN) == POLLIN)
+	{
+		err = mqtt_input(&client);
+		if (err != 0)
 		{
-			if (crc & 0x8000)
-				crc = (crc << 1) ^ 0x1021;
-			else
-				crc <<= 1;
+			LOG_ERR("Error in mqtt_input: %d", err);
+			return (-1);
 		}
 	}
-	return crc;
+
+	if ((fds.revents & POLLERR) == POLLERR)
+	{
+		LOG_ERR("POLLERR");
+		return (-1);
+	}
+
+	if ((fds.revents & POLLNVAL) == POLLNVAL)
+	{
+		LOG_ERR("POLLNVAL");
+		return (-1);
+	}
+
+	if (first_alive_flag == 1)
+	{
+		first_alive_flag = 0;
+		char charbuf[] = {"UNIT ALIVE"};
+		uint16_t sizestruct = sizeof(charbuf);
+		LOG_INF("MQTT UNIT SENDING ALIVE INFO");
+		int err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
+								   charbuf, sizestruct);
+	}
+
+	if (data_ready_to_send == 1)
+	{
+		data_ready_to_send = 0;
+		get_time_procedure();
+		LOG_INF("timestamp gathered from modem %" PRIu32, record_unix_time_s);
+		send_measured_train_data_with_multiple_packets_from_flash();
+	}
+
+	if (mqtt_trigger_reset == 1)
+	{
+		mqtt_trigger_reset = 0;
+		LOG_INF("trigger reset in progress\n");
+		k_sleep(K_MSEC(1000));
+		LOG_INF("endup mqtt client connection\n");
+
+		int8_t errrno;
+		errrno = mqtt_disconnect(&client);
+		if (errrno)
+		{
+			LOG_ERR("Could not disconnect: %d", errrno);
+		}
+		k_sleep(K_MSEC(1000));
+
+		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE\n");
+		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
+		k_sleep(K_MSEC(1000));
+		LOG_INF("nrf_modem_lib_shutdown\n");
+		nrf_modem_lib_shutdown();
+		k_sleep(K_MSEC(2000));
+		sys_reboot(SYS_REBOOT_COLD);
+		k_sleep(K_MSEC(1000));
+	}
+
+	initial_stage_timeout_counter++;
+
+	if (mqtt_skip_init_procedure == 1)
+	{
+		mqtt_skip_init_procedure = 0;
+		LOG_INF("SKIP REQUEST RECEIVED\n");
+		int8_t errrno;
+		errrno = mqtt_disconnect(&client);
+		if (errrno)
+		{
+			LOG_ERR("Could not disconnect: %d", errrno);
+		}
+		k_sleep(K_MSEC(1000));
+
+		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE\n");
+		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
+		k_sleep(K_MSEC(1000));
+		LOG_INF("nrf_modem_lib_shutdown\n");
+		nrf_modem_lib_shutdown();
+		k_sleep(K_MSEC(2000));
+		return (-1);
+	}
+
+	return (1);
 }
 
 int main(void)
 {
-	int err;
-
-	uint32_t connect_attempt = 0;
 
 	uint32_t record_cnt = 1780;
 
@@ -965,10 +1059,6 @@ int main(void)
 	adc_channel_setup(adc_dev, &channel_cfg_3);
 	adc_channel_setup(adc_dev, &channel_cfg_4);
 
-	printk("\nstarting timer\n");
-	k_sleep(K_MSEC(100));
-	nrfx_timer_enable(&timer_inst);
-
 	rec_counter = 0;
 	int16_t sample_print = 0;
 	int16_t sample_buffer2[4] = {0};
@@ -984,9 +1074,33 @@ int main(void)
 	uint8_t chsel = 0;
 
 	uint16_t offset_gather_cnt = 200;
-do_measurement:
+	LOG_INF(" ");
+	LOG_INF("-----------------------------");
+	LOG_INF("<----MEASUREMENT STAGE --->");
+	LOG_INF("first modem init");
+	init_modem_and_mqtt();
+	LOG_INF("entering MQTT pooling loop");
+	while (1)
+	{
+		pool_retval = mqtt_pooling_procedure();
+		if (pool_retval == -1)
+		{
+			break;
+		}
+	}
+	connect_attempt = 0;
+	LOG_INF("leaving  INIT STAGE");
+	LOG_INF(" ");
+	LOG_INF("-----------------------------");
+
 	offset_gather_cnt = 200;
-	printk("gathering offsets\n");
+	LOG_INF("<----MEASUREMENT STAGE --->");
+	LOG_INF("starting timer");
+	k_sleep(K_MSEC(100));
+	nrfx_timer_enable(&timer_inst);
+	k_sleep(K_MSEC(100));
+	LOG_INF("gathering offsets");
+
 	while (offset_gather_cnt--)
 	{
 		while (ADC_SAMPLE_FLAG == 0)
@@ -1017,18 +1131,19 @@ do_measurement:
 	offsets[2] = filtered_value_array[2];
 	offsets[3] = filtered_value_array[3];
 
+	LOG_INF("offsets done");
+
 	buff_head = 0;
 	total_recorded_samples = 0;
-	uint8_t data_ready_to_send = 0;
 
 	int16_t cntrval = 0;
 
-	printk("circular buffer init\n");
+	LOG_INF("circular buffer init");
 	circular_buffer_init();
-	printk("entering trigger waiting loop\n");
+	LOG_INF("entering trigger waiting loop");
+
 	while (1) // waiting for trigger
 	{
-
 		if (ADC_SAMPLE_FLAG == 1)
 		{
 			// gpio_pin_set_dt(&led0, 1);
@@ -1053,7 +1168,7 @@ do_measurement:
 			ch3_off_value = new_sample;
 			rms_value[3] = update_rms(buffer_rms_ch3, &indexx, &sum_squares_ch3, new_sample);
 
-			saturate_channel_values();
+			saturate_channel_values(&ch0_off_value, &ch1_off_value, &ch2_off_value, &ch3_off_value);
 
 			last_circ_buff_record = circular_buffer_add_value(ch0_off_value, ch1_off_value, ch2_off_value, ch3_off_value);
 
@@ -1120,7 +1235,7 @@ do_measurement:
 					ch3_off_value = new_sample;
 					rms_value[3] = update_rms(buffer_rms_ch3, &indexx, &sum_squares_ch3, new_sample);
 
-					saturate_channel_values();
+					saturate_channel_values(&ch0_off_value, &ch1_off_value, &ch2_off_value, &ch3_off_value);
 
 					flash_write_buffer_byte[0] = ch0_off_value >> 8;
 					flash_write_buffer_byte[1] = ch0_off_value & 0xff;
@@ -1244,127 +1359,20 @@ do_measurement:
 
 	if (jumpto_measurement_start_enabled == 0)
 	{
-		err = modem_configure();
-		if (err)
-		{
-			LOG_ERR("Failed to configure the modem");
-			return 0;
-		}
-
-		if (dk_buttons_init(button_handler) != 0)
-		{
-			LOG_ERR("Failed to initialize the buttons library");
-		}
-
-		err = client_init(&client);
-		if (err)
-		{
-			LOG_ERR("Failed to initialize MQTT client: %d", err);
-			return 0;
-		}
-
-	do_connect:
-		if (connect_attempt++ > 0)
-		{
-			LOG_INF("Reconnecting in %d seconds...",
-					CONFIG_MQTT_RECONNECT_DELAY_S);
-			k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
-		}
-
-		err = mqtt_connect(&client);
-		if (err)
-		{
-			LOG_ERR("Error in mqtt_connect: %d", err);
-			goto do_connect;
-		}
-
-		err = fds_init(&client, &fds);
-		if (err)
-		{
-			LOG_ERR("Error in fds_init: %d", err);
-			return 0;
-		}
+		init_modem_and_mqtt();
 	}
 	else
 	{
 		jumpto_measurement_start_enabled = 0;
 	}
 
-	rec_counter = 0;
 	while (1)
 	{
+		pool_retval = mqtt_pooling_procedure();
 
-		err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
-		if (err < 0)
+		if (pool_retval == -1)
 		{
-			LOG_ERR("Error in poll(): %d", errno);
 			break;
-		}
-
-		err = mqtt_live(&client);
-		if ((err != 0) && (err != -EAGAIN))
-		{
-			LOG_ERR("Error in mqtt_live: %d", err);
-			break;
-		}
-
-		if ((fds.revents & POLLIN) == POLLIN)
-		{
-			err = mqtt_input(&client);
-			if (err != 0)
-			{
-				LOG_ERR("Error in mqtt_input: %d", err);
-				break;
-			}
-		}
-
-		if ((fds.revents & POLLERR) == POLLERR)
-		{
-			LOG_ERR("POLLERR");
-			break;
-		}
-
-		if ((fds.revents & POLLNVAL) == POLLNVAL)
-		{
-			LOG_ERR("POLLNVAL");
-			break;
-		}
-
-		if (data_ready_to_send == 1)
-		{
-			data_ready_to_send = 0;
-			get_time_procedure();
-			LOG_INF("timestamp gathered from modem %" PRIu32, record_unix_time_s);
-			send_measured_train_data_with_multiple_packets_from_flash();
-		}
-
-		if (mqtt_trigger_reset == 1)
-		{
-			mqtt_trigger_reset = 0;
-			LOG_INF("trigger reset in progress\n");
-			k_sleep(K_MSEC(1000));
-			LOG_INF("endup mqtt client connection\n");
-			int8_t errrno;
-			errrno = mqtt_disconnect(&client);
-			if (errrno)
-			{
-				LOG_ERR("Could not disconnect: %d", errrno);
-			}
-			k_sleep(K_MSEC(1000));
-
-			LOG_INF("LTE_LC_FUNC_MODE_OFFLINE\n");
-			lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
-			k_sleep(K_MSEC(1000));
-			LOG_INF("nrf_modem_lib_shutdown\n");
-			nrf_modem_lib_shutdown();
-			k_sleep(K_MSEC(2000));
-			sys_reboot(SYS_REBOOT_COLD);
-		}
-
-		if (jumpto_measurement_start_enabled == 1)
-		{
-
-			goto do_measurement;
 		}
 	}
 
@@ -1375,169 +1383,6 @@ do_measurement:
 	{
 		LOG_ERR("Could not disconnect MQTT client: %d", err);
 	}
-	goto do_connect;
 
 	return 0;
 }
-
-/*
-
-
-
-	if (!device_is_ready(adc_dev))
-	{
-		printk("ADC not ready\n");
-		return;
-	}
-
-	// adc_channel_setup(adc_dev, &channel_cfg_0);
-	adc_channel_setup(adc_dev, &channel_cfg_1);
-	adc_channel_setup(adc_dev, &channel_cfg_2);
-	adc_channel_setup(adc_dev, &channel_cfg_3);
-	adc_channel_setup(adc_dev, &channel_cfg_4);
-
-	if (dk_leds_init() != 0)
-	{
-		LOG_ERR("Failed to initialize the LED library");
-	}
-
-	err = modem_configure();
-	if (err)
-	{
-		LOG_ERR("Failed to configure the modem");
-		return 0;
-	}
-
-	if (dk_buttons_init(button_handler) != 0)
-	{
-		LOG_ERR("Failed to initialize the buttons library");
-	}
-
-	err = client_init(&client);
-	if (err)
-	{
-		LOG_ERR("Failed to initialize MQTT client: %d", err);
-		return 0;
-	}
-
-do_connect:
-	if (connect_attempt++ > 0)
-	{
-		LOG_INF("Reconnecting in %d seconds...",
-				CONFIG_MQTT_RECONNECT_DELAY_S);
-		k_sleep(K_SECONDS(CONFIG_MQTT_RECONNECT_DELAY_S));
-	}
-
-	err = mqtt_connect(&client);
-	if (err)
-	{
-		LOG_ERR("Error in mqtt_connect: %d", err);
-		goto do_connect;
-	}
-
-	err = fds_init(&client, &fds);
-	if (err)
-	{
-		LOG_ERR("Error in fds_init: %d", err);
-		return 0;
-	}
-
-	if (record_cnt > 500)
-	{
-		send_multiple_packets(5);
-		record_cnt = 0;
-	}
-	else
-	{
-		record_cnt++;
-		k_sleep(K_MSEC(100));
-	}
-
-	while (1)
-	{
-
-		rec_counter = 0;
-		int16_t sample_buffer2[4] = {0};
-
-		// gpio_pin_set_dt(&led0, 1);
-		// gpio_pin_toggle_dt(&led0);
-		// adc_read(adc_dev, &sequence);
-		if (ADC_SAMPLE_FLAG == 1)
-		{
-			// gpio_pin_set_dt(&led0, 1);
-			ADC_SAMPLE_FLAG = 0;
-			adc_read(adc_dev, &sequence);				   // takes 248 us
-			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
-			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
-
-			ch0_volt[rec_counter] = sample_buffer2[0];
-			ch1_volt[rec_counter] = sample_buffer2[1];
-			ch0_int[rec_counter] = sample_buffer2[2];
-			ch1_int[rec_counter] = sample_buffer2[3];
-			rec_counter++; // 1us
-
-			if (rec_counter > RES_VAR_LEN - 1)
-			{
-				while (1)
-				{
-					printk("\nfinito\n");
-					k_sleep(K_MSEC(1000));
-				};
-			}
-
-		} //	gpio_pin_set_dt(&led0, 0);
-	}
-
-
-
-
-
-
-
-	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
-	if (err < 0)
-	{
-		LOG_ERR("Error in poll(): %d", errno);
-		break;
-	}
-
-	err = mqtt_live(&client);
-	if ((err != 0) && (err != -EAGAIN))
-	{
-		LOG_ERR("Error in mqtt_live: %d", err);
-		break;
-	}
-
-	if ((fds.revents & POLLIN) == POLLIN)
-	{
-		err = mqtt_input(&client);
-		if (err != 0)
-		{
-			LOG_ERR("Error in mqtt_input: %d", err);
-			break;
-		}
-	}
-
-	if ((fds.revents & POLLERR) == POLLERR)
-	{
-		LOG_ERR("POLLERR");
-		break;
-	}
-
-	if ((fds.revents & POLLNVAL) == POLLNVAL)
-	{
-		LOG_ERR("POLLNVAL");
-		break;
-	}
-
-	LOG_INF("Disconnecting MQTT client");
-
-	err = mqtt_disconnect(&client);
-	if (err)
-	{
-		LOG_ERR("Could not disconnect MQTT client: %d", err);
-	}
-	goto do_connect;
-*/
-
-/* This is never reached */

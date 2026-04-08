@@ -22,7 +22,7 @@ static uint8_t payload_buf[MQTT_BUFFER_SIZE];
 
 extern uint8_t jumpto_measurement_start_enabled;
 extern uint8_t mqtt_trigger_reset;
-
+extern uint8_t mqtt_skip_init_procedure;
 /* MQTT Broker details. */
 static struct sockaddr_storage broker;
 
@@ -142,6 +142,33 @@ int data_publish(struct mqtt_client *c, enum mqtt_qos qos,
 
 	return mqtt_publish(c, &param);
 }
+
+
+int sys_data_publish(struct mqtt_client *c, enum mqtt_qos qos,
+	uint8_t *data, size_t len)
+{
+	struct mqtt_publish_param param;
+
+	param.message.topic.qos = qos;
+	param.message.topic.topic.utf8 = CONFIG_MQTT_PUB_SYS_TOPIC;
+	param.message.topic.topic.size = strlen(CONFIG_MQTT_PUB_SYS_TOPIC);
+	param.message.payload.data = data;
+	param.message.payload.len = len;
+	param.message_id = sys_rand32_get();
+	param.dup_flag = 0;
+	param.retain_flag = 0;
+
+	//data_print("Publishing: ", data, len);
+	LOG_INF("to topic: %s len: %u",
+		CONFIG_MQTT_PUB_SYS_TOPIC,
+		(unsigned int)strlen(CONFIG_MQTT_PUB_SYS_TOPIC));
+
+	return mqtt_publish(c, &param);
+}
+
+
+
+
 /**@brief MQTT client event handler
  */
 void mqtt_evt_handler(struct mqtt_client *const c,
@@ -205,6 +232,11 @@ void mqtt_evt_handler(struct mqtt_client *const c,
 				mqtt_trigger_reset=1;
 			}
 
+		    if (compare_buffer_to_text(payload_buf,"SKP")) {
+				LOG_INF("SKIP INIT RCVD...");
+				mqtt_skip_init_procedure=1;
+			}
+			
 			
 
 
