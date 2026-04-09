@@ -1,8 +1,8 @@
 /*
  * TODO
- *
+ * - eeprom ukladani TRIGGER values atd
  * - rozliseni pomoci define na ruzne jednotky and topics NRF/01/UP_STREAM
- * - jak ukoncit mereni rms check? skrz detekci prujezdu? ale spis skrz napeti pulsy
+ * 
  */
 
 #include <stdint.h>
@@ -51,8 +51,8 @@
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
 #define RMS_TRIG_TRESHOLD 100
-#define END_RMS_TRIG_TRESHOLD 100
-#define RMS_LOW_SAMPLES_TO_TRIGGER_END 3000 // cca 1,5 sec
+#define END_RMS_TRIG_TRESHOLD 50
+#define RMS_LOW_SAMPLES_TO_TRIGGER_END 6000 // cca 3 sec   2000smp=1sec
 
 #define RMS_BUFFER_SIZE 100
 
@@ -517,8 +517,25 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 				}
 				else
 				{
+
 					crc_err_counter++;
-					if (crc_err_counter > 50)
+					k_sleep(K_MSEC(10));
+
+					if (crc_err_counter > 30)
+					{
+						k_sleep(K_MSEC(25));
+					}
+
+					if (crc_err_counter > 60)
+					{
+						k_sleep(K_MSEC(55));
+					}
+
+					if (crc_err_counter > 80)
+					{
+						k_sleep(K_MSEC(50));
+					}
+					if (crc_err_counter > 100)
 					{
 						crc_err_counter = 0;
 						flash_sample_fail_counter++;
@@ -526,7 +543,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 						seed_packet.chan_0_int[samples_to_load_cntr] = -32760;
 						seed_packet.chan_1_vlt[samples_to_load_cntr] = -32760;
 						seed_packet.chan_1_int[samples_to_load_cntr] = -32760;
-						// LOG_INF("CRC mismatch at sample, %d", samples_to_load_cntr);  // DEBUG FIX
+						LOG_ERR("CRC mismatch at sample, %d", samples_to_load_cntr); // DEBUG FIX
 						// k_sleep(K_MSEC(3));
 						samples_to_load_cntr++; // try another sample
 						flash_address_read += 10;
@@ -873,23 +890,22 @@ do_connect:
 	}
 }
 
+// FIME tady byl konec reseni pooling
 int8_t mqtt_pooling_procedure(void)
 {
-
+	LOG_INF("mqtt_pooling_procedure - enterning pool wait procedure");
 	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
 	if (err < 0)
 	{
 		LOG_ERR("Error in poll(): %d", errno);
 		return (-1);
 	}
-
 	err = mqtt_live(&client);
 	if ((err != 0) && (err != -EAGAIN))
 	{
 		LOG_ERR("Error in mqtt_live: %d", err);
 		return (-1);
 	}
-
 	if ((fds.revents & POLLIN) == POLLIN)
 	{
 		err = mqtt_input(&client);
@@ -912,9 +928,33 @@ int8_t mqtt_pooling_procedure(void)
 		return (-1);
 	}
 
+	if (first_alive_flag == 2)
+	{
+		LOG_INF("first_alive_flag==2");
+		initial_stage_timeout_counter++;
+		if (initial_stage_timeout_counter == 2)
+		{
+			int8_t errrno;
+			errrno = mqtt_disconnect(&client);
+			if (errrno)
+			{
+				LOG_ERR("Could not disconnect: %d", errrno);
+			}
+			k_sleep(K_MSEC(1000));
+
+			LOG_INF("LTE_LC_FUNC_MODE_OFFLINE\n");
+			lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
+			k_sleep(K_MSEC(1000));
+			LOG_INF("nrf_modem_lib_shutdown\n");
+			nrf_modem_lib_shutdown();
+			k_sleep(K_MSEC(1000));
+			return (-1);
+		}
+	}
+
 	if (first_alive_flag == 1)
 	{
-		first_alive_flag = 0;
+		first_alive_flag = 2;
 		char charbuf[] = {"UNIT ALIVE"};
 		uint16_t sizestruct = sizeof(charbuf);
 		LOG_INF("MQTT UNIT SENDING ALIVE INFO");
@@ -950,12 +990,12 @@ int8_t mqtt_pooling_procedure(void)
 		k_sleep(K_MSEC(1000));
 		LOG_INF("nrf_modem_lib_shutdown\n");
 		nrf_modem_lib_shutdown();
-		k_sleep(K_MSEC(2000));
+		k_sleep(K_MSEC(3000));
+		LOG_INF("RST trigg REBOOT NOW");
+		k_sleep(K_MSEC(3000));
 		sys_reboot(SYS_REBOOT_COLD);
 		k_sleep(K_MSEC(1000));
 	}
-
-	initial_stage_timeout_counter++;
 
 	if (mqtt_skip_init_procedure == 1)
 	{
@@ -979,6 +1019,34 @@ int8_t mqtt_pooling_procedure(void)
 	}
 
 	return (1);
+}
+
+void test_flash(void)
+{
+	flash_write_buffer_byte[0] = 1;
+	flash_write_buffer_byte[1] = 2;
+
+	flash_write_buffer_byte[2] = 3;
+	flash_write_buffer_byte[3] = 4;
+
+	flash_write_buffer_byte[4] = 5;
+	flash_write_buffer_byte[5] = 6;
+
+	flash_write_buffer_byte[6] = 7;
+	flash_write_buffer_byte[7] = 8;
+	FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 8); // cca 20-40 us?
+
+	k_sleep(K_MSEC(5));
+
+	FLASH_MEMORY_READ_DATA(flash_address_write, flash_read_buffer_byte, 8);
+
+	LOG_INF("data %d \t %d", flash_read_buffer_byte[0], flash_read_buffer_byte[1]);
+	LOG_INF("data %d \t %d", flash_read_buffer_byte[2], flash_read_buffer_byte[3]);
+	LOG_INF("data %d \t %d", flash_read_buffer_byte[4], flash_read_buffer_byte[5]);
+	LOG_INF("data %d \t %d", flash_read_buffer_byte[6], flash_read_buffer_byte[7]);
+
+	flash_address_write += 8;
+	k_sleep(K_MSEC(100));
 }
 
 int main(void)
@@ -1074,26 +1142,33 @@ int main(void)
 	uint8_t chsel = 0;
 
 	uint16_t offset_gather_cnt = 200;
-	LOG_INF(" ");
-	LOG_INF("-----------------------------");
-	LOG_INF("<----MEASUREMENT STAGE --->");
-	LOG_INF("first modem init");
-	init_modem_and_mqtt();
-	LOG_INF("entering MQTT pooling loop");
-	while (1)
-	{
-		pool_retval = mqtt_pooling_procedure();
-		if (pool_retval == -1)
-		{
-			break;
-		}
-	}
-	connect_attempt = 0;
-	LOG_INF("leaving  INIT STAGE");
-	LOG_INF(" ");
-	LOG_INF("-----------------------------");
 
-	offset_gather_cnt = 200;
+	while (0) {test_flash();}
+
+	if (0)
+	{
+		LOG_INF("-----------------------------");
+		LOG_INF("<---- REMOTE CONFIG STAGE --->");
+		LOG_INF("first modem init");
+		init_modem_and_mqtt();
+		LOG_INF("--entering MQTT pooling loop--");
+		while (1)
+		{
+			pool_retval = mqtt_pooling_procedure();
+			if (pool_retval == -1)
+			{
+				break;
+			}
+		}
+		connect_attempt = 0;
+		LOG_INF("leaving  INIT STAGE");
+		LOG_INF("-----------------------------");
+	}
+	else
+	{
+		first_alive_flag = 0;
+	}
+
 	LOG_INF("<----MEASUREMENT STAGE --->");
 	LOG_INF("starting timer");
 	k_sleep(K_MSEC(100));
@@ -1376,13 +1451,18 @@ int main(void)
 		}
 	}
 
-	LOG_INF("Disconnecting MQTT client");
+	LOG_INF("PROGRAM END Disconnecting MQTT client");
 
 	err = mqtt_disconnect(&client);
+
 	if (err)
 	{
 		LOG_ERR("Could not disconnect MQTT client: %d", err);
 	}
+
+	LOG_INF("PROGRAM END  trigg REBOOT NOW");
+	k_sleep(K_MSEC(1000));
+	sys_reboot(SYS_REBOOT_COLD);
 
 	return 0;
 }
