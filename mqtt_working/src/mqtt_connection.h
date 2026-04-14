@@ -43,5 +43,7 @@ int data_publish(struct mqtt_client *c, enum mqtt_qos qos,
 
 int sys_data_publish(struct mqtt_client *c, enum mqtt_qos qos,
 	uint8_t *data, size_t len);
-
+	
+int sys_log_data_publish(struct mqtt_client *c, enum mqtt_qos qos,
+	uint8_t *data, size_t len);
 #endif /* _CONNECTION_H_ */

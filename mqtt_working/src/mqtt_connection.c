@@ -20,8 +20,9 @@ static uint8_t rx_buffer[MQTT_BUFFER_SIZE];
 static uint8_t tx_buffer[MQTT_BUFFER_SIZE];
 static uint8_t payload_buf[MQTT_BUFFER_SIZE];
 
-extern uint8_t jumpto_measurement_start_enabled;
 extern uint8_t mqtt_trigger_reset;
+extern uint8_t first_alive_flag;
+extern uint8_t dump_log_flag;
 extern uint8_t mqtt_skip_init_procedure;
 /* MQTT Broker details. */
 static struct sockaddr_storage broker;
@@ -166,7 +167,27 @@ int sys_data_publish(struct mqtt_client *c, enum mqtt_qos qos,
 	return mqtt_publish(c, &param);
 }
 
+int sys_log_data_publish(struct mqtt_client *c, enum mqtt_qos qos,
+	uint8_t *data, size_t len)
+{
+	struct mqtt_publish_param param;
 
+	param.message.topic.qos = qos;
+	param.message.topic.topic.utf8 = CONFIG_MQTT_PUB_SYS_LOG_TOPIC;
+	param.message.topic.topic.size = strlen(CONFIG_MQTT_PUB_SYS_LOG_TOPIC);
+	param.message.payload.data = data;
+	param.message.payload.len = len;
+	param.message_id = sys_rand32_get();
+	param.dup_flag = 0;
+	param.retain_flag = 0;
+
+	//data_print("Publishing: ", data, len);
+	printk("to topic: %s len: %u",
+		CONFIG_MQTT_PUB_SYS_LOG_TOPIC,
+		(unsigned int)strlen(CONFIG_MQTT_PUB_SYS_LOG_TOPIC));
+
+	return mqtt_publish(c, &param);
+}
 
 
 /**@brief MQTT client event handler
@@ -216,24 +237,21 @@ void mqtt_evt_handler(struct mqtt_client *const c,
 
 		/* STEP 6.2 - On successful extraction of data */
 		if (err >= 0) {
-			data_print("Received: ", payload_buf, p->message.payload.len);
-			LOG_INF("TOPIC RCVD...");
-
-			//compare_buffer_to_text(payload_buf,"kuk")
-
-
-			if (compare_buffer_to_text(payload_buf,"JMP")) {
-				LOG_INF("JMP RCVD...");
-				jumpto_measurement_start_enabled=1;
-			}
+			data_print("Received CMD: ", payload_buf, p->message.payload.len);
 
 		    if (compare_buffer_to_text(payload_buf,"RST")) {
-				LOG_INF("RST RCVD...");
+				LOG_INF("request reset ...");
 				mqtt_trigger_reset=1;
+				first_alive_flag=0; // je nutno nastavit aby se vyhnul prechodu do norm stavu
+			}
+
+		    if (compare_buffer_to_text(payload_buf,"LDM")) { // DUMP LOG
+				LOG_INF("request logs dump ...");
+				dump_log_flag=1;
 			}
 
 		    if (compare_buffer_to_text(payload_buf,"SKP")) {
-				LOG_INF("SKIP INIT RCVD...");
+				LOG_INF("request skip pooling procedure ...");
 				mqtt_skip_init_procedure=1;
 			}
 			

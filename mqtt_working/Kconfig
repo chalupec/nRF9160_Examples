@@ -13,9 +13,16 @@ config MQTT_PUB_TOPIC
 
 config MQTT_PUB_SYS_TOPIC
     string "MQTT publish system topic"
-    default "NRF/XX/SYS_UP_STREAM"
+    default "NRF/XX/UP_STREAM_SYS"
     help
       MQTT topic used for system uplink messages
+
+config MQTT_PUB_SYS_LOG_TOPIC
+    string "MQTT publish system log topic"
+    default "NRF/XX/UP_STREAM_SYS_LOG"
+    help
+      MQTT topic used for system uplink messages
+
 
 
 config MQTT_SUB_TOPIC

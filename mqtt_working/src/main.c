@@ -2,7 +2,7 @@
  * TODO
  * - eeprom ukladani TRIGGER values atd
  * - rozliseni pomoci define na ruzne jednotky and topics NRF/01/UP_STREAM
- * 
+ *
  */
 
 #include <stdint.h>
@@ -37,6 +37,8 @@
 // #include <clock.h>
 
 #include <sys/_types.h>
+
+#include "log_ram_backend.h"
 
 #define SPIM_INST_IDX 1
 #define MOSI_PIN 4
@@ -88,10 +90,17 @@
 /** @brief Symbol specifying timer instance to be used. */
 #define TIMER_INST_IDX 0
 
-uint8_t jumpto_measurement_start_enabled = 0;
+#define LOG_MANIPULATION_BUFF_LEN 64
+
+
+// RAM LOGGER
+uint8_t buf[LOG_MANIPULATION_BUFF_LEN];
+uint32_t len;
+
 uint8_t mqtt_trigger_reset = 0;
 uint8_t mqtt_skip_init_procedure = 0;
 uint8_t first_alive_flag = 1;
+uint8_t dump_log_flag = 0;
 
 int32_t rms_value[4] = {0};
 
@@ -281,8 +290,8 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 		{
 			break;
 		}
-		LOG_INF("Network registration status: %s",
-				evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ? "Connected - home network" : "Connected - roaming");
+		LOG_INF("Network reg stat: %s",
+				evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ? "Conected - home network" : "Connected - roaming");
 		k_sem_give(&lte_connected);
 		break;
 	case LTE_LC_EVT_RRC_UPDATE:
@@ -295,7 +304,6 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 
 static int modem_configure(void)
 {
-	int err;
 
 	LOG_INF("Initializing modem library");
 	err = nrf_modem_lib_init();
@@ -346,10 +354,10 @@ void send_multiple_packets(uint16_t total_packet_to_send)
 		//	LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
-		//	int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
+		//	err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 		//						   byte_ptr, sizestruct);
 
-		int err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
+		err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
 							   byte_ptr, sizestruct);
 
 		if (err)
@@ -393,7 +401,7 @@ void send_measured_train_data_with_multiple_packets(void)
 		//	LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
-		int err = 0;
+		err = 0;
 		//	err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 		//						   byte_ptr, sizestruct);
 
@@ -556,7 +564,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 		// LOG_INF("size of struct is: %d", sizestruct);
 		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
 
-		int err = 0;
+		err = 0;
 		//	err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 		//						   byte_ptr, sizestruct);
 		err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
@@ -702,7 +710,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 			k_sleep(K_MSEC(100));
 			LOG_INF("step: %d", 4);
 			k_sleep(K_MSEC(100));
-			int err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
+			err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 								   byte_ptr, sizestruct);
 			if (err)
 			{
@@ -820,10 +828,10 @@ uint16_t circular_buffer_add_value(int16_t value0, int16_t value1, int16_t value
 
 void get_time_procedure(void)
 {
-	int err = date_time_update_async(NULL);
+	err = date_time_update_async(NULL);
 	if (err)
 	{
-		printk("date_time_update_async error: %d\n", err);
+		LOG_ERR("date_time_update_async error: %d", err);
 	}
 
 	struct tm timeinfo;
@@ -831,7 +839,7 @@ void get_time_procedure(void)
 
 	if (date_time_now(&unix_time_ms))
 	{
-		printk("Failed to get time\n");
+		LOG_ERR("Failed to get time");
 		return;
 	}
 
@@ -841,7 +849,7 @@ void get_time_procedure(void)
 
 	gmtime_r(&unix_time_s, &timeinfo);
 
-	printk("Current UTC time: %s", asctime(&timeinfo));
+	LOG_INF("Current UTC time: %s", asctime(&timeinfo));
 }
 
 void init_modem_and_mqtt(void)
@@ -860,7 +868,7 @@ void init_modem_and_mqtt(void)
 	}
 
 	LOG_INF("MQTT client init");
-	client.keepalive=30; // FIXME CHECK ONLY
+	client.keepalive = 30; // FIXME CHECK ONLY
 	err = client_init(&client);
 	if (err)
 	{
@@ -929,6 +937,70 @@ int8_t mqtt_pooling_procedure(void)
 		return (-1);
 	}
 
+	if (dump_log_flag == 1)
+	{
+		dump_log_flag = 0;
+		LOG_INF("ENTERING LOG DUMP MQTT REPORT");
+	
+	
+		while ((len = log_ram_read(buf, sizeof(buf))) > 0)
+		{
+
+	 err = sys_log_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, buf, LOG_MANIPULATION_BUFF_LEN); // FIXME CHECK ONLY 10 is ok
+	
+			k_sleep(K_MSEC(100));
+		}
+
+	}
+
+	if (mqtt_trigger_reset == 1)
+	{
+		mqtt_trigger_reset = 0;
+		LOG_INF("trigger reset in progress");
+		k_sleep(K_MSEC(1000));
+		LOG_INF("end-up mqtt client connection");
+
+		int8_t errrno;
+		errrno = mqtt_disconnect(&client);
+		if (errrno)
+		{
+			LOG_ERR("Could not disconnect: %d", errrno);
+		}
+		k_sleep(K_MSEC(1000));
+
+		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
+		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
+		k_sleep(K_MSEC(1000));
+		LOG_INF("nrf_modem_lib_shutdown");
+		nrf_modem_lib_shutdown();
+		k_sleep(K_MSEC(3000));
+		LOG_INF("RST trigg REBOOT NOW");
+		k_sleep(K_MSEC(3000));
+		sys_reboot(SYS_REBOOT_COLD);
+		k_sleep(K_MSEC(1000));
+	}
+
+	if (mqtt_skip_init_procedure == 1)
+	{
+		mqtt_skip_init_procedure = 0;
+		LOG_INF("SKIP REQUEST RECEIVED");
+		int8_t errrno;
+		errrno = mqtt_disconnect(&client);
+		if (errrno)
+		{
+			LOG_ERR("Could not disconnect: %d", errrno);
+		}
+		k_sleep(K_MSEC(1000));
+
+		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
+		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
+		k_sleep(K_MSEC(1000));
+		LOG_INF("nrf_modem_lib_shutdown");
+		nrf_modem_lib_shutdown();
+		k_sleep(K_MSEC(2000));
+		return (-1);
+	}
+
 	if (first_alive_flag == 2)
 	{
 		LOG_INF("entering first_alive_flag=2");
@@ -943,10 +1015,10 @@ int8_t mqtt_pooling_procedure(void)
 			}
 			k_sleep(K_MSEC(1000));
 
-			LOG_INF("LTE_LC_FUNC_MODE_OFFLINE\n");
+			LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
 			lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
 			k_sleep(K_MSEC(1000));
-			LOG_INF("nrf_modem_lib_shutdown\n");
+			LOG_INF("nrf_modem_lib_shutdown");
 			nrf_modem_lib_shutdown();
 			k_sleep(K_MSEC(1000));
 			return (-1);
@@ -960,7 +1032,7 @@ int8_t mqtt_pooling_procedure(void)
 		char charbuf[] = {"UNIT ALIVE"};
 		uint16_t sizestruct = sizeof(charbuf);
 		LOG_INF("MQTT UNIT SENDING ALIVE INFO");
-		int err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, charbuf, 10); // FIXME CHECK ONLY 10 is ok
+		err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, charbuf, 10); // FIXME CHECK ONLY 10 is ok
 	}
 
 	if (data_ready_to_send == 1)
@@ -969,54 +1041,6 @@ int8_t mqtt_pooling_procedure(void)
 		get_time_procedure();
 		LOG_INF("timestamp gathered from modem %" PRIu32, record_unix_time_s);
 		send_measured_train_data_with_multiple_packets_from_flash();
-	}
-
-	if (mqtt_trigger_reset == 1)
-	{
-		mqtt_trigger_reset = 0;
-		LOG_INF("trigger reset in progress\n");
-		k_sleep(K_MSEC(1000));
-		LOG_INF("endup mqtt client connection\n");
-
-		int8_t errrno;
-		errrno = mqtt_disconnect(&client);
-		if (errrno)
-		{
-			LOG_ERR("Could not disconnect: %d", errrno);
-		}
-		k_sleep(K_MSEC(1000));
-
-		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE\n");
-		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
-		k_sleep(K_MSEC(1000));
-		LOG_INF("nrf_modem_lib_shutdown\n");
-		nrf_modem_lib_shutdown();
-		k_sleep(K_MSEC(3000));
-		LOG_INF("RST trigg REBOOT NOW");
-		k_sleep(K_MSEC(3000));
-		sys_reboot(SYS_REBOOT_COLD);
-		k_sleep(K_MSEC(1000));
-	}
-
-	if (mqtt_skip_init_procedure == 1)
-	{
-		mqtt_skip_init_procedure = 0;
-		LOG_INF("SKIP REQUEST RECEIVED\n");
-		int8_t errrno;
-		errrno = mqtt_disconnect(&client);
-		if (errrno)
-		{
-			LOG_ERR("Could not disconnect: %d", errrno);
-		}
-		k_sleep(K_MSEC(1000));
-
-		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE\n");
-		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
-		k_sleep(K_MSEC(1000));
-		LOG_INF("nrf_modem_lib_shutdown\n");
-		nrf_modem_lib_shutdown();
-		k_sleep(K_MSEC(2000));
-		return (-1);
 	}
 
 	return (1);
@@ -1059,16 +1083,17 @@ int main(void)
 	(void)status;
 
 	k_sleep(K_MSEC(500));
-	printk("\nSAMPLE APP STARTS\n");
-	k_sleep(K_MSEC(500));
+	LOG_INF("\n\nSAMPLE APP STARTS");
+	k_sleep(K_MSEC(100));
 
 #if defined(__ZEPHYR__)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
 #endif
 
 	k_sleep(K_MSEC(500));
-	printk("SPIM INIT\n");
-	k_sleep(K_MSEC(500));
+	LOG_INF("SPIM INIT");
+
+	k_sleep(K_MSEC(100));
 
 	nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
 															  MOSI_PIN,
@@ -1081,13 +1106,9 @@ int main(void)
 	status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
 	// NRFX_ASSERT(status == NRFX_SUCCESS);
 
+	k_sleep(K_MSEC(100));
+	LOG_INF("SPIM INIT finished");
 	k_sleep(K_MSEC(500));
-	printk("SPIM INIT finished\n");
-	k_sleep(K_MSEC(500));
-
-	uint8_t wr_buff[32];
-	uint8_t rd_buff[32];
-	uint8_t cntradd = 0;
 
 	int handle = 0;
 	int ret = 0;
@@ -1109,16 +1130,14 @@ int main(void)
 
 	k_sleep(K_MSEC(500));
 
-	// printk("\nSAMPLE APP STARTS\n");
-
 	if (dk_leds_init() != 0)
 	{
-		LOG_ERR("Failed to initialize the LED library");
+		LOG_ERR("Failed to initialize the LED library\n");
 	}
 
 	if (!device_is_ready(adc_dev))
 	{
-		printk("ADC not ready\n");
+		LOG_ERR("ADC not ready\n");
 		return;
 	}
 
@@ -1144,7 +1163,26 @@ int main(void)
 
 	uint16_t offset_gather_cnt = 200;
 
-	while (0) {test_flash();}
+	while (0)
+	{
+		test_flash();
+	}
+
+	k_sleep(K_MSEC(2000));
+	printk("\n\n\n\n");
+	printk("********* START OF RAM RECS DUMP *********\n");
+	if (log_ram_is_retained())
+	{
+		printk("RAM log retained after reset\n");
+	}
+	k_sleep(K_MSEC(200));
+
+	while ((len = log_ram_read(buf, sizeof(buf))) > 0)
+	{
+		printk("%.*s", len, buf);
+		k_sleep(K_MSEC(100));
+	}
+	printk("********* END OF RAM RECS DUMP **********\n\n\n\n");
 
 	if (1)
 	{
@@ -1163,7 +1201,7 @@ int main(void)
 		}
 		connect_attempt = 0;
 		LOG_INF("leaving  INIT STAGE");
-		LOG_INF("-----------------------------");
+		LOG_INF("-----------------------------\n");
 	}
 	else
 	{
@@ -1433,14 +1471,9 @@ int main(void)
 		}
 	}
 
-	if (jumpto_measurement_start_enabled == 0)
-	{
-		init_modem_and_mqtt();
-	}
-	else
-	{
-		jumpto_measurement_start_enabled = 0;
-	}
+
+	init_modem_and_mqtt();
+
 
 	while (1)
 	{
@@ -1461,7 +1494,7 @@ int main(void)
 		LOG_ERR("Could not disconnect MQTT client: %d", err);
 	}
 
-	LOG_INF("PROGRAM END  trigg REBOOT NOW");
+	LOG_INF("PROGRAM END  trigg REBOOT NOW\n");
 	k_sleep(K_MSEC(1000));
 	sys_reboot(SYS_REBOOT_COLD);
 
