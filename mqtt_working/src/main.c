@@ -860,6 +860,7 @@ void init_modem_and_mqtt(void)
 	}
 
 	LOG_INF("MQTT client init");
+	client.keepalive=30; // FIXME CHECK ONLY
 	err = client_init(&client);
 	if (err)
 	{
@@ -893,7 +894,7 @@ do_connect:
 // FIME tady byl konec reseni pooling
 int8_t mqtt_pooling_procedure(void)
 {
-	LOG_INF("mqtt_pooling_procedure - enterning pool wait procedure");
+	LOG_INF("mqtt_pooling_procedure - enterning pool wait");
 	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
 	if (err < 0)
 	{
@@ -930,7 +931,7 @@ int8_t mqtt_pooling_procedure(void)
 
 	if (first_alive_flag == 2)
 	{
-		LOG_INF("first_alive_flag==2");
+		LOG_INF("entering first_alive_flag=2");
 		initial_stage_timeout_counter++;
 		if (initial_stage_timeout_counter == 2)
 		{
@@ -954,12 +955,12 @@ int8_t mqtt_pooling_procedure(void)
 
 	if (first_alive_flag == 1)
 	{
+		LOG_INF("entering first_alive_flag=1");
 		first_alive_flag = 2;
 		char charbuf[] = {"UNIT ALIVE"};
 		uint16_t sizestruct = sizeof(charbuf);
 		LOG_INF("MQTT UNIT SENDING ALIVE INFO");
-		int err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
-								   charbuf, sizestruct);
+		int err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, charbuf, 10); // FIXME CHECK ONLY 10 is ok
 	}
 
 	if (data_ready_to_send == 1)
@@ -1145,7 +1146,7 @@ int main(void)
 
 	while (0) {test_flash();}
 
-	if (0)
+	if (1)
 	{
 		LOG_INF("-----------------------------");
 		LOG_INF("<---- REMOTE CONFIG STAGE --->");
