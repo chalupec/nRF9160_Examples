@@ -180,12 +180,7 @@ int sys_log_data_publish(struct mqtt_client *c, enum mqtt_qos qos,
 	param.message_id = sys_rand32_get();
 	param.dup_flag = 0;
 	param.retain_flag = 0;
-
-	//data_print("Publishing: ", data, len);
-	printk("to topic: %s len: %u",
-		CONFIG_MQTT_PUB_SYS_LOG_TOPIC,
-		(unsigned int)strlen(CONFIG_MQTT_PUB_SYS_LOG_TOPIC));
-
+	printk("%s pub bytes: %u\n",CONFIG_MQTT_PUB_SYS_LOG_TOPIC,len);
 	return mqtt_publish(c, &param);
 }
 
