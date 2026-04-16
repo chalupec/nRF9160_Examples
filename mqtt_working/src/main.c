@@ -92,7 +92,6 @@
 
 #define LOG_MANIPULATION_BUFF_LEN 64
 
-
 // RAM LOGGER
 uint8_t buf[LOG_MANIPULATION_BUFF_LEN];
 uint32_t len;
@@ -183,7 +182,7 @@ uint16_t train_counter = 0;
 
 static const struct device *adc_dev = DEVICE_DT_GET(ADC_NODE);
 
-static const nrfx_timer_t timer = NRFX_TIMER_INSTANCE(0);
+// static const nrfx_timer_t timer = NRFX_TIMER_INSTANCE(0);
 
 nrfx_spim_t spim_inst = NRFX_SPIM_INSTANCE(SPIM_INST_IDX);
 
@@ -358,7 +357,7 @@ void send_multiple_packets(uint16_t total_packet_to_send)
 		//						   byte_ptr, sizestruct);
 
 		err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
-							   byte_ptr, sizestruct);
+						   byte_ptr, sizestruct);
 
 		if (err)
 		{
@@ -421,7 +420,6 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 {
 	uint16_t pckt_cnt = 1;
 	uint16_t total_packet_to_send = 0;
-	uint16_t array_offset = 0;
 	uint16_t samples_to_load_cntr = 0;
 	uint16_t fl_buff_bcnt = 0;
 
@@ -587,7 +585,6 @@ void send_measured_train_data_with_multiple_packets_from_flash_to_UART(void)
 	k_sleep(K_MSEC(4000));
 	uint16_t pckt_cnt = 1;
 	uint16_t total_packet_to_send = 0;
-	uint16_t array_offset = 0;
 	uint16_t samples_to_load_cntr = 0;
 	uint16_t fl_buff_bcnt = 0;
 
@@ -672,7 +669,9 @@ void send_measured_train_data_with_multiple_packets_from_flash_to_UART(void)
 				   seed_packet.chan_0_vlt[samples_to_load_cntr],
 				   seed_packet.chan_0_int[samples_to_load_cntr],
 				   seed_packet.chan_1_vlt[samples_to_load_cntr],
-				   seed_packet.chan_1_int[samples_to_load_cntr++]);
+				   seed_packet.chan_1_int[samples_to_load_cntr]);
+
+			samples_to_load_cntr++;
 
 			k_sleep(K_MSEC(1));
 		}
@@ -711,7 +710,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 			LOG_INF("step: %d", 4);
 			k_sleep(K_MSEC(100));
 			err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
-								   byte_ptr, sizestruct);
+							   byte_ptr, sizestruct);
 			if (err)
 			{
 				LOG_INF("Failed to send message, %d", err);
@@ -852,7 +851,7 @@ void get_time_procedure(void)
 	LOG_INF("Current UTC time: %s", asctime(&timeinfo));
 }
 
-void init_modem_and_mqtt(void)
+uint8_t init_modem_and_mqtt(void)
 {
 	LOG_INF("Configuring modem");
 	err = modem_configure();
@@ -897,6 +896,8 @@ do_connect:
 		LOG_ERR("Error in fds_init: %d", err);
 		return 0;
 	}
+
+	return 1;
 }
 
 // FIME tady byl konec reseni pooling
@@ -941,16 +942,14 @@ int8_t mqtt_pooling_procedure(void)
 	{
 		dump_log_flag = 0;
 		LOG_INF("ENTERING LOG DUMP MQTT REPORT");
-	
-	
+
 		while ((len = log_ram_read(buf, sizeof(buf))) > 0)
 		{
 
-	 err = sys_log_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, buf, LOG_MANIPULATION_BUFF_LEN); // FIXME CHECK ONLY 10 is ok
-	
+			err = sys_log_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, buf, LOG_MANIPULATION_BUFF_LEN); // FIXME CHECK ONLY 10 is ok
+
 			k_sleep(K_MSEC(100));
 		}
-
 	}
 
 	if (mqtt_trigger_reset == 1)
@@ -1003,6 +1002,7 @@ int8_t mqtt_pooling_procedure(void)
 
 	if (first_alive_flag == 2)
 	{
+
 		LOG_INF("entering first_alive_flag=2");
 		initial_stage_timeout_counter++;
 		if (initial_stage_timeout_counter == 2)
@@ -1030,7 +1030,6 @@ int8_t mqtt_pooling_procedure(void)
 		LOG_INF("entering first_alive_flag=1");
 		first_alive_flag = 2;
 		char charbuf[] = {"UNIT ALIVE"};
-		uint16_t sizestruct = sizeof(charbuf);
 		LOG_INF("MQTT UNIT SENDING ALIVE INFO");
 		err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, charbuf, 10); // FIXME CHECK ONLY 10 is ok
 	}
@@ -1077,8 +1076,6 @@ void test_flash(void)
 int main(void)
 {
 
-	uint32_t record_cnt = 1780;
-
 	nrfx_err_t status;
 	(void)status;
 
@@ -1110,9 +1107,6 @@ int main(void)
 	LOG_INF("SPIM INIT finished");
 	k_sleep(K_MSEC(500));
 
-	int handle = 0;
-	int ret = 0;
-
 	nrfx_timer_t timer_inst = NRFX_TIMER_INSTANCE(TIMER_INST_IDX);
 	uint32_t base_frequency = NRF_TIMER_BASE_FREQUENCY_GET(timer_inst.p_reg);
 	nrfx_timer_config_t config = NRFX_TIMER_DEFAULT_CONFIG(base_frequency);
@@ -1138,7 +1132,9 @@ int main(void)
 	if (!device_is_ready(adc_dev))
 	{
 		LOG_ERR("ADC not ready\n");
-		return;
+		while (1)
+		{
+		}
 	}
 
 	adc_channel_setup(adc_dev, &channel_cfg_0);
@@ -1147,11 +1143,13 @@ int main(void)
 	adc_channel_setup(adc_dev, &channel_cfg_3);
 	adc_channel_setup(adc_dev, &channel_cfg_4);
 
-	rec_counter = 0;
+#ifdef SAMPLE_PRINTING_ENABLED
 	int16_t sample_print = 0;
-	int16_t sample_buffer2[4] = {0};
+#endif
 
-	int16_t sample_solve_rms = 0;
+	rec_counter = 0;
+
+	int16_t sample_buffer2[4] = {0};
 
 	int32_t filtered_value_array[4] = {5200, 5200, 5200, 5200};
 	int32_t filtered_value = 5200;
@@ -1168,21 +1166,24 @@ int main(void)
 		test_flash();
 	}
 
-	k_sleep(K_MSEC(2000));
-	printk("\n\n\n\n");
-	printk("********* START OF RAM RECS DUMP *********\n");
-	if (log_ram_is_retained())
+	if (0)
 	{
-		printk("RAM log retained after reset\n");
-	}
-	k_sleep(K_MSEC(200));
+		k_sleep(K_MSEC(1000));
+		printk("\n\n\n\n");
+		printk("********* START OF RAM RECS DUMP *********\n");
+		if (log_ram_is_retained())
+		{
+			printk("RAM log retained after reset\n");
+		}
+		k_sleep(K_MSEC(200));
 
-	while ((len = log_ram_read(buf, sizeof(buf))) > 0)
-	{
-		printk("%.*s", len, buf);
-		k_sleep(K_MSEC(100));
+		while ((len = log_ram_read(buf, sizeof(buf))) > 0)
+		{
+			printk("%.*s", len, buf);
+			k_sleep(K_MSEC(50));
+		}
+		printk("********* END OF RAM RECS DUMP **********\n\n\n\n");
 	}
-	printk("********* END OF RAM RECS DUMP **********\n\n\n\n");
 
 	if (1)
 	{
@@ -1225,9 +1226,9 @@ int main(void)
 		{
 			// gpio_pin_set_dt(&led0, 1);
 			ADC_SAMPLE_FLAG = 0;
-			adc_read(adc_dev, &sequence);				   // takes 248 us
-			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
-			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+			adc_read(adc_dev, &sequence);				  // takes 248 us
+			add_samples_to_buffer(sample_buffer, buffer); // takes 2 us
+			average_of_vectors(buffer, sample_buffer2);	  // 3.5 us
 
 			chsel = 0;
 			while (chsel < 4)
@@ -1250,8 +1251,6 @@ int main(void)
 	buff_head = 0;
 	total_recorded_samples = 0;
 
-	int16_t cntrval = 0;
-
 	LOG_INF("circular buffer init");
 	circular_buffer_init();
 	LOG_INF("entering trigger waiting loop");
@@ -1262,9 +1261,9 @@ int main(void)
 		{
 			// gpio_pin_set_dt(&led0, 1);
 			ADC_SAMPLE_FLAG = 0;
-			adc_read(adc_dev, &sequence);				   // takes 248 us
-			add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
-			average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+			adc_read(adc_dev, &sequence);				  // takes 248 us
+			add_samples_to_buffer(sample_buffer, buffer); // takes 2 us
+			average_of_vectors(buffer, sample_buffer2);	  // 3.5 us
 
 			new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
 			ch0_off_value = new_sample;
@@ -1329,9 +1328,9 @@ int main(void)
 				{
 					// gpio_pin_set_dt(&led0, 1);
 					ADC_SAMPLE_FLAG = 0;
-					adc_read(adc_dev, &sequence);				   // takes 248 us
-					add_samples_to_buffer(sample_buffer, &buffer); // takes 2 us
-					average_of_vectors(buffer, &sample_buffer2);   // 3.5 us
+					adc_read(adc_dev, &sequence);				  // takes 248 us
+					add_samples_to_buffer(sample_buffer, buffer); // takes 2 us
+					average_of_vectors(buffer, sample_buffer2);	  // 3.5 us
 
 					new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
 					ch0_off_value = new_sample;
@@ -1451,29 +1450,18 @@ int main(void)
 					loc_circ_buf_cntr = 0;
 				}
 			}
-#ifdef CIRC_BUFF_STAMP_VALUE_ADD
-			ch0_volt[samples_to_store_from_circ_buff] = ch0_volt[samples_to_store_from_circ_buff] + 5000;
-			ch0_int[samples_to_store_from_circ_buff] = ch0_int[samples_to_store_from_circ_buff] + 5000;
-			ch1_volt[samples_to_store_from_circ_buff] = ch1_volt[samples_to_store_from_circ_buff] + 5000;
-			ch1_int[samples_to_store_from_circ_buff] = ch1_int[samples_to_store_from_circ_buff] + 5000;
-#endif
-
 			data_ready_to_send = 1;
-			//	clear_buffer(circ_buff_ch0, CRCLR_BUFF_SIZE);
-			//	clear_buffer(circ_buff_ch1, CRCLR_BUFF_SIZE);
-			//	clear_buffer(circ_buff_ch2, CRCLR_BUFF_SIZE);
-			//  clear_buffer(circ_buff_ch3, CRCLR_BUFF_SIZE);
 		}
 
 		if (data_ready_to_send == 1)
 		{
+			first_alive_flag = 0;
+			LOG_INF("data_ready_to_send flag set");
 			break;
 		}
 	}
 
-
 	init_modem_and_mqtt();
-
 
 	while (1)
 	{

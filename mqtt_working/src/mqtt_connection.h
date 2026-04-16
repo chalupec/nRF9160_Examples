@@ -15,15 +15,7 @@
 	//client->user_name->utf8 = "iot-course-but";
 
 
-static struct mqtt_utf8 username = {
-	.utf8 = (uint8_t *)"iot-course-but",
-	.size = sizeof("iot-course-but") - 1
-};
 
-static struct mqtt_utf8 password = {
-	.utf8 = (uint8_t *)"thisisthemostsecretsecretever",
-	.size = sizeof("thisisthemostsecretsecretever") - 1
-};
 
 
 

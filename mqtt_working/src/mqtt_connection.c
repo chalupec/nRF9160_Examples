@@ -15,6 +15,18 @@
 #include <zephyr/random/random.h>
 
 
+
+static struct mqtt_utf8 username = {
+	.utf8 = (uint8_t *)"iot-course-but",
+	.size = sizeof("iot-course-but") - 1
+};
+
+static struct mqtt_utf8 password = {
+	.utf8 = (uint8_t *)"thisisthemostsecretsecretever",
+	.size = sizeof("thisisthemostsecretsecretever") - 1
+};
+
+
 /* Buffers for MQTT client. */
 static uint8_t rx_buffer[MQTT_BUFFER_SIZE];
 static uint8_t tx_buffer[MQTT_BUFFER_SIZE];
