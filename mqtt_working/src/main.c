@@ -3,94 +3,9 @@
  *
  */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <ncs_version.h>
-#include <zephyr/kernel.h>
-#include <zephyr/net/socket.h>
-#include <poll.h>
-#include <zephyr/types.h>
+#include "main.h"
 
-#include <zephyr/logging/log.h>
-#include <dk_buttons_and_leds.h>
-#include <modem/nrf_modem_lib.h>
-#include <modem/lte_lc.h>
-/* STEP 2.3 - Include the header file for the MQTT Library*/
-#include <zephyr/net/mqtt.h>
 
-#include "mqtt_connection.h"
-
-#include <zephyr/drivers/adc.h>
-#include <hal/nrf_saadc.h>
-#include <nrfx_timer.h>
-
-#include <date_time.h>
-
-#include <nrfx_spim.h>
-#include "../include/drivers/APS6404L.h"
-#include "unit_lib.h"
-
-#include <zephyr/sys/reboot.h>
-#include <math.h>
-// #include <clock.h>
-
-#include <sys/_types.h>
-
-#include "log_ram_backend.h"
-
-#include "eeprom_emul.h"
-
-#define SPIM_INST_IDX 1
-#define MOSI_PIN 4
-#define MISO_PIN 1
-#define SCK_PIN 5
-#define MEM_CS_PIN 0
-
-// #define SAMPLE_PRINTING_ENABLED
-// #define CIRC_BUFF_STAMP_VALUE_ADD
-
-#define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
-#define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
-
-#define DEFAULT_START_RMS_TRIG_TRESHOLD 55
-#define DEFAULT_END_RMS_TRIG_TRESHOLD 35
-#define DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END 6000 // cca 3 sec   2000smp=1sec
-
-#define RMS_BUFFER_SIZE 100
-
-#define NR_OF_SAMPLES_TO_MEASURE 27000 // 13500
-
-#define RES_VAR_LEN 5000
-
-#define WAVE_SAMPLE_LEN 1024 // MUST BE SAME AS CRCLR_BUFF_SIZE
-
-#define CRCLR_BUFF_SIZE 1024 // MUST BE SAME AS WAVE_SAMPLE_LEN
-
-#define FLASH_BYTE_READ_OUT_LEN 8 // POZOR OMEZENI VE FCI FLASH READ v driver knihovne, na max 32
-
-/** @brief Symbol specifying time in milliseconds to wait for handler execution. */
-#define TIME_TO_WAIT_US 500UL
-
-#define DAQ_TIME_US 40
-
-#define ADC_NODE DT_IO_CHANNELS_CTLR(DT_PATH(zephyr_user))
-
-#define CHANNEL_0 0
-#define CHANNEL_1 1
-#define CHANNEL_2 2
-#define CHANNEL_3 3
-#define CHANNEL_4 4
-
-#define BUFFER_WIDTH 4
-#define BUFFER_LENGTH 4
-
-// nt buffer[BUFFER_SIZE] = {0};
-// int index = 0;
-
-/** @brief Symbol specifying timer instance to be used. */
-#define TIMER_INST_IDX 0
-
-#define LOG_MANIPULATION_BUFF_LEN 64
 
 // RAM LOGGER
 uint8_t buf[LOG_MANIPULATION_BUFF_LEN];
@@ -142,46 +57,6 @@ static struct pollfd fds;
 
 static K_SEM_DEFINE(lte_connected, 0, 1);
 
-struct __attribute__((__packed__)) data_packet_t
-{
-	uint16_t packet_header;
-	uint16_t packet_version;
-	uint16_t actual_packet_nr;
-	uint16_t total_packet_nr;
-	uint32_t timestamp;
-	uint32_t total_sample_count;
-	uint16_t train_counter;
-
-	int16_t chan_0_vlt[WAVE_SAMPLE_LEN];
-	int16_t chan_0_int[WAVE_SAMPLE_LEN];
-	int16_t chan_1_vlt[WAVE_SAMPLE_LEN];
-	int16_t chan_1_int[WAVE_SAMPLE_LEN];
-
-	uint16_t CRC;
-};
-
-struct __attribute__((__packed__)) servis_packet_t
-{
-	uint16_t packet_header;
-	uint16_t packet_version;
-	uint16_t reserve_word;
-	uint16_t packet_counter;
-	uint16_t batt_voltage;
-	int16_t unit_temperature;
-	uint32_t IMEI;
-	uint32_t DEV_ID;
-	uint16_t train_counter;
-	uint16_t pwr_cycle_counter;
-	uint32_t uptime_minutes;
-	uint32_t last_powercycle_timestamp;
-	uint16_t unit_status_bits;
-	uint8_t signal_stength;
-	uint16_t modem_status_word;
-	float GPS_lat;
-	float GPS_lon;
-	float GPS_alt;
-	uint16_t CRC;
-};
 
 static struct data_packet_t seed_packet;
 uint16_t train_counter = 0;
@@ -333,46 +208,6 @@ static int modem_configure(void)
 	return 0;
 }
 
-void send_multiple_packets(uint16_t total_packet_to_send)
-{
-
-	uint16_t pckt_cnt = 1;
-
-	while (pckt_cnt <= total_packet_to_send)
-	{
-		seed_packet.packet_header = 0xBEEF;
-		seed_packet.packet_version = 0x0101;
-		seed_packet.actual_packet_nr = pckt_cnt++;
-		seed_packet.total_packet_nr = total_packet_to_send;
-
-		seed_packet.timestamp = 1748277406;
-		seed_packet.train_counter = train_counter;
-
-		seed_packet.CRC = 0xABCD;
-		/*
-				memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
-				memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
-				memcpy(seed_packet.chan_0_int, chan_dat_128, 128);
-				memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
-		*/
-		uint16_t sizestruct = sizeof(seed_packet);
-		//	LOG_INF("size of struct is: %d", sizestruct);
-		uint8_t *byte_ptr = (uint8_t *)&seed_packet;
-
-		//	err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
-		//						   byte_ptr, sizestruct);
-
-		err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
-						   byte_ptr, sizestruct);
-
-		if (err)
-		{
-			LOG_INF("Failed to send message, %d", err);
-			return;
-		}
-	}
-	train_counter++;
-}
 
 void send_measured_train_data_with_multiple_packets(void)
 {
@@ -703,11 +538,6 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 			train_counter++;
 			seed_packet.CRC = 0xABCD;
 
-			/*memcpy(seed_packet.chan_0_vlt, chan_dat, 64);
-			memcpy(seed_packet.chan_1_vlt, chan_dat, 16);
-			memcpy(&seed_packet.chan_0_int[5], chan_dat_128, 128);
-			memcpy(seed_packet.chan_1_int, &chan_dat_128[10], 50);
-*/
 			uint16_t sizestruct = sizeof(seed_packet);
 			LOG_INF("size of struct is: %d", sizestruct);
 			uint8_t *byte_ptr = (uint8_t *)&seed_packet;
@@ -728,7 +558,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	case DK_BTN2_MSK:
 		if (button_state & DK_BTN2_MSK)
 		{
-			send_multiple_packets(5);
+			
 		}
 		break;
 
@@ -1135,7 +965,6 @@ int main(void)
 	spim_config.irq_priority = 2;
 
 	status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
-	// NRFX_ASSERT(status == NRFX_SUCCESS);
 
 	k_sleep(K_MSEC(100));
 	LOG_INF("SPIM INIT finished");
@@ -1426,14 +1255,6 @@ int main(void)
 
 					flash_write_buffer_byte[6] = ch3_off_value >> 8;
 					flash_write_buffer_byte[7] = ch3_off_value & 0xff;
-					// FIXME
-					////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
-					//	flash_write_buffer_byte[2] = rms_value[0] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
-					//	flash_write_buffer_byte[3] = rms_value[0] & 0xff; // FIXME ONLY FOR OBSERVING RMS
-					//	flash_write_buffer_byte[6] = rms_value[2] >> 8;	  // FIXME ONLY FOR OBSERVING RMS
-					//	flash_write_buffer_byte[7] = rms_value[2] & 0xff; // FIXME ONLY FOR OBSERVING RMS
-					// FIXME
-					////////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        ///////
 
 					crc = crc16_ccitt_jch(flash_write_buffer_byte, 8);
 					flash_write_buffer_byte[8] = crc >> 8;
