@@ -36,6 +36,12 @@ extern uint8_t mqtt_trigger_reset;
 extern uint8_t first_alive_flag;
 extern uint8_t dump_log_flag;
 extern uint8_t mqtt_skip_init_procedure;
+
+extern uint8_t config_request_flag;
+
+extern char cfg_buff[256];
+
+
 /* MQTT Broker details. */
 static struct sockaddr_storage broker;
 
@@ -262,7 +268,13 @@ void mqtt_evt_handler(struct mqtt_client *const c,
 				mqtt_skip_init_procedure=1;
 			}
 			
-			
+
+		    if (compare_buffer_to_text(payload_buf,"CFG")) {
+				LOG_INF("config request received ...");
+  				memcpy(cfg_buff, payload_buf, p->message.payload.len);
+				config_request_flag=1;
+			}
+						
 
 
 			// Control the LED 

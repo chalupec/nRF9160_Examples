@@ -16,14 +16,10 @@
 /* EEPROM key IDs */
 typedef enum
 {
-    EEPROM_KEY_TRIG_DURATION  = 0x00,
+    EEPROM_KEY_END_TRIG_DURATION  = 0x00,
     EEPROM_KEY_TRIG_START     = 0x01,
     EEPROM_KEY_TRIG_END       = 0x02,
-    EEPROM_KEY_NR_OF_SMPLS    = 0x03,
-    EEPROM_KEY_TOPIC_ID       = 0x04,
-    EEPROM_KEY_PWR_CYCLES     = 0x05,
-    EEPROM_KEY_TRAIN_COUNTER  = 0x06
-
+    EEPROM_KEY_NR_OF_SMPLS    = 0x03
 } eeprom_key_t;
 
 /* API */

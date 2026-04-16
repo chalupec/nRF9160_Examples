@@ -1,7 +1,5 @@
 /*
  * TODO
- * - eeprom ukladani TRIGGER values atd duration a max samples
- * - rozliseni pomoci define na ruzne jednotky and topics NRF/01/UP_STREAM
  *
  */
 
@@ -56,7 +54,7 @@
 
 #define DEFAULT_START_RMS_TRIG_TRESHOLD 55
 #define DEFAULT_END_RMS_TRIG_TRESHOLD 35
-#define RMS_LOW_SAMPLES_TO_TRIGGER_END 6000 // cca 3 sec   2000smp=1sec
+#define DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END 6000 // cca 3 sec   2000smp=1sec
 
 #define RMS_BUFFER_SIZE 100
 
@@ -102,10 +100,14 @@ uint8_t mqtt_trigger_reset = 0;
 uint8_t mqtt_skip_init_procedure = 0;
 uint8_t first_alive_flag = 1;
 uint8_t dump_log_flag = 0;
+uint8_t config_request_flag = 0;
+
+char cfg_buff[256];
 
 int32_t rms_value[4] = {0};
 uint16_t rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
 uint16_t rms_trig_end = DEFAULT_END_RMS_TRIG_TRESHOLD;
+uint16_t rms_trig_end_duration = DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END;
 
 int32_t buffer_rms_ch0[RMS_BUFFER_SIZE] = {0};
 int32_t buffer_rms_ch1[RMS_BUFFER_SIZE] = {0};
@@ -942,6 +944,34 @@ int8_t mqtt_pooling_procedure(void)
 		return (-1);
 	}
 
+	if (config_request_flag == 1)
+	{
+		config_request_flag = 0;
+		LOG_INF("CFG solving");
+
+		uint16_t v1, v2, v3;
+
+		if (sscanf(cfg_buff, "CFG %hu %hu %hu", &v1, &v2, &v3) == 3)
+		{
+			LOG_INF("CFG received params %d %d %d", v1, v2, v3);
+			rms_trig_end_duration = v3;
+			eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
+			LOG_INF("EEPROM MQTT def triggeru low duration");
+
+			rms_trig_start = v1;
+			eeprom_emul_write_u16(EEPROM_KEY_TRIG_START, rms_trig_start);
+			LOG_INF("EEPROM MQTT def triggeru high ");
+
+			rms_trig_end = v2;
+			eeprom_emul_write_u16(EEPROM_KEY_TRIG_END, rms_trig_end);
+			LOG_INF("EEPROM MQTT def triggeru low ");
+		}
+		else
+		{
+			LOG_INF("CFG params not valid");
+		}
+	}
+
 	if (dump_log_flag == 1)
 	{
 		dump_log_flag = 0;
@@ -1169,6 +1199,14 @@ int main(void)
 	k_sleep(K_MSEC(100));
 
 	/* load or default */
+
+	if (eeprom_emul_read_u16(EEPROM_KEY_END_TRIG_DURATION, &rms_trig_end_duration) != 0)
+	{
+		rms_trig_end_duration = DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END;
+		eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
+		LOG_INF("EEPROM self def triggeru low duration");
+	}
+
 	if (eeprom_emul_read_u16(EEPROM_KEY_TRIG_START, &rms_trig_start) != 0)
 	{
 		rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
@@ -1185,6 +1223,7 @@ int main(void)
 
 	LOG_INF("start trigger val %d", rms_trig_start);
 	LOG_INF("end triggeru val %d", rms_trig_end);
+	LOG_INF("end trigger val duration %d smpls", rms_trig_end_duration);
 	k_sleep(K_MSEC(1000));
 
 	while (0)
@@ -1414,9 +1453,9 @@ int main(void)
 						rms_low_counter_to_end = 0;
 					}
 
-					if (rms_low_counter_to_end > RMS_LOW_SAMPLES_TO_TRIGGER_END)
+					if (rms_low_counter_to_end > rms_trig_end_duration)
 					{
-						LOG_INF("RMS under %d ends mearurement", rms_trig_end);
+						LOG_INF("RMS under %d for %d samples", rms_trig_end,rms_trig_end_duration);
 						trigger_measurement_end = 1;
 					}
 
