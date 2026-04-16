@@ -590,7 +590,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=185
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=188
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -647,9 +647,9 @@ HWM:INTERNAL=v2
 HWMv2:INTERNAL=True
 KERNEL_META_PATH:INTERNAL=C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/zephyr.meta
 //shared var
-PM_YML_DEP_FILES:INTERNAL=C:/ncs/v2.9.0/nrf/subsys/partition_manager/pm.yml.libmodem;C:/ncs/v2.9.0/nrf/subsys/partition_manager/pm.yml.tfm;C:/ncs/v2.9.0/nrf/subsys/partition_manager/pm.yml.trustzone
+PM_YML_DEP_FILES:INTERNAL=C:/ncs/v2.9.0/nrf/subsys/partition_manager/pm.yml.nvs;C:/ncs/v2.9.0/nrf/subsys/partition_manager/pm.yml.libmodem;C:/ncs/v2.9.0/nrf/subsys/partition_manager/pm.yml.tfm;C:/ncs/v2.9.0/nrf/subsys/partition_manager/pm.yml.trustzone
 //shared var
-PM_YML_FILES:INTERNAL=C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/subsys/partition_manager/pm.yml.libmodem;C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/subsys/partition_manager/pm.yml.tfm;C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/subsys/partition_manager/pm.yml.trustzone
+PM_YML_FILES:INTERNAL=C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/subsys/partition_manager/pm.yml.nvs;C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/subsys/partition_manager/pm.yml.libmodem;C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/subsys/partition_manager/pm.yml.tfm;C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/subsys/partition_manager/pm.yml.trustzone
 //List of SoC directories for SoC (nrf9161)
 SOC_DIRECTORIES:INTERNAL=C:/ncs/v2.9.0/zephyr/soc/nordic
 //SoC Linker script

@@ -8,6 +8,7 @@ set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_CHOSEN|zephyr,uart-mcu
 set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_CHOSEN|zephyr,flash" "/soc/peripheral@40000000/flash-controller@39000/flash@0")
 set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_CHOSEN|zephyr,sram" "/reserved-memory/image_ns_app@20020000")
 set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_CHOSEN|zephyr,code-partition" "/soc/peripheral@40000000/flash-controller@39000/flash@0/partitions/partition@50000")
+set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_CHOSEN|zephyr,storage" "/soc/peripheral@40000000/flash-controller@39000/flash@0/partitions/partition@f8000")
 set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_ALIAS|watchdog0" "/soc/peripheral@40000000/watchdog@18000")
 set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_ALIAS|led0" "/leds/led_0")
 set_target_properties(${DEVICETREE_TARGET} PROPERTIES "DT_ALIAS|bootloader-led0" "/leds/led_0")

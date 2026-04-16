@@ -1,6 +1,6 @@
 /*
  * TODO
- * - eeprom ukladani TRIGGER values atd
+ * - eeprom ukladani TRIGGER values atd duration a max samples
  * - rozliseni pomoci define na ruzne jednotky and topics NRF/01/UP_STREAM
  *
  */
@@ -40,6 +40,8 @@
 
 #include "log_ram_backend.h"
 
+#include "eeprom_emul.h"
+
 #define SPIM_INST_IDX 1
 #define MOSI_PIN 4
 #define MISO_PIN 1
@@ -52,8 +54,8 @@
 #define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
-#define RMS_TRIG_TRESHOLD 100
-#define END_RMS_TRIG_TRESHOLD 50
+#define DEFAULT_START_RMS_TRIG_TRESHOLD 55
+#define DEFAULT_END_RMS_TRIG_TRESHOLD 35
 #define RMS_LOW_SAMPLES_TO_TRIGGER_END 6000 // cca 3 sec   2000smp=1sec
 
 #define RMS_BUFFER_SIZE 100
@@ -102,6 +104,8 @@ uint8_t first_alive_flag = 1;
 uint8_t dump_log_flag = 0;
 
 int32_t rms_value[4] = {0};
+uint16_t rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
+uint16_t rms_trig_end = DEFAULT_END_RMS_TRIG_TRESHOLD;
 
 int32_t buffer_rms_ch0[RMS_BUFFER_SIZE] = {0};
 int32_t buffer_rms_ch1[RMS_BUFFER_SIZE] = {0};
@@ -1161,6 +1165,28 @@ int main(void)
 
 	uint16_t offset_gather_cnt = 200;
 
+	eeprom_emul_init();
+	k_sleep(K_MSEC(100));
+
+	/* load or default */
+	if (eeprom_emul_read_u16(EEPROM_KEY_TRIG_START, &rms_trig_start) != 0)
+	{
+		rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
+		eeprom_emul_write_u16(EEPROM_KEY_TRIG_START, rms_trig_start);
+		LOG_INF("EEPROM self def triggeru high ");
+	}
+
+	if (eeprom_emul_read_u16(EEPROM_KEY_TRIG_END, &rms_trig_end) != 0)
+	{
+		rms_trig_end = DEFAULT_END_RMS_TRIG_TRESHOLD;
+		eeprom_emul_write_u16(EEPROM_KEY_TRIG_END, rms_trig_end);
+		LOG_INF("EEPROM self def triggeru low ");
+	}
+
+	LOG_INF("start trigger val %d", rms_trig_start);
+	LOG_INF("end triggeru val %d", rms_trig_end);
+	k_sleep(K_MSEC(1000));
+
 	while (0)
 	{
 		test_flash();
@@ -1300,9 +1326,9 @@ int main(void)
 #endif
 		}
 
-		if ((rms_value[0] > RMS_TRIG_TRESHOLD) || (rms_value[2] > RMS_TRIG_TRESHOLD))
+		if ((rms_value[0] > rms_trig_start) || (rms_value[2] > rms_trig_start))
 		{
-			LOG_INF("treshold crossed");
+			LOG_INF("RMS treshold %d crossed", rms_trig_start);
 			uint16_t sample_cntr = 0;
 
 			if (circ_buff_overflow == 1)
@@ -1379,7 +1405,7 @@ int main(void)
 					sample_cntr++;
 					total_recorded_samples++;
 
-					if ((rms_value[0] < END_RMS_TRIG_TRESHOLD) && (rms_value[2] < END_RMS_TRIG_TRESHOLD))
+					if ((rms_value[0] < rms_trig_end) && (rms_value[2] < rms_trig_end))
 					{
 						rms_low_counter_to_end++;
 					}
@@ -1390,7 +1416,7 @@ int main(void)
 
 					if (rms_low_counter_to_end > RMS_LOW_SAMPLES_TO_TRIGGER_END)
 					{
-						LOG_INF("end trigger - rms low");
+						LOG_INF("RMS under %d ends mearurement", rms_trig_end);
 						trigger_measurement_end = 1;
 					}
 

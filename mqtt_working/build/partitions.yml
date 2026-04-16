@@ -1,8 +1,24 @@
+EMPTY_0:
+  address: 0xfe000
+  end_address: 0x100000
+  placement:
+    after:
+    - nvs_storage
+  region: flash_primary
+  size: 0x2000
 app:
   address: 0x8000
-  end_address: 0x100000
+  end_address: 0xf8000
   region: flash_primary
-  size: 0xf8000
+  size: 0xf0000
+nonsecure_storage:
+  address: 0xf8000
+  end_address: 0xfe000
+  orig_span: &id001
+  - nvs_storage
+  region: flash_primary
+  size: 0x6000
+  span: *id001
 nrf_modem_lib_ctrl:
   address: 0x20008000
   end_address: 0x200084e8
@@ -27,13 +43,13 @@ nrf_modem_lib_rx:
 nrf_modem_lib_sram:
   address: 0x20008000
   end_address: 0x2000c568
-  orig_span: &id001
+  orig_span: &id002
   - nrf_modem_lib_ctrl
   - nrf_modem_lib_tx
   - nrf_modem_lib_rx
   region: sram_primary
   size: 0x4568
-  span: *id001
+  span: *id002
 nrf_modem_lib_tx:
   address: 0x200084e8
   end_address: 0x2000a568
@@ -44,6 +60,18 @@ nrf_modem_lib_tx:
     - nrf_modem_lib_ctrl
   region: sram_primary
   size: 0x2080
+nvs_storage:
+  address: 0xf8000
+  end_address: 0xfe000
+  inside:
+  - nonsecure_storage
+  placement:
+    align:
+      start: 0x8000
+    before:
+    - end
+  region: flash_primary
+  size: 0x6000
 otp:
   address: 0xff8108
   end_address: 0xff83fc
@@ -52,14 +80,14 @@ otp:
 sram_nonsecure:
   address: 0x20008000
   end_address: 0x20040000
-  orig_span: &id002
+  orig_span: &id003
   - sram_primary
   - nrf_modem_lib_ctrl
   - nrf_modem_lib_tx
   - nrf_modem_lib_rx
   region: sram_primary
   size: 0x38000
-  span: *id002
+  span: *id003
 sram_primary:
   address: 0x2000c568
   end_address: 0x20040000
@@ -68,11 +96,11 @@ sram_primary:
 sram_secure:
   address: 0x20000000
   end_address: 0x20008000
-  orig_span: &id003
+  orig_span: &id004
   - tfm_sram
   region: sram_primary
   size: 0x8000
-  span: *id003
+  span: *id004
 tfm:
   address: 0x0
   end_address: 0x8000
@@ -83,20 +111,20 @@ tfm:
   size: 0x8000
 tfm_nonsecure:
   address: 0x8000
-  end_address: 0x100000
-  orig_span: &id004
+  end_address: 0xf8000
+  orig_span: &id005
   - app
   region: flash_primary
-  size: 0xf8000
-  span: *id004
+  size: 0xf0000
+  span: *id005
 tfm_secure:
   address: 0x0
   end_address: 0x8000
-  orig_span: &id005
+  orig_span: &id006
   - tfm
   region: flash_primary
   size: 0x8000
-  span: *id005
+  span: *id006
 tfm_sram:
   address: 0x20000000
   end_address: 0x20008000

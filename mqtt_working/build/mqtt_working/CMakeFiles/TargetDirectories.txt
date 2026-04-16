@@ -121,6 +121,8 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/fb/CM
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/fs/CMakeFiles/subsys__fs.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/fs/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/fs/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/fs/nvs/CMakeFiles/edit_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/fs/nvs/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/ipc/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/ipc/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/logging/CMakeFiles/edit_cache.dir
@@ -152,6 +154,8 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/stats
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/stats/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/storage/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/storage/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/storage/flash_map/CMakeFiles/edit_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/storage/flash_map/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/task_wdt/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/task_wdt/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/subsys/testsuite/CMakeFiles/edit_cache.dir
@@ -219,6 +223,9 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/cons
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/entropy/CMakeFiles/drivers__entropy.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/entropy/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/entropy/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/flash/CMakeFiles/edit_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/flash/CMakeFiles/drivers__flash.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/flash/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/gpio/CMakeFiles/drivers__gpio.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/gpio/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/zephyr/drivers/gpio/CMakeFiles/rebuild_cache.dir

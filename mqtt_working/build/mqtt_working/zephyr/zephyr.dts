@@ -14,6 +14,7 @@
 		zephyr,flash = &flash0;
 		zephyr,sram = &sram0_ns_app;
 		zephyr,code-partition = &slot0_ns_partition;
+		zephyr,storage = &storage_partition;
 	};
 	aliases {
 		led0 = &led0;

@@ -15,6 +15,12 @@
 	zephyr,user {
 		io-channels = <&adc 0 &adc 1 &adc 2 &adc 3 &adc 4 &adc 5 &adc 6>;
 	};
+
+	
+    chosen {
+        zephyr,storage = &storage_partition;
+    };
+
 };
 
 
@@ -86,3 +92,5 @@
 		};
 	};
 };
+
+
