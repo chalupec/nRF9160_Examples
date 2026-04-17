@@ -739,7 +739,7 @@ do_connect:
 // FIME tady byl konec reseni pooling
 int8_t mqtt_pooling_procedure(void)
 {
-	LOG_INF("mqtt_pooling_procedure - enterning pool wait");
+	LOG_INF("mqtt_keepalive_time_left fcn");
 	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
 	if (err < 0)
 	{
@@ -1051,8 +1051,8 @@ int main(void)
 	}
 
 	LOG_INF("start trigger val %d", rms_trig_start);
-	LOG_INF("end triggeru val %d", rms_trig_end);
-	LOG_INF("end trigger val duration %d smpls", rms_trig_end_duration);
+	LOG_INF("end trigger val %d", rms_trig_end);
+	LOG_INF("end trig low duration %d smpls", rms_trig_end_duration);
 	k_sleep(K_MSEC(1000));
 
 	while (0)

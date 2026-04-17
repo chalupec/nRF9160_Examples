@@ -14,11 +14,11 @@ void FLASH_READ_ID(unsigned char *buff) {
 }
 
 void FLASH_GLOBAL_UNLOCK(void) {
-    asm("NOP");
+    __asm__ volatile ("nop");
 }
 
 void FLASH_MEMORY_ERASE(void) {
-    asm("NOP");
+    __asm__ volatile ("nop");
 }
 
 void FLASH_MEMORY_WRITE_BYTE_ARRAY(unsigned long address, unsigned char *pBuffer, unsigned int length) {

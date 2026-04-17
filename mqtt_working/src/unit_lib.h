@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <zephyr/types.h>
+#include <string.h>
 
 uint16_t crc16_ccitt_jch(uint8_t *data, uint8_t length);
 
