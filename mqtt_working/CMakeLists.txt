@@ -11,6 +11,7 @@ project(cellular_fundamentals)
 
 # NORDIC SDK APP START
 target_sources(app PRIVATE src/drivers/APS6404L.c)
+target_sources(app PRIVATE src/drivers/bme280.c)
 target_sources(app PRIVATE src/mqtt_connection.c)
 target_sources(app PRIVATE src/log_ram_backend.c)
 target_sources(app PRIVATE src/eeprom_emul.c)

@@ -3,9 +3,12 @@
  *
  */
 
+/*
+NRF pin control 17us  8 bytes
+GPIO pin control 21us  8 bytes
+
+*/
 #include "main.h"
-
-
 
 // RAM LOGGER
 uint8_t buf[LOG_MANIPULATION_BUFF_LEN];
@@ -57,7 +60,6 @@ static struct pollfd fds;
 
 static K_SEM_DEFINE(lte_connected, 0, 1);
 
-
 static struct data_packet_t seed_packet;
 uint16_t train_counter = 0;
 
@@ -106,6 +108,9 @@ uint32_t connect_attempt = 0;
 int8_t pool_retval = 0;
 
 uint32_t initial_stage_timeout_counter = 0;
+
+
+struct custom_bme280_data sens_data_str;
 
 static const struct adc_sequence sequence = {
 	.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
@@ -207,7 +212,6 @@ static int modem_configure(void)
 
 	return 0;
 }
-
 
 void send_measured_train_data_with_multiple_packets(void)
 {
@@ -558,7 +562,6 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	case DK_BTN2_MSK:
 		if (button_state & DK_BTN2_MSK)
 		{
-			
 		}
 		break;
 
@@ -954,12 +957,18 @@ int main(void)
 	k_sleep(K_MSEC(500));
 	LOG_INF("SPIM INIT");
 
+	nrf_gpio_cfg_output(MEM_CS_PIN);
+	nrf_gpio_cfg_output(BME_CS_PIN);
+
+	nrf_gpio_pin_set(MEM_CS_PIN);
+	nrf_gpio_pin_set(BME_CS_PIN);
+
 	k_sleep(K_MSEC(100));
 
 	nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
 															  MOSI_PIN,
 															  MISO_PIN,
-															  MEM_CS_PIN);
+															  NRF_SPIM_PIN_NOT_CONNECTED);
 
 	spim_config.frequency = 8000000;
 	spim_config.irq_priority = 2;
@@ -1054,6 +1063,39 @@ int main(void)
 	LOG_INF("end trigger val %d", rms_trig_end);
 	LOG_INF("end trig low duration %d smpls", rms_trig_end_duration);
 	k_sleep(K_MSEC(1000));
+
+
+
+	nrf_gpio_cfg_output(MEM_CS_PIN);
+	nrf_gpio_cfg_output(BME_CS_PIN);
+
+	nrf_gpio_pin_set(MEM_CS_PIN);
+	nrf_gpio_pin_set(BME_CS_PIN);
+
+	uint8_t buff[32] = {0};
+
+k_sleep(K_MSEC(100));
+
+LOG_INF ("BME init");
+custom_bme280_init(&sens_data_str);
+
+k_sleep(K_MSEC(1000));
+LOG_INF ("BME init");
+k_sleep(K_MSEC(1000));
+k_sleep(K_MSEC(1000));
+	while (1)
+	{
+//bme280_reg_read(ID, buff, 1);
+LOG_INF("ID VAL %02X ", buff[0]);
+k_sleep(K_MSEC(1000));
+
+//		k_sleep(K_MSEC(1));
+//nrf_gpio_pin_set(BME_CS_PIN);
+//nrf_gpio_pin_set(MEM_CS_PIN);
+//		k_sleep(K_MSEC(1));
+//		nrf_gpio_pin_clear(BME_CS_PIN);
+//		nrf_gpio_pin_clear(MEM_CS_PIN);
+	}
 
 	while (0)
 	{
@@ -1276,7 +1318,7 @@ int main(void)
 
 					if (rms_low_counter_to_end > rms_trig_end_duration)
 					{
-						LOG_INF("RMS under %d for %d samples", rms_trig_end,rms_trig_end_duration);
+						LOG_INF("RMS under %d for %d samples", rms_trig_end, rms_trig_end_duration);
 						trigger_measurement_end = 1;
 					}
 

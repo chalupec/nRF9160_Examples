@@ -9,6 +9,7 @@
 #define MISO_PIN 1
 #define SCK_PIN 5
 #define MEM_CS_PIN 0
+#define BME_CS_PIN 7
 
 // #define SAMPLE_PRINTING_ENABLED
 // #define CIRC_BUFF_STAMP_VALUE_ADD
@@ -84,6 +85,7 @@
 
 #include <nrfx_spim.h>
 #include "../include/drivers/APS6404L.h"
+#include "../include/drivers/bme280.h"
 #include "unit_lib.h"
 
 #include <zephyr/sys/reboot.h>

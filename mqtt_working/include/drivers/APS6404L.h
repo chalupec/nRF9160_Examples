@@ -6,6 +6,7 @@
 #endif
 
 #include <nrfx_spim.h>
+#include "../../src/main.h"
 
 //******************* Instruction Set ************// 
 #define SPI_FLASH_JEDEC_ID 	0x9f
