@@ -1076,25 +1076,24 @@ int main(void)
 
 k_sleep(K_MSEC(100));
 
+LOG_INF ("BME reset");
+bme280_reset();
 LOG_INF ("BME init");
 custom_bme280_init(&sens_data_str);
 
-k_sleep(K_MSEC(1000));
-LOG_INF ("BME init");
+
+LOG_INF ("BME init end");
 k_sleep(K_MSEC(1000));
 k_sleep(K_MSEC(1000));
 	while (1)
 	{
-//bme280_reg_read(ID, buff, 1);
-LOG_INF("ID VAL %02X ", buff[0]);
+
 k_sleep(K_MSEC(1000));
 
-//		k_sleep(K_MSEC(1));
-//nrf_gpio_pin_set(BME_CS_PIN);
-//nrf_gpio_pin_set(MEM_CS_PIN);
-//		k_sleep(K_MSEC(1));
-//		nrf_gpio_pin_clear(BME_CS_PIN);
-//		nrf_gpio_pin_clear(MEM_CS_PIN);
+custom_bme280_sample_fetch(&sens_data_str);
+//bme280_reg_read(ID, buff, 1);
+LOG_INF("TEMP %d  HUM %d PRSR %d  ", sens_data_str.comp_temp,sens_data_str.comp_humidity, sens_data_str.comp_press);
+
 	}
 
 	while (0)

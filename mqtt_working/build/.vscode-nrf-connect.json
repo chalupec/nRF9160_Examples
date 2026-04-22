@@ -7,8 +7,10 @@
     "c:\\ncs\\v2.9.0\\zephyr\\boards\\nordic\\nrf9161dk"
   ],
   "boardRevision": "0.9.0",
-  "optimizations": "speed",
-  "cmakeArgs": [],
+  "optimizations": "debug",
+  "cmakeArgs": [
+    "-DNCS_TOOLCHAIN_VERSION=NONE"
+  ],
   "confFiles": [
     "prj.conf"
   ],

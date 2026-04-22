@@ -8,8 +8,6 @@
 
 #include "../../include/drivers/bme280.h"
 
-
-
 /* -------------------------------------------------------------------------- */
 /* Low level SPI access                                                        */
 /* -------------------------------------------------------------------------- */
@@ -185,7 +183,7 @@ int bme280_wait_until_ready(void)
 /* Zephyr sensor API                                                           */
 /* -------------------------------------------------------------------------- */
 
-static int custom_bme280_sample_fetch(void)
+int custom_bme280_sample_fetch(struct custom_bme280_data *data)
 {
 
     uint8_t buf[8];
@@ -204,9 +202,9 @@ static int custom_bme280_sample_fetch(void)
     adc_temp = (buf[3] << 12) | (buf[4] << 4) | (buf[5] >> 4);
     adc_hum = (buf[6] << 8) | buf[7];
 
-    bme280_compensate_temp(&sens_data_str, adc_temp);
-    bme280_compensate_press(&sens_data_str, adc_press);
-    bme280_compensate_humidity(&sens_data_str, adc_hum);
+    bme280_compensate_temp(data, adc_temp);
+    bme280_compensate_press(data, adc_press);
+    bme280_compensate_humidity(data, adc_hum);
 
     return 0;
 }
@@ -290,6 +288,19 @@ int bme280_read_compensation(struct custom_bme280_data *data)
     return 0;
 }
 
+int bme280_reset(void)
+{
+    // struct custom_bme280_data *data = dev->data;
+    int err;
+    k_sleep(K_MSEC(3));
+    err = bme280_reg_write(BME_RESET, RST_SEQ);
+    k_sleep(K_MSEC(3));
+    return err;
+}
+
+
+
+
 int custom_bme280_init(struct custom_bme280_data *data)
 {
     // struct custom_bme280_data *data = dev->data;
@@ -300,10 +311,10 @@ int custom_bme280_init(struct custom_bme280_data *data)
     {
         return -ENOTSUP;
     }
-     err = bme280_wait_until_ready();
+    err = bme280_wait_until_ready();
     if (!err)
     {
-        err = bme280_read_compensation(&data);
+        err = bme280_read_compensation(data);
     }
     if (!err)
     {

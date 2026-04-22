@@ -28,6 +28,9 @@
 #define HUMMSB 0xFD
 #define REG_STATUS 0xF3
 
+#define BME_RESET 0xE0
+#define RST_SEQ   0xB6
+
 #define BME280_CHIP_ID 0x60
 
 #define STATUS_MEASURING 0x08
@@ -84,7 +87,12 @@ int bme280_reg_write(uint8_t reg, uint8_t value);
 
 int custom_bme280_init(struct custom_bme280_data *data);
 
+int custom_bme280_sample_fetch(struct custom_bme280_data *data);
+
+
 int bme280_wait_until_ready(void);
+
+int bme280_reset(void);
 
 int bme280_read_compensation(struct custom_bme280_data *data);
 

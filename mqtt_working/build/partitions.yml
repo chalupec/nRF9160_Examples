@@ -7,10 +7,10 @@ EMPTY_0:
   region: flash_primary
   size: 0x2000
 app:
-  address: 0x8000
+  address: 0x10000
   end_address: 0xf8000
   region: flash_primary
-  size: 0xf0000
+  size: 0xe8000
 nonsecure_storage:
   address: 0xf8000
   end_address: 0xfe000
@@ -103,27 +103,27 @@ sram_secure:
   span: *id004
 tfm:
   address: 0x0
-  end_address: 0x8000
+  end_address: 0x10000
   placement:
     before:
     - app
   region: flash_primary
-  size: 0x8000
+  size: 0x10000
 tfm_nonsecure:
-  address: 0x8000
+  address: 0x10000
   end_address: 0xf8000
   orig_span: &id005
   - app
   region: flash_primary
-  size: 0xf0000
+  size: 0xe8000
   span: *id005
 tfm_secure:
   address: 0x0
-  end_address: 0x8000
+  end_address: 0x10000
   orig_span: &id006
   - tfm
   region: flash_primary
-  size: 0x8000
+  size: 0x10000
   span: *id006
 tfm_sram:
   address: 0x20000000

@@ -1,7 +1,7 @@
 ;
 MEMORY
 {
-  FLASH (rx) : ORIGIN = (0x0), LENGTH = (0x8000)
+  FLASH (rx) : ORIGIN = (0x0), LENGTH = (0x10000)
   RAM (rw) : ORIGIN = (0x20000000), LENGTH = (0x8000)
 }
 __msp_stack_size__ = (0x00000800);
@@ -244,6 +244,6 @@ SECTIONS
     Image$$ER_VENEER$$Base = ADDR(.gnu.sgstubs);
     Image$$VENEER_ALIGN$$Limit = ADDR(.sgstubs_end);
     ASSERT ((Image$$VENEER_ALIGN$$Limit - Image$$ER_VENEER$$Base) <= (0x400), "Veneer region overflowed")
-    Load$$LR$$LR_NS_PARTITION$$Base = ((0x8000));
+    Load$$LR$$LR_NS_PARTITION$$Base = ((0x10000));
     PROVIDE(__stack = Image$$ARM_LIB_STACK$$ZI$$Limit);
 }
