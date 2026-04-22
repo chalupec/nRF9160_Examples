@@ -1,7 +1,7 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-
+#define DEFAULT_BME280_USAGE_SETUP 1
 
 
 #define SPIM_INST_IDX 1
@@ -13,6 +13,9 @@
 
 // #define SAMPLE_PRINTING_ENABLED
 // #define CIRC_BUFF_STAMP_VALUE_ADD
+
+
+
 
 #define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1

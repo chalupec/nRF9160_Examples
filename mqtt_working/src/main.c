@@ -26,6 +26,7 @@ int32_t rms_value[4] = {0};
 uint16_t rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
 uint16_t rms_trig_end = DEFAULT_END_RMS_TRIG_TRESHOLD;
 uint16_t rms_trig_end_duration = DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END;
+uint16_t bme280_enabled = DEFAULT_BME280_USAGE_SETUP;
 
 int32_t buffer_rms_ch0[RMS_BUFFER_SIZE] = {0};
 int32_t buffer_rms_ch1[RMS_BUFFER_SIZE] = {0};
@@ -108,7 +109,6 @@ uint32_t connect_attempt = 0;
 int8_t pool_retval = 0;
 
 uint32_t initial_stage_timeout_counter = 0;
-
 
 struct custom_bme280_data sens_data_str;
 
@@ -782,14 +782,11 @@ int8_t mqtt_pooling_procedure(void)
 		config_request_flag = 0;
 		LOG_INF("CFG solving");
 
-		uint16_t v1, v2, v3;
+		uint16_t v1, v2, v3, v4;
 
-		if (sscanf(cfg_buff, "CFG %hu %hu %hu", &v1, &v2, &v3) == 3)
+		if (sscanf(cfg_buff, "CFG %hu %hu %hu %hu", &v1, &v2, &v3, &v4) == 4)
 		{
-			LOG_INF("CFG received params %d %d %d", v1, v2, v3);
-			rms_trig_end_duration = v3;
-			eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
-			LOG_INF("EEPROM MQTT def triggeru low duration");
+			LOG_INF("CFG received params %d %d %d %d", v1, v2, v3, v4);
 
 			rms_trig_start = v1;
 			eeprom_emul_write_u16(EEPROM_KEY_TRIG_START, rms_trig_start);
@@ -798,6 +795,14 @@ int8_t mqtt_pooling_procedure(void)
 			rms_trig_end = v2;
 			eeprom_emul_write_u16(EEPROM_KEY_TRIG_END, rms_trig_end);
 			LOG_INF("EEPROM MQTT def triggeru low ");
+
+			rms_trig_end_duration = v3;
+			eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
+			LOG_INF("EEPROM MQTT def triggeru low duration");
+
+			bme280_enabled = v4;
+			eeprom_emul_write_u16(EEPROM_KEY_BME280_ENA, bme280_enabled);
+			LOG_INF("EEPROM MQTT def BME280 enable state");
 		}
 		else
 		{
@@ -836,7 +841,7 @@ int8_t mqtt_pooling_procedure(void)
 
 		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
 		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(2000));
 		LOG_INF("nrf_modem_lib_shutdown");
 		nrf_modem_lib_shutdown();
 		k_sleep(K_MSEC(3000));
@@ -856,14 +861,14 @@ int8_t mqtt_pooling_procedure(void)
 		{
 			LOG_ERR("Could not disconnect: %d", errrno);
 		}
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(2000));
 
 		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
 		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(2000));
 		LOG_INF("nrf_modem_lib_shutdown");
 		nrf_modem_lib_shutdown();
-		k_sleep(K_MSEC(2000));
+		k_sleep(K_MSEC(3000));
 		return (-1);
 	}
 
@@ -954,15 +959,16 @@ int main(void)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
 #endif
 
-	k_sleep(K_MSEC(500));
-	LOG_INF("SPIM INIT");
-
+	// even if BME280 not used setup pin state
+	LOG_INF("GPIO setup");
 	nrf_gpio_cfg_output(MEM_CS_PIN);
 	nrf_gpio_cfg_output(BME_CS_PIN);
 
 	nrf_gpio_pin_set(MEM_CS_PIN);
 	nrf_gpio_pin_set(BME_CS_PIN);
 
+	k_sleep(K_MSEC(500));
+	LOG_INF("SPIM INIT");
 	k_sleep(K_MSEC(100));
 
 	nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
@@ -1059,42 +1065,28 @@ int main(void)
 		LOG_INF("EEPROM self def triggeru low ");
 	}
 
+	if (eeprom_emul_read_u16(EEPROM_KEY_BME280_ENA, &bme280_enabled) != 0)
+	{
+		bme280_enabled = DEFAULT_END_RMS_TRIG_TRESHOLD;
+		eeprom_emul_write_u16(EEPROM_KEY_BME280_ENA, bme280_enabled);
+		LOG_INF("EEPROM self def BME280 disabled ");
+	}
+
 	LOG_INF("start trigger val %d", rms_trig_start);
 	LOG_INF("end trigger val %d", rms_trig_end);
 	LOG_INF("end trig low duration %d smpls", rms_trig_end_duration);
+	LOG_INF("BME280 enable val %d", bme280_enabled);
 	k_sleep(K_MSEC(1000));
 
+	//	nrf_gpio_cfg_output(MEM_CS_PIN);
+	//	nrf_gpio_cfg_output(BME_CS_PIN);
+	//
+	//	nrf_gpio_pin_set(MEM_CS_PIN);
+	//	nrf_gpio_pin_set(BME_CS_PIN);
 
-
-	nrf_gpio_cfg_output(MEM_CS_PIN);
-	nrf_gpio_cfg_output(BME_CS_PIN);
-
-	nrf_gpio_pin_set(MEM_CS_PIN);
-	nrf_gpio_pin_set(BME_CS_PIN);
-
-	uint8_t buff[32] = {0};
-
-k_sleep(K_MSEC(100));
-
-LOG_INF ("BME reset");
-bme280_reset();
-LOG_INF ("BME init");
-custom_bme280_init(&sens_data_str);
-
-
-LOG_INF ("BME init end");
-k_sleep(K_MSEC(1000));
-k_sleep(K_MSEC(1000));
-	while (1)
-	{
-
-k_sleep(K_MSEC(1000));
-
-custom_bme280_sample_fetch(&sens_data_str);
-//bme280_reg_read(ID, buff, 1);
-LOG_INF("TEMP %d  HUM %d PRSR %d  ", sens_data_str.comp_temp,sens_data_str.comp_humidity, sens_data_str.comp_press);
-
-	}
+	//	EEPROM_KEY_BME280_ENA
+	//
+	//
 
 	while (0)
 	{
@@ -1144,11 +1136,22 @@ LOG_INF("TEMP %d  HUM %d PRSR %d  ", sens_data_str.comp_temp,sens_data_str.comp_
 		first_alive_flag = 0;
 	}
 
+//	if (bme280_enabled == 1)
+//	{
+//		LOG_INF("BME reset");
+//		bme280_reset();
+//		k_sleep(K_MSEC(500));
+//		LOG_INF("BME init");
+//		custom_bme280_init(&sens_data_str);
+//		k_sleep(K_MSEC(500));
+//		LOG_INF("BME init done");
+//	}
+	k_sleep(K_MSEC(3000));
 	LOG_INF("<----MEASUREMENT STAGE --->");
 	LOG_INF("starting timer");
-	k_sleep(K_MSEC(100));
+	k_sleep(K_MSEC(5000));
 	nrfx_timer_enable(&timer_inst);
-	k_sleep(K_MSEC(100));
+	k_sleep(K_MSEC(1000));
 	LOG_INF("gathering offsets");
 
 	while (offset_gather_cnt--)
@@ -1383,6 +1386,18 @@ LOG_INF("TEMP %d  HUM %d PRSR %d  ", sens_data_str.comp_temp,sens_data_str.comp_
 		if (data_ready_to_send == 1)
 		{
 			first_alive_flag = 0;
+
+			if (bme280_enabled == 1)
+			{
+				uint8_t readout_cntr = 4;
+				while (readout_cntr--)
+				{
+					custom_bme280_sample_fetch(&sens_data_str);
+					LOG_INF("BME280 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
+					k_sleep(K_MSEC(1000));
+				}
+			}
+
 			LOG_INF("data_ready_to_send flag set");
 			break;
 		}

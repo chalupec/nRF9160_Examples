@@ -19,7 +19,8 @@ typedef enum
     EEPROM_KEY_END_TRIG_DURATION  = 0x00,
     EEPROM_KEY_TRIG_START     = 0x01,
     EEPROM_KEY_TRIG_END       = 0x02,
-    EEPROM_KEY_NR_OF_SMPLS    = 0x03
+    EEPROM_KEY_NR_OF_SMPLS    = 0x03,
+    EEPROM_KEY_BME280_ENA    = 0x04
 } eeprom_key_t;
 
 /* API */
