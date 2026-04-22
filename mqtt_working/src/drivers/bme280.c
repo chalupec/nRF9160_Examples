@@ -209,24 +209,24 @@ int custom_bme280_sample_fetch(struct custom_bme280_data *data)
     return 0;
 }
 
-static int custom_bme280_channel_get(struct custom_bme280_data *data, uint8_t sensor, int32_t *val)
+int bme280_sensor_channel_get(struct custom_bme280_data *data, uint8_t sensor, float *val)
 {
     // struct custom_bme280_data *data = dev->data;
 
     switch (sensor)
     {
     case SENSOR_CHAN_AMBIENT_TEMP:
-        val = data->comp_temp / 100;
+        *val = (float)data->comp_temp / 100.0f;
 
         break;
 
     case SENSOR_CHAN_PRESS:
-        val = (data->comp_press >> 8) / 1000;
+        *val = (float)(data->comp_press >> 8) / 1000.0f;
 
         break;
 
     case SENSOR_CHAN_HUMIDITY:
-        val = data->comp_humidity >> 10;
+        *val = (float)(data->comp_humidity >> 10);
         break;
 
     default:
@@ -297,9 +297,6 @@ int bme280_reset(void)
     k_sleep(K_MSEC(3));
     return err;
 }
-
-
-
 
 int custom_bme280_init(struct custom_bme280_data *data)
 {

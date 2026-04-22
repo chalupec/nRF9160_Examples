@@ -5,8 +5,6 @@
 
 #include "main.h"
 
-
-
 // RAM LOGGER
 uint8_t buf[LOG_MANIPULATION_BUFF_LEN];
 uint32_t len;
@@ -14,10 +12,9 @@ uint32_t len;
 uint8_t mqtt_trigger_reset = 0;
 uint8_t mqtt_skip_init_procedure = 0;
 uint8_t first_alive_flag = 1;
+uint8_t first_record_write = 1;
 uint8_t dump_log_flag = 0;
 uint8_t config_request_flag = 0;
-
-
 
 char cfg_buff[256];
 
@@ -26,6 +23,12 @@ uint16_t rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
 uint16_t rms_trig_end = DEFAULT_END_RMS_TRIG_TRESHOLD;
 uint16_t rms_trig_end_duration = DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END;
 uint16_t bme280_enabled = DEFAULT_BME280_USAGE_SETUP;
+
+struct custom_bme280_data sens_data_str;
+
+float unit_temperature = -1;
+float unit_humidity = -1;
+float unit_pressure = -1;
 
 int32_t buffer_rms_ch0[RMS_BUFFER_SIZE] = {0};
 int32_t buffer_rms_ch1[RMS_BUFFER_SIZE] = {0};
@@ -59,7 +62,6 @@ static struct mqtt_client client;
 static struct pollfd fds;
 
 static K_SEM_DEFINE(lte_connected, 0, 1);
-
 
 static struct data_packet_t seed_packet;
 uint16_t train_counter = 0;
@@ -210,7 +212,6 @@ static int modem_configure(void)
 
 	return 0;
 }
-
 
 void send_measured_train_data_with_multiple_packets(void)
 {
@@ -385,6 +386,12 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 					{
 						k_sleep(K_MSEC(50));
 					}
+
+					if (crc_err_counter > 90)
+					{
+						k_sleep(K_MSEC(100));
+					}
+
 					if (crc_err_counter > 100)
 					{
 						crc_err_counter = 0;
@@ -561,7 +568,6 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	case DK_BTN2_MSK:
 		if (button_state & DK_BTN2_MSK)
 		{
-			
 		}
 		break;
 
@@ -959,6 +965,13 @@ int main(void)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
 #endif
 
+	LOG_INF("GPIO setup");
+	nrf_gpio_cfg_output(MEM_CS_PIN);
+	nrf_gpio_cfg_output(BME_CS_PIN);
+
+	nrf_gpio_pin_set(MEM_CS_PIN);
+	nrf_gpio_pin_set(BME_CS_PIN);
+
 	k_sleep(K_MSEC(500));
 	LOG_INF("SPIM INIT");
 
@@ -967,7 +980,7 @@ int main(void)
 	nrfx_spim_config_t spim_config = NRFX_SPIM_DEFAULT_CONFIG(SCK_PIN,
 															  MOSI_PIN,
 															  MISO_PIN,
-															  MEM_CS_PIN);
+															  NRF_SPIM_PIN_NOT_CONNECTED);
 
 	spim_config.frequency = 8000000;
 	spim_config.irq_priority = 2;
@@ -1119,6 +1132,24 @@ int main(void)
 		first_alive_flag = 0;
 	}
 
+	LOG_INF("GPIO update config after modem off");
+	nrf_gpio_cfg_output(MEM_CS_PIN);
+	nrf_gpio_cfg_output(BME_CS_PIN);
+
+	nrf_gpio_pin_set(MEM_CS_PIN);
+	nrf_gpio_pin_set(BME_CS_PIN);
+
+	if (bme280_enabled == 1)
+	{
+		LOG_INF("BME reset");
+		bme280_reset();
+		k_sleep(K_MSEC(500));
+		LOG_INF("BME init");
+		custom_bme280_init(&sens_data_str);
+		k_sleep(K_MSEC(500));
+		LOG_INF("BME init done");
+	}
+
 	LOG_INF("<----MEASUREMENT STAGE --->");
 	LOG_INF("starting timer");
 	k_sleep(K_MSEC(100));
@@ -1232,6 +1263,8 @@ int main(void)
 
 			trigger_measurement_end = 0;
 
+			first_record_write = 1;
+
 			while (1)
 			{
 				if (ADC_SAMPLE_FLAG == 1)
@@ -1276,6 +1309,7 @@ int main(void)
 					flash_write_buffer_byte[8] = crc >> 8;
 					flash_write_buffer_byte[9] = crc & 0xff;
 					FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 10); // cca 20-40 us?
+
 					flash_address_write += 10;
 
 					sample_cntr++;
@@ -1292,7 +1326,7 @@ int main(void)
 
 					if (rms_low_counter_to_end > rms_trig_end_duration)
 					{
-						LOG_INF("RMS under %d for %d samples", rms_trig_end,rms_trig_end_duration);
+						LOG_INF("RMS under %d for %d samples", rms_trig_end, rms_trig_end_duration);
 						trigger_measurement_end = 1;
 					}
 
@@ -1358,6 +1392,14 @@ int main(void)
 		if (data_ready_to_send == 1)
 		{
 			first_alive_flag = 0;
+			if (bme280_enabled == 1)
+			{
+				custom_bme280_sample_fetch(&sens_data_str);
+				// LOG_INF("BME280 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
+				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_AMBIENT_TEMP, &unit_temperature);
+				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_HUMIDITY, &unit_humidity);
+				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure);
+			}
 			LOG_INF("data_ready_to_send flag set");
 			break;
 		}

@@ -89,6 +89,7 @@ int custom_bme280_init(struct custom_bme280_data *data);
 
 int custom_bme280_sample_fetch(struct custom_bme280_data *data);
 
+int bme280_sensor_channel_get(struct custom_bme280_data *data, uint8_t sensor, float *val);
 
 int bme280_wait_until_ready(void);
 

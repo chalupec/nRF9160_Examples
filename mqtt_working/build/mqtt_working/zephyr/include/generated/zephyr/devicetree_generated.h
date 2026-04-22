@@ -1215,7 +1215,6 @@
 	28, /* /leds/led_2 */ \
 	29, /* /leds/led_3 */ \
 	111, /* /soc/peripheral@40000000/i2c@a000/pcal6408a@21 */ \
-	115, /* /soc/peripheral@40000000/spi@9000 */ \
 	117, /* /soc/peripheral@40000000/spi@b000 */
 
 /* Existence and alternate IDs: */
@@ -12612,7 +12611,6 @@
 #define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_REQUIRES_ORDS \
 	7, /* /soc/interrupt-controller@e000e100 */ \
 	9, /* /soc/peripheral@40000000 */ \
-	10, /* /soc/peripheral@40000000/gpio@842500 */ \
 	39, /* /pin-controller/spi1_default */ \
 	41, /* /pin-controller/spi1_sleep */
 
@@ -12710,18 +12708,6 @@
 #define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_interrupts_EXISTS 1
 #define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_zephyr_deferred_init 0
 #define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_zephyr_deferred_init_EXISTS 1
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_IDX_0_EXISTS 1
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_IDX_0_PH DT_N_S_soc_S_peripheral_40000000_S_gpio_842500
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_IDX_0_VAL_pin 0
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_IDX_0_VAL_pin_EXISTS 1
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_IDX_0_VAL_flags 1
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_IDX_0_VAL_flags_EXISTS 1
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_FOREACH_PROP_ELEM(fn) fn(DT_N_S_soc_S_peripheral_40000000_S_spi_9000, cs_gpios, 0)
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_soc_S_peripheral_40000000_S_spi_9000, cs_gpios, 0)
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_soc_S_peripheral_40000000_S_spi_9000, cs_gpios, 0, __VA_ARGS__)
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_soc_S_peripheral_40000000_S_spi_9000, cs_gpios, 0, __VA_ARGS__)
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_LEN 1
-#define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_cs_gpios_EXISTS 1
 #define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_overrun_character 255
 #define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_overrun_character_EXISTS 1
 #define DT_N_S_soc_S_peripheral_40000000_S_spi_9000_P_pinctrl_0_IDX_0 DT_N_S_pin_controller_S_spi1_default
