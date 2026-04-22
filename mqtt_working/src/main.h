@@ -128,12 +128,16 @@ struct __attribute__((__packed__)) data_packet_t
 
 struct __attribute__((__packed__)) servis_packet_t
 {
+
     uint16_t packet_header;
     uint16_t packet_version;
+    uint32_t timestamp;
     uint16_t reserve_word;
     uint16_t packet_counter;
     uint16_t batt_voltage;
     int16_t unit_temperature;
+    uint16_t unit_humidity;
+    uint16_t unit_pressure;
     uint32_t IMEI;
     uint32_t DEV_ID;
     uint16_t train_counter;
@@ -141,7 +145,7 @@ struct __attribute__((__packed__)) servis_packet_t
     uint32_t uptime_minutes;
     uint32_t last_powercycle_timestamp;
     uint16_t unit_status_bits;
-    uint8_t  signal_stength;
+    int16_t  signal_strength;
     uint16_t modem_status_word;
     float    GPS_lat;
     float    GPS_lon;

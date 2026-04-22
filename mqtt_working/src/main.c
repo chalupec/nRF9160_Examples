@@ -64,6 +64,8 @@ static struct pollfd fds;
 static K_SEM_DEFINE(lte_connected, 0, 1);
 
 static struct data_packet_t seed_packet;
+static struct servis_packet_t telemetry_packet;
+
 uint16_t train_counter = 0;
 
 static const struct device *adc_dev = DEVICE_DT_GET(ADC_NODE);
@@ -211,6 +213,47 @@ static int modem_configure(void)
 	dk_set_led_on(DK_LED2);
 
 	return 0;
+}
+
+void prepare_and_send_telemetry_data(void)
+{
+
+	telemetry_packet.packet_header = 0xFEED;
+
+	telemetry_packet.packet_version = 0x0101;
+	telemetry_packet.timestamp = record_unix_time_s;
+	telemetry_packet.reserve_word = 0xAAAA;
+	telemetry_packet.packet_counter = 0;
+	telemetry_packet.batt_voltage = 0;
+	telemetry_packet.unit_temperature = (int16_t)(unit_temperature * 100.0f);
+	telemetry_packet.unit_humidity = (uint16_t)(unit_humidity * 100.0f);
+	telemetry_packet.unit_pressure = (uint16_t)(unit_pressure * 1000.0f);
+	telemetry_packet.IMEI = 0;
+	telemetry_packet.DEV_ID = 0;
+	telemetry_packet.train_counter = 0;
+	telemetry_packet.pwr_cycle_counter = 0;
+	telemetry_packet.uptime_minutes = 0;
+	telemetry_packet.last_powercycle_timestamp = 0;
+	telemetry_packet.unit_status_bits = bme280_enabled;
+	telemetry_packet.signal_strength = 0;
+	telemetry_packet.modem_status_word = 0;
+	telemetry_packet.GPS_lat = -1;
+	telemetry_packet.GPS_lon = -1;
+	telemetry_packet.GPS_alt = -1;
+	telemetry_packet.CRC = 0xABCD;
+
+	uint16_t sizestruct = sizeof(telemetry_packet);
+	// LOG_INF("size of struct is: %d", sizestruct);
+	uint8_t *byte_ptr = (uint8_t *)&telemetry_packet;
+
+	LOG_INF("MQTT UNIT SENDING TELEMETRY INFO");
+	err = 0;
+	err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, byte_ptr, sizestruct); // FIXME CHECK ONLY 10 is ok
+	if (err)
+	{
+		LOG_INF("Failed to send message, %d", err);
+		return;
+	}
 }
 
 void send_measured_train_data_with_multiple_packets(void)
@@ -917,7 +960,11 @@ int8_t mqtt_pooling_procedure(void)
 		data_ready_to_send = 0;
 		get_time_procedure();
 		LOG_INF("timestamp gathered from modem %" PRIu32, record_unix_time_s);
+				
+		prepare_and_send_telemetry_data();
+		k_sleep(K_MSEC(1000));
 		send_measured_train_data_with_multiple_packets_from_flash();
+
 	}
 
 	return (1);
