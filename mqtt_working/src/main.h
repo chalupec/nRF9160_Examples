@@ -2,7 +2,7 @@
 #define _MAIN_H_
 
 
-
+#define DEFAULT_BME280_USAGE_SETUP 0
 
 #define SPIM_INST_IDX 1
 #define MOSI_PIN 4

@@ -17,12 +17,15 @@ uint8_t first_alive_flag = 1;
 uint8_t dump_log_flag = 0;
 uint8_t config_request_flag = 0;
 
+
+
 char cfg_buff[256];
 
 int32_t rms_value[4] = {0};
 uint16_t rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
 uint16_t rms_trig_end = DEFAULT_END_RMS_TRIG_TRESHOLD;
 uint16_t rms_trig_end_duration = DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END;
+uint16_t bme280_enabled = DEFAULT_BME280_USAGE_SETUP;
 
 int32_t buffer_rms_ch0[RMS_BUFFER_SIZE] = {0};
 int32_t buffer_rms_ch1[RMS_BUFFER_SIZE] = {0};
@@ -779,14 +782,11 @@ int8_t mqtt_pooling_procedure(void)
 		config_request_flag = 0;
 		LOG_INF("CFG solving");
 
-		uint16_t v1, v2, v3;
+		uint16_t v1, v2, v3, v4;
 
-		if (sscanf(cfg_buff, "CFG %hu %hu %hu", &v1, &v2, &v3) == 3)
+		if (sscanf(cfg_buff, "CFG %hu %hu %hu %hu", &v1, &v2, &v3, &v4) == 4)
 		{
-			LOG_INF("CFG received params %d %d %d", v1, v2, v3);
-			rms_trig_end_duration = v3;
-			eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
-			LOG_INF("EEPROM MQTT def triggeru low duration");
+			LOG_INF("CFG received params %d %d %d %d", v1, v2, v3, v4);
 
 			rms_trig_start = v1;
 			eeprom_emul_write_u16(EEPROM_KEY_TRIG_START, rms_trig_start);
@@ -795,6 +795,14 @@ int8_t mqtt_pooling_procedure(void)
 			rms_trig_end = v2;
 			eeprom_emul_write_u16(EEPROM_KEY_TRIG_END, rms_trig_end);
 			LOG_INF("EEPROM MQTT def triggeru low ");
+
+			rms_trig_end_duration = v3;
+			eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
+			LOG_INF("EEPROM MQTT def triggeru low duration");
+
+			bme280_enabled = v4;
+			eeprom_emul_write_u16(EEPROM_KEY_BME280_ENA, bme280_enabled);
+			LOG_INF("EEPROM MQTT def BME280 enable state");
 		}
 		else
 		{
@@ -1050,9 +1058,17 @@ int main(void)
 		LOG_INF("EEPROM self def triggeru low ");
 	}
 
+	if (eeprom_emul_read_u16(EEPROM_KEY_BME280_ENA, &bme280_enabled) != 0)
+	{
+		bme280_enabled = DEFAULT_END_RMS_TRIG_TRESHOLD;
+		eeprom_emul_write_u16(EEPROM_KEY_BME280_ENA, bme280_enabled);
+		LOG_INF("EEPROM self def BME280 disabled ");
+	}
+
 	LOG_INF("start trigger val %d", rms_trig_start);
 	LOG_INF("end trigger val %d", rms_trig_end);
 	LOG_INF("end trig low duration %d smpls", rms_trig_end_duration);
+	LOG_INF("BME280 enable val %d", bme280_enabled);
 	k_sleep(K_MSEC(1000));
 
 	while (0)
