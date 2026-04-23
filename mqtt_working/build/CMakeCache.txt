@@ -76,6 +76,9 @@ CONFIG_SPEED_OPTIMIZATIONS:UNINITIALIZED=y
 CONF_FILE:UNINITIALIZED=prj.conf
 
 //No help, variable specified on the command line.
+DEBUG_THREAD_INFO:UNINITIALIZED=Off
+
+//No help, variable specified on the command line.
 NCS_TOOLCHAIN_VERSION:UNINITIALIZED=NONE
 
 //No help, variable specified on the command line.
@@ -89,6 +92,9 @@ ZEPHYR_RUNNER_CONFIG_KERNEL_HEX:STRING=
 
 //The directory containing a CMake configuration file for Zephyr.
 Zephyr_DIR:PATH=C:/ncs/v2.9.0/zephyr/share/zephyr-package/cmake
+
+//No help, variable specified on the command line.
+mqtt_working_DEBUG_THREAD_INFO:UNINITIALIZED=Off
 
 //Value Computed by CMake
 sysbuild_BINARY_DIR:STATIC=C:/ADWITECH/nRF9160_Examples/mqtt_working/build/_sysbuild

@@ -4,7 +4,7 @@
  */
 
 #include "main.h"
-
+#include <modem/modem_info.h>
 // RAM LOGGER
 uint8_t buf[LOG_MANIPULATION_BUFF_LEN];
 uint32_t len;
@@ -219,7 +219,6 @@ void prepare_and_send_telemetry_data(void)
 {
 
 	telemetry_packet.packet_header = 0xFEED;
-
 	telemetry_packet.packet_version = 0x0101;
 	telemetry_packet.timestamp = record_unix_time_s;
 	telemetry_packet.reserve_word = 0xAAAA;
@@ -236,6 +235,9 @@ void prepare_and_send_telemetry_data(void)
 	telemetry_packet.last_powercycle_timestamp = 0;
 	telemetry_packet.unit_status_bits = bme280_enabled;
 	telemetry_packet.signal_strength = 0;
+	telemetry_packet.signal_rsrp = -1;
+	telemetry_packet.signal_rsrq = -1;
+	telemetry_packet.signal_snr = -1;
 	telemetry_packet.modem_status_word = 0;
 	telemetry_packet.GPS_lat = -1;
 	telemetry_packet.GPS_lon = -1;
@@ -960,11 +962,10 @@ int8_t mqtt_pooling_procedure(void)
 		data_ready_to_send = 0;
 		get_time_procedure();
 		LOG_INF("timestamp gathered from modem %" PRIu32, record_unix_time_s);
-				
+
 		prepare_and_send_telemetry_data();
 		k_sleep(K_MSEC(1000));
 		send_measured_train_data_with_multiple_packets_from_flash();
-
 	}
 
 	return (1);

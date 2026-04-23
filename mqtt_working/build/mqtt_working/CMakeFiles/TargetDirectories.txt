@@ -270,6 +270,9 @@ C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/lte
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/lte_link_control/common/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/lte_link_control/modules/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/lte_link_control/modules/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/modem_info/CMakeFiles/rebuild_cache.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/modem_info/CMakeFiles/..__nrf__lib__modem_info.dir
+C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/modem_info/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/flash_patch/CMakeFiles/edit_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/flash_patch/CMakeFiles/rebuild_cache.dir
 C:/ADWITECH/nRF9160_Examples/mqtt_working/build/mqtt_working/modules/nrf/lib/fatal_error/CMakeFiles/edit_cache.dir

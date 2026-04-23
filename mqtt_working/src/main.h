@@ -1,7 +1,6 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-
 #define DEFAULT_BME280_USAGE_SETUP 0
 
 #define SPIM_INST_IDX 1
@@ -14,7 +13,7 @@
 // #define SAMPLE_PRINTING_ENABLED
 // #define CIRC_BUFF_STAMP_VALUE_ADD
 
-#define ALPHA_NUM 1	 // Numerator of alpha (e.g., 1)
+#define ALPHA_NUM 1  // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
 #define DEFAULT_START_RMS_TRIG_TRESHOLD 55
@@ -57,7 +56,6 @@
 
 #define LOG_MANIPULATION_BUFF_LEN 64
 
-
 #include <stdint.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -72,6 +70,8 @@
 #include <dk_buttons_and_leds.h>
 #include <modem/nrf_modem_lib.h>
 #include <modem/lte_lc.h>
+#include <modem/modem_info.h>
+
 /* STEP 2.3 - Include the header file for the MQTT Library*/
 #include <zephyr/net/mqtt.h>
 
@@ -102,8 +102,6 @@
  *  Konfigurační konstanty
  * ============================ */
 
-
-
 /* ============================
  *  Datové struktury
  * ============================ */
@@ -128,7 +126,6 @@ struct __attribute__((__packed__)) data_packet_t
 
 struct __attribute__((__packed__)) servis_packet_t
 {
-
     uint16_t packet_header;
     uint16_t packet_version;
     uint32_t timestamp;
@@ -145,12 +142,16 @@ struct __attribute__((__packed__)) servis_packet_t
     uint32_t uptime_minutes;
     uint32_t last_powercycle_timestamp;
     uint16_t unit_status_bits;
-    int16_t  signal_strength;
+    int16_t signal_strength;
+    int16_t signal_rsrp;
+    int16_t signal_rsrq;
+    int16_t signal_snr;
     uint16_t modem_status_word;
-    float    GPS_lat;
-    float    GPS_lon;
-    float    GPS_alt;
+    float GPS_lat;
+    float GPS_lon;
+    float GPS_alt;
     uint16_t CRC;
+
 };
 
 /* ============================
