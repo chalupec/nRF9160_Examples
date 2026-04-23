@@ -1,6 +1,6 @@
 /*
  * TODO
- *
+ * sila signalu
  */
 
 #include "main.h"
@@ -1121,7 +1121,7 @@ int main(void)
 
 	if (eeprom_emul_read_u16(EEPROM_KEY_BME280_ENA, &bme280_enabled) != 0)
 	{
-		bme280_enabled = DEFAULT_END_RMS_TRIG_TRESHOLD;
+		bme280_enabled = DEFAULT_BME280_USAGE_SETUP;
 		eeprom_emul_write_u16(EEPROM_KEY_BME280_ENA, bme280_enabled);
 		LOG_INF("EEPROM self def BME280 disabled ");
 	}
