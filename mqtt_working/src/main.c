@@ -40,7 +40,10 @@ int32_t ch1_off_value;
 int32_t ch2_off_value;
 int32_t ch3_off_value;
 
-size_t indexx = 0;
+size_t indexx0 = 0;
+size_t indexx1 = 0;
+size_t indexx2 = 0;
+size_t indexx3 = 0;
 int64_t sum_squares_ch0 = 0;
 int64_t sum_squares_ch1 = 0;
 int64_t sum_squares_ch2 = 0;
@@ -1209,7 +1212,7 @@ int main(void)
 	{
 		while (ADC_SAMPLE_FLAG == 0)
 		{
-			// wait
+			k_sleep(K_USEC(10));// wait
 		}
 		if (ADC_SAMPLE_FLAG == 1)
 		{
@@ -1256,19 +1259,19 @@ int main(void)
 
 			new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
 			ch0_off_value = new_sample;
-			rms_value[0] = update_rms(buffer_rms_ch0, &indexx, &sum_squares_ch0, new_sample);
+			rms_value[0] = update_rms(buffer_rms_ch0, &indexx0, &sum_squares_ch0, new_sample);
 
 			new_sample = sample_buffer2[1] - offsets[1]; // Replace with actual sensor/ADC reading
 			ch1_off_value = new_sample;
-			rms_value[1] = update_rms(buffer_rms_ch1, &indexx, &sum_squares_ch1, new_sample);
+			rms_value[1] = update_rms(buffer_rms_ch1, &indexx1, &sum_squares_ch1, new_sample);
 
 			new_sample = sample_buffer2[2] - offsets[2]; // Replace with actual sensor/ADC reading
 			ch2_off_value = new_sample;
-			rms_value[2] = update_rms(buffer_rms_ch2, &indexx, &sum_squares_ch2, new_sample);
+			rms_value[2] = update_rms(buffer_rms_ch2, &indexx2, &sum_squares_ch2, new_sample);
 
 			new_sample = sample_buffer2[3] - offsets[3]; // Replace with actual sensor/ADC reading
 			ch3_off_value = new_sample;
-			rms_value[3] = update_rms(buffer_rms_ch3, &indexx, &sum_squares_ch3, new_sample);
+			rms_value[3] = update_rms(buffer_rms_ch3, &indexx3, &sum_squares_ch3, new_sample);
 
 			saturate_channel_values(&ch0_off_value, &ch1_off_value, &ch2_off_value, &ch3_off_value);
 
@@ -1325,19 +1328,19 @@ int main(void)
 
 					new_sample = sample_buffer2[0] - offsets[0]; // Replace with actual sensor/ADC reading
 					ch0_off_value = new_sample;
-					rms_value[0] = update_rms(buffer_rms_ch0, &indexx, &sum_squares_ch0, new_sample);
+					rms_value[0] = update_rms(buffer_rms_ch0, &indexx0, &sum_squares_ch0, new_sample);
 
 					new_sample = sample_buffer2[1] - offsets[1]; // Replace with actual sensor/ADC reading
 					ch1_off_value = new_sample;
-					rms_value[1] = update_rms(buffer_rms_ch1, &indexx, &sum_squares_ch1, new_sample);
+					rms_value[1] = update_rms(buffer_rms_ch1, &indexx1, &sum_squares_ch1, new_sample);
 
 					new_sample = sample_buffer2[2] - offsets[2]; // Replace with actual sensor/ADC reading
 					ch2_off_value = new_sample;
-					rms_value[2] = update_rms(buffer_rms_ch2, &indexx, &sum_squares_ch2, new_sample);
+					rms_value[2] = update_rms(buffer_rms_ch2, &indexx2, &sum_squares_ch2, new_sample);
 
 					new_sample = sample_buffer2[3] - offsets[3]; // Replace with actual sensor/ADC reading
 					ch3_off_value = new_sample;
-					rms_value[3] = update_rms(buffer_rms_ch3, &indexx, &sum_squares_ch3, new_sample);
+					rms_value[3] = update_rms(buffer_rms_ch3, &indexx3, &sum_squares_ch3, new_sample);
 
 					saturate_channel_values(&ch0_off_value, &ch1_off_value, &ch2_off_value, &ch3_off_value);
 
@@ -1391,6 +1394,8 @@ int main(void)
 				}
 			}
 
+			nrfx_timer_disable(&timer_inst);
+			k_sleep(K_MSEC(1));
 			nrfx_timer_uninit(&timer_inst);
 
 			uint16_t memclr_cnt = 1000;
