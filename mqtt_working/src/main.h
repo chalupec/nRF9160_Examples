@@ -133,8 +133,8 @@ struct __attribute__((__packed__)) servis_packet_t
     uint16_t packet_counter;
     uint16_t batt_voltage;
     int16_t unit_temperature;
-    uint16_t unit_humidity;
-    uint16_t unit_pressure;
+    uint32_t unit_humidity;
+    uint32_t unit_pressure;
     uint32_t IMEI;
     uint32_t DEV_ID;
     uint16_t train_counter;

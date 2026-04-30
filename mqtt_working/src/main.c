@@ -28,7 +28,7 @@ struct custom_bme280_data sens_data_str;
 
 float unit_temperature = -1;
 float unit_humidity = -1;
-float unit_pressure = -1;
+float unit_pressure_hpa = -1;
 
 int32_t buffer_rms_ch0[RMS_BUFFER_SIZE] = {0};
 int32_t buffer_rms_ch1[RMS_BUFFER_SIZE] = {0};
@@ -220,7 +220,6 @@ static int modem_configure(void)
 
 void prepare_and_send_telemetry_data(void)
 {
-
 	telemetry_packet.packet_header = 0xFEED;
 	telemetry_packet.packet_version = 0x0101;
 	telemetry_packet.timestamp = record_unix_time_s;
@@ -228,8 +227,8 @@ void prepare_and_send_telemetry_data(void)
 	telemetry_packet.packet_counter = 0;
 	telemetry_packet.batt_voltage = 0;
 	telemetry_packet.unit_temperature = (int16_t)(unit_temperature * 100.0f);
-	telemetry_packet.unit_humidity = (uint16_t)(unit_humidity * 100.0f);
-	telemetry_packet.unit_pressure = (uint16_t)(unit_pressure * 1000.0f);
+	telemetry_packet.unit_humidity = (uint32_t)(unit_humidity * 100.0f);
+	telemetry_packet.unit_pressure = (uint32_t)(unit_pressure_hpa * 100.0f); 
 	telemetry_packet.IMEI = 0;
 	telemetry_packet.DEV_ID = 0;
 	telemetry_packet.train_counter = 0;
@@ -1201,6 +1200,21 @@ int main(void)
 		LOG_INF("BME init done");
 	}
 
+
+	// FOR TEST PURPOSES
+	if (0) {
+		while(1){
+			custom_bme280_sample_fetch(&sens_data_str);
+			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_AMBIENT_TEMP, &unit_temperature);
+			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_HUMIDITY, &unit_humidity);
+			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure_hpa);
+		    LOG_INF("BME280-1 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
+		    LOG_INF("BME280-2 T %d H %d P %d", (int16_t)unit_temperature, (int16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
+			LOG_INF("\n\n");
+			k_sleep(K_MSEC(1500));
+		}
+	}
+
 	LOG_INF("<----MEASUREMENT STAGE --->");
 	LOG_INF("starting timer");
 	k_sleep(K_MSEC(100));
@@ -1212,7 +1226,7 @@ int main(void)
 	{
 		while (ADC_SAMPLE_FLAG == 0)
 		{
-			k_sleep(K_USEC(10));// wait
+			//k_sleep(K_USEC(10));// wait FIXME zmerit na OSCILO
 		}
 		if (ADC_SAMPLE_FLAG == 1)
 		{
@@ -1451,7 +1465,10 @@ int main(void)
 				// LOG_INF("BME280 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
 				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_AMBIENT_TEMP, &unit_temperature);
 				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_HUMIDITY, &unit_humidity);
-				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure);
+				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure_hpa);
+
+		    	LOG_INF("BME280T %d H %d P %d", (int16_t)unit_temperature, (uint16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
+
 			}
 			LOG_INF("data_ready_to_send flag set");
 			break;
