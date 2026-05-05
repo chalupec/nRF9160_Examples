@@ -8,7 +8,6 @@
 
 #include "../../include/drivers/bme280.h"
 
-
 /* -------------------------------------------------------------------------- */
 /* Low level SPI access                                                        */
 /* -------------------------------------------------------------------------- */
@@ -87,7 +86,7 @@ static void bme280_compensate_temp(struct custom_bme280_data *data,
 {
     int32_t var1, var2;
 
-    var1 = (((adc_temp >> 3) - ((int32_t)data->dig_t1 << 1)) * ((int32_t)data->dig_t2)) >>11;
+    var1 = (((adc_temp >> 3) - ((int32_t)data->dig_t1 << 1)) * ((int32_t)data->dig_t2)) >> 11;
 
     var2 = (((((adc_temp >> 4) - ((int32_t)data->dig_t1)) * ((adc_temp >> 4) - ((int32_t)data->dig_t1))) >> 12) * ((int32_t)data->dig_t3)) >> 14;
 
@@ -95,19 +94,20 @@ static void bme280_compensate_temp(struct custom_bme280_data *data,
     data->comp_temp = (data->t_fine * 5 + 128) >> 8;
 }
 
+
+
 // problem values
-static void bme280_compensate_press_old(struct custom_bme280_data *data,                                    int32_t adc_press)
+static void bme280_compensate_press_old(struct custom_bme280_data *data, int32_t adc_press)
 {
     int64_t var1, var2, p;
 
     var1 = ((int64_t)data->t_fine) - 128000;
     var2 = var1 * var1 * (int64_t)data->dig_p6;
-    var2= var2 + ((var1*(int64_t)data->dig_p5) << 17);
+    var2 = var2 + ((var1 * (int64_t)data->dig_p5) << 17);
     var2 += ((int64_t)data->dig_p4) << 35;
-    var1 = ((var1 * var1 * (int64_t)data->dig_p3) >> 8) +((var1 * (int64_t)data->dig_p2) << 12);
+    var1 = ((var1 * var1 * (int64_t)data->dig_p3) >> 8) + ((var1 * (int64_t)data->dig_p2) << 12);
     var1 = (((((int64_t)1) << 47) + var1) * (int64_t)data->dig_p1) >> 33;
 
-   
     if (var1 == 0)
     {
         data->comp_press = 0;
@@ -125,22 +125,18 @@ static void bme280_compensate_press_old(struct custom_bme280_data *data,        
     data->comp_press = (uint32_t)p;
 }
 
-
 static void bme280_compensate_press(struct custom_bme280_data *data,
                                     int32_t adc_press)
 {
     int64_t var1, var2, p;
 
-
-   
-    var1 = (((int64_t)data->t_fine >> 1) - (int64_t)64000); //ok
-    var2 = ( ( (var1 >> 2) * (var1 >> 2) ) >> 11) * ((int64_t)data->dig_p6);  //ok
-    var2 = (var2 + ((var1 * ((int64_t)data->dig_p5)) << 1)); //ok
-    var2 = ((var2 >> 2) + (((int64_t)data->dig_p4) << 16)); //ok
-    var1 = (((  ((int64_t)data->dig_p3) * (((var1 >> 2) * (var1 >> 2)) >> 13)) >> 3) + (( ((int64_t)data->dig_p2) * var1) >> 1)); //ok
-    var1 = var1 >> 18;  //ok
-    var1 = ((((32768 + var1)) * ((int64_t)data->dig_p1)) >> 15);  //ok
-
+    var1 = (((int64_t)data->t_fine >> 1) - (int64_t)64000);                                                                    // ok
+    var2 = (((var1 >> 2) * (var1 >> 2)) >> 11) * ((int64_t)data->dig_p6);                                                      // ok
+    var2 = (var2 + ((var1 * ((int64_t)data->dig_p5)) << 1));                                                                   // ok
+    var2 = ((var2 >> 2) + (((int64_t)data->dig_p4) << 16));                                                                    // ok
+    var1 = (((((int64_t)data->dig_p3) * (((var1 >> 2) * (var1 >> 2)) >> 13)) >> 3) + ((((int64_t)data->dig_p2) * var1) >> 1)); // ok
+    var1 = var1 >> 18;                                                                                                         // ok
+    var1 = ((((32768 + var1)) * ((int64_t)data->dig_p1)) >> 15);                                                               // ok
 
     if (var1 == 0)
     {
@@ -148,23 +144,24 @@ static void bme280_compensate_press(struct custom_bme280_data *data,
         return;
     }
 
+    p = ((((unsigned long)(((long)1048576) - adc_press)) - (var2 >> 12))) * 3125; // ok
 
- p = ((((unsigned long) (((long) 1048576) - adc_press)) - (var2 >> 12)))*3125; //ok
+    if (p < 0x80000000)
+    {
+        p = ((p << 1) / ((unsigned long)var1));
+    }
+    else
+    {
+        p = ((p / (unsigned long)var1) * 2);
+    } // ok
 
-        if (p < 0x80000000) {
-            p = ((p << 1) / ((unsigned long) var1));
-        } else {
-            p = ((p / (unsigned long) var1) * 2);
-        }//ok
-        
-        var1 = (((int64_t)data->dig_p9) * ((int64_t) (((p >> 3) * (p >> 3)) >> 13))); //ok
-        var1 = var1 >> 12;  //ok
-        var2 = (((int64_t) (p >> 2)) * ((int64_t)data->dig_p8)); //ok
-        var2 = var2 >> 13; //ok
-        p = (int64_t) ((int64_t)p + ((var1 + var2 + (int64_t)data->dig_p7) >> 4));
-        data->comp_press = (uint32_t)p;
+    var1 = (((int64_t)data->dig_p9) * ((int64_t)(((p >> 3) * (p >> 3)) >> 13))); // ok
+    var1 = var1 >> 12;                                                           // ok
+    var2 = (((int64_t)(p >> 2)) * ((int64_t)data->dig_p8));                      // ok
+    var2 = var2 >> 13;                                                           // ok
+    p = (int64_t)((int64_t)p + ((var1 + var2 + (int64_t)data->dig_p7) >> 4));
+    data->comp_press = (uint32_t)p;
 }
-
 
 static void bme280_compensate_humidity(struct custom_bme280_data *data,
                                        int32_t adc_hum)
@@ -172,22 +169,11 @@ static void bme280_compensate_humidity(struct custom_bme280_data *data,
     int32_t h;
 
     h = data->t_fine - 76800;
-    h = (((((adc_hum << 14) -
-            ((int32_t)data->dig_h4 << 20) -
-            ((int32_t)data->dig_h5 * h)) +
-           16384) >>
-          15) *
-         (((((((h * data->dig_h6) >> 10) *
-              (((h * data->dig_h3) >> 11) + 32768)) >>
-             10) +
-            2097152) *
-               data->dig_h2 +
-           8192) >>
-          14));
+    h = (((((adc_hum << 14) - ((int32_t)data->dig_h4 << 20) - ((int32_t)data->dig_h5 * h)) +  16384) >> 15) *
+         (((((((h * data->dig_h6) >> 10) * (((h * data->dig_h3) >> 11) + 32768)) >> 10) +
+            2097152) *  data->dig_h2 +  8192) >> 14));
 
-    h -= (((((h >> 15) * (h >> 15)) >> 7) *
-           data->dig_h1) >>
-          4);
+    h -= (((((h >> 15) * (h >> 15)) >> 7) *  data->dig_h1) >>   4);
 
     h = CLAMP(h, 0, 419430400);
     data->comp_humidity = (uint32_t)(h >> 12);
@@ -235,29 +221,28 @@ int custom_bme280_sample_fetch(struct custom_bme280_data *data)
 
     adc_press = (buf[0] << 12) | (buf[1] << 4) | (buf[2] >> 4);
 
-  // ltemp = (int32_t) buf[0] << 16;
-  // ltemp |= (int32_t) buf[1] << 8;
-  // ltemp |= (int32_t) buf[2];
-  // ltemp = ltemp >> 4;
-  // printk("puvoddni %d  stare %d",adc_press,ltemp );
-
+    // ltemp = (int32_t) buf[0] << 16;
+    // ltemp |= (int32_t) buf[1] << 8;
+    // ltemp |= (int32_t) buf[2];
+    // ltemp = ltemp >> 4;
+    // printk("puvoddni %d  stare %d",adc_press,ltemp );
 
     adc_temp = (buf[3] << 12) | (buf[4] << 4) | (buf[5] >> 4);
 
-  // ltemp = (int32_t) buf[3] << 16;
-  // ltemp |= (int32_t) buf[4] << 8;
-  // ltemp |= (int32_t) buf[5];
-  // ltemp = ltemp >> 4;
-  // printk("puvoddni %d  stare %d",adc_temp,ltemp );
+    // ltemp = (int32_t) buf[3] << 16;
+    // ltemp |= (int32_t) buf[4] << 8;
+    // ltemp |= (int32_t) buf[5];
+    // ltemp = ltemp >> 4;
+    // printk("puvoddni %d  stare %d",adc_temp,ltemp );
 
     adc_hum = (buf[6] << 8) | buf[7];
 
-    ltemp = (int32_t) buf[6] << 8;
-    ltemp |= (int32_t) buf[7];
-    printk("puvoddni %d  stare %d",adc_hum,ltemp );
+    ltemp = (int32_t)buf[6] << 8;
+    ltemp |= (int32_t)buf[7];
+    // printk("puvoddni %d  stare %d",adc_hum,ltemp );
 
     bme280_compensate_temp(data, adc_temp);
-   // bme280_compensate_press_old(data, adc_press);
+    //bme280_compensate_press_old(data, adc_press);
     bme280_compensate_press(data, adc_press);
     bme280_compensate_humidity(data, adc_hum);
 
@@ -276,12 +261,13 @@ int bme280_sensor_channel_get(struct custom_bme280_data *data, uint8_t sensor, f
         break;
 
     case SENSOR_CHAN_PRESS:
-        *val = (float)(data->comp_press) / 100.0f; // returns value in kPa
-       // *val = (float)(data->comp_press) / 1.0f;
+        *val = (float)(data->comp_press) / 100.0f; // returns value in hPa
+                                                   // *val = (float)(data->comp_press) / 1.0f;
         break;
 
     case SENSOR_CHAN_HUMIDITY:
-        *val = (float)(data->comp_humidity >> 10);
+        *val = (float)(data->comp_humidity) / 1024.0f; // returns value in %RH
+                                       
         //*val = (float)(data->comp_humidity);
         break;
 
@@ -380,27 +366,6 @@ int custom_bme280_init(struct custom_bme280_data *data)
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // static int custom_bme280_pm_action(const struct device *dev,
 //                                    enum pm_device_action action)

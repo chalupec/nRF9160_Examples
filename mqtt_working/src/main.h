@@ -22,7 +22,7 @@
 
 #define RMS_BUFFER_SIZE 100
 
-#define NR_OF_SAMPLES_TO_MEASURE 27000 // 13500
+#define NR_OF_SAMPLES_TO_MEASURE 3*27000 // 13500
 
 #define RES_VAR_LEN 5000
 
@@ -127,12 +127,17 @@ struct __attribute__((__packed__)) data_packet_t
 struct __attribute__((__packed__)) servis_packet_t
 {
     uint16_t packet_header;
-    uint16_t packet_version;
+    uint8_t packet_ver_major;
+    uint8_t packet_ver_minor;
+    uint8_t hw_ver_major;
+    uint8_t hw_ver_minor;
+    uint8_t sw_ver_major;
+    uint8_t sw_ver_minor;
     uint32_t timestamp;
     uint16_t reserve_word;
     uint16_t packet_counter;
     uint16_t batt_voltage;
-    int16_t unit_temperature;
+    int32_t unit_temperature;
     uint32_t unit_humidity;
     uint32_t unit_pressure;
     uint32_t IMEI;

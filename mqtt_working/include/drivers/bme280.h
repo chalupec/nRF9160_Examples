@@ -29,17 +29,16 @@
 #define REG_STATUS 0xF3
 
 #define BME_RESET 0xE0
-#define RST_SEQ   0xB6
+#define RST_SEQ 0xB6
 
 #define BME280_CHIP_ID 0x60
 
 #define STATUS_MEASURING 0x08
 #define STATUS_IM_UPDATE 0x01
 
-#define SENSOR_CHAN_AMBIENT_TEMP  1
-#define SENSOR_CHAN_PRESS  2
-#define SENSOR_CHAN_HUMIDITY  3
-
+#define SENSOR_CHAN_AMBIENT_TEMP 1
+#define SENSOR_CHAN_PRESS 2
+#define SENSOR_CHAN_HUMIDITY 3
 
 /* Driver runtime data */
 struct custom_bme280_data

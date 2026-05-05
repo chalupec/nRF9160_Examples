@@ -220,15 +220,23 @@ static int modem_configure(void)
 
 void prepare_and_send_telemetry_data(void)
 {
+	//stable part section
 	telemetry_packet.packet_header = 0xFEED;
-	telemetry_packet.packet_version = 0x0101;
+    telemetry_packet.packet_ver_major=1;
+    telemetry_packet.packet_ver_minor=2;
+    telemetry_packet.hw_ver_major=0;
+    telemetry_packet.hw_ver_minor=1;
+    telemetry_packet.sw_ver_major=0;
+    telemetry_packet.sw_ver_minor=1;
 	telemetry_packet.timestamp = record_unix_time_s;
+	//version depended section
+
 	telemetry_packet.reserve_word = 0xAAAA;
 	telemetry_packet.packet_counter = 0;
 	telemetry_packet.batt_voltage = 0;
-	telemetry_packet.unit_temperature = (int16_t)(unit_temperature * 100.0f);
-	telemetry_packet.unit_humidity = (uint32_t)(unit_humidity * 100.0f);
-	telemetry_packet.unit_pressure = (uint32_t)(unit_pressure_hpa * 100.0f); 
+	telemetry_packet.unit_temperature = (int32_t)(unit_temperature * 1000.0f);
+	telemetry_packet.unit_humidity = (uint32_t)(unit_humidity * 1000.0f);
+	telemetry_packet.unit_pressure = (uint32_t)(unit_pressure_hpa * 1000.0f); 
 	telemetry_packet.IMEI = 0;
 	telemetry_packet.DEV_ID = 0;
 	telemetry_packet.train_counter = 0;
@@ -378,7 +386,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 				fl_buff_bcnt = 0;
 				FLASH_MEMORY_READ_DATA(flash_address_read, flash_read_buffer_byte, 10);
 
-				//// FIXME TEST ONLY
+				//// TEST ONLY
 				//	if (samples_to_load_cntr == 500)
 				//	{
 				//		flash_read_buffer_byte[4] = 501;
@@ -387,7 +395,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 				//	{
 				//		flash_read_buffer_byte[1] = 31;
 				//	}
-				//// FIXME
+				//// 
 
 				uint16_t crc_to_compare = 0;
 
@@ -1208,10 +1216,9 @@ int main(void)
 			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_AMBIENT_TEMP, &unit_temperature);
 			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_HUMIDITY, &unit_humidity);
 			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure_hpa);
-		    LOG_INF("BME280-1 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
-		    LOG_INF("BME280-2 T %d H %d P %d", (int16_t)unit_temperature, (int16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
-			LOG_INF("\n\n");
-			k_sleep(K_MSEC(1500));
+		   // LOG_INF("BME280-1 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
+		    LOG_INF("T %d H %d P %d", (int16_t)unit_temperature, (int16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
+			k_sleep(K_MSEC(500));
 		}
 	}
 
@@ -1309,7 +1316,7 @@ int main(void)
 		if ((rms_value[0] > rms_trig_start) || (rms_value[2] > rms_trig_start))
 		{
 			LOG_INF("RMS treshold %d crossed", rms_trig_start);
-			uint16_t sample_cntr = 0;
+			uint32_t sample_cntr = 0;
 
 			if (circ_buff_overflow == 1)
 			{
@@ -1462,12 +1469,14 @@ int main(void)
 			if (bme280_enabled == 1)
 			{
 				custom_bme280_sample_fetch(&sens_data_str);
+				k_sleep(K_MSEC(500));
+				custom_bme280_sample_fetch(&sens_data_str);
 				// LOG_INF("BME280 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
 				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_AMBIENT_TEMP, &unit_temperature);
 				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_HUMIDITY, &unit_humidity);
 				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure_hpa);
 
-		    	LOG_INF("BME280T %d H %d P %d", (int16_t)unit_temperature, (uint16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
+		    	LOG_INF("BME280 T %d H %d P %d", (int16_t)unit_temperature, (uint16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
 
 			}
 			LOG_INF("data_ready_to_send flag set");
