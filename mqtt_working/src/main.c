@@ -12,7 +12,6 @@ uint32_t len;
 uint8_t mqtt_trigger_reset = 0;
 uint8_t mqtt_skip_init_procedure = 0;
 uint8_t first_alive_flag = 1;
-uint8_t first_record_write = 1;
 uint8_t dump_log_flag = 0;
 uint8_t config_request_flag = 0;
 
@@ -117,6 +116,8 @@ int8_t pool_retval = 0;
 
 uint32_t initial_stage_timeout_counter = 0;
 
+const struct device *clk = DEVICE_DT_GET(DT_NODELABEL(clock));
+
 static const struct adc_sequence sequence = {
 	.channels = BIT(CHANNEL_1) | BIT(CHANNEL_2) | BIT(CHANNEL_3) | BIT(CHANNEL_4),
 	.buffer = sample_buffer,
@@ -180,12 +181,12 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 		{
 			break;
 		}
-		LOG_INF("Network reg stat: %s",
+		LOG_INF("Network reg stat: %s;",
 				evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ? "Conected - home network" : "Connected - roaming");
 		k_sem_give(&lte_connected);
 		break;
 	case LTE_LC_EVT_RRC_UPDATE:
-		LOG_INF("RRC mode: %s", evt->rrc_mode == LTE_LC_RRC_MODE_CONNECTED ? "Connected" : "Idle");
+		LOG_INF("RRC mode: %s;", evt->rrc_mode == LTE_LC_RRC_MODE_CONNECTED ? "Connected" : "Idle");
 		break;
 	default:
 		break;
@@ -195,24 +196,24 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 static int modem_configure(void)
 {
 
-	LOG_INF("Initializing modem library");
+	LOG_INF("Initializing modem library;");
 	err = nrf_modem_lib_init();
 	if (err)
 	{
-		LOG_ERR("Failed to initialize the modem library, error: %d", err);
+		LOG_ERR("Failed to initialize the modem library, error: %d;", err);
 		return err;
 	}
 
-	LOG_INF("Connecting to LTE network");
+	LOG_INF("Connecting to LTE network;");
 	err = lte_lc_connect_async(lte_handler);
 	if (err)
 	{
-		LOG_ERR("Error in lte_lc_connect_async, error: %d", err);
+		LOG_ERR("Error in lte_lc_connect_async, error: %d;", err);
 		return err;
 	}
 
 	k_sem_take(&lte_connected, K_FOREVER);
-	LOG_INF("Connected to LTE network");
+	LOG_INF("Connected to LTE network;");
 	dk_set_led_on(DK_LED2);
 
 	return 0;
@@ -220,23 +221,23 @@ static int modem_configure(void)
 
 void prepare_and_send_telemetry_data(void)
 {
-	//stable part section
+	// stable part section
 	telemetry_packet.packet_header = 0xFEED;
-    telemetry_packet.packet_ver_major=1;
-    telemetry_packet.packet_ver_minor=2;
-    telemetry_packet.hw_ver_major=0;
-    telemetry_packet.hw_ver_minor=1;
-    telemetry_packet.sw_ver_major=0;
-    telemetry_packet.sw_ver_minor=1;
+	telemetry_packet.packet_ver_major = 1;
+	telemetry_packet.packet_ver_minor = 2;
+	telemetry_packet.hw_ver_major = 0;
+	telemetry_packet.hw_ver_minor = 1;
+	telemetry_packet.sw_ver_major = 0;
+	telemetry_packet.sw_ver_minor = 1;
 	telemetry_packet.timestamp = record_unix_time_s;
-	//version depended section
+	// version depended section
 
 	telemetry_packet.reserve_word = 0xAAAA;
 	telemetry_packet.packet_counter = 0;
 	telemetry_packet.batt_voltage = 0;
 	telemetry_packet.unit_temperature = (int32_t)(unit_temperature * 1000.0f);
 	telemetry_packet.unit_humidity = (uint32_t)(unit_humidity * 1000.0f);
-	telemetry_packet.unit_pressure = (uint32_t)(unit_pressure_hpa * 1000.0f); 
+	telemetry_packet.unit_pressure = (uint32_t)(unit_pressure_hpa * 1000.0f);
 	telemetry_packet.IMEI = 0;
 	telemetry_packet.DEV_ID = 0;
 	telemetry_packet.train_counter = 0;
@@ -258,12 +259,12 @@ void prepare_and_send_telemetry_data(void)
 	// LOG_INF("size of struct is: %d", sizestruct);
 	uint8_t *byte_ptr = (uint8_t *)&telemetry_packet;
 
-	LOG_INF("MQTT UNIT SENDING TELEMETRY INFO");
+	LOG_INF("MQTT UNIT SENDING TELEMETRY INFO;");
 	err = 0;
 	err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, byte_ptr, sizestruct); // FIXME CHECK ONLY 10 is ok
 	if (err)
 	{
-		LOG_INF("Failed to send message, %d", err);
+		LOG_INF("Failed to send message, %d;", err);
 		return;
 	}
 }
@@ -322,6 +323,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 	uint16_t total_packet_to_send = 0;
 	uint16_t samples_to_load_cntr = 0;
 	uint16_t fl_buff_bcnt = 0;
+	uint16_t crc_to_compare = 0;
 
 	crc_err_counter = 0;
 	flash_sample_fail_counter = 0;
@@ -343,6 +345,8 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 		seed_packet.train_counter = train_counter;
 		seed_packet.CRC = 0xABCD;
 
+		k_sleep(K_MSEC(100));
+
 		if (circ_buff_overflow == 1)
 		{ // circ_buff_overflow occured then use buffered data, than use psram data
 			circ_buff_overflow = 0;
@@ -355,6 +359,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 
 			LOG_INF("cicr buff ovrflw, aligning result");
 			LOG_INF("buff head: %d, tail: %d", temp_head, temp_tail);
+			k_sleep(K_MSEC(1500));
 
 			if (temp_tail == 0)
 			{
@@ -395,9 +400,9 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 				//	{
 				//		flash_read_buffer_byte[1] = 31;
 				//	}
-				//// 
+				////
 
-				uint16_t crc_to_compare = 0;
+				
 
 				crc_to_compare = flash_read_buffer_byte[8] << 8;
 				crc_to_compare |= flash_read_buffer_byte[9];
@@ -456,6 +461,10 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 						seed_packet.chan_1_vlt[samples_to_load_cntr] = -32760;
 						seed_packet.chan_1_int[samples_to_load_cntr] = -32760;
 						LOG_ERR("CRC mismatch at sample, %d", samples_to_load_cntr); // DEBUG FIX
+
+						LOG_INF("flash_read_buffer_byte: 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X", flash_read_buffer_byte[0], flash_read_buffer_byte[1], flash_read_buffer_byte[2], flash_read_buffer_byte[3], flash_read_buffer_byte[4], flash_read_buffer_byte[5], flash_read_buffer_byte[6], flash_read_buffer_byte[7], flash_read_buffer_byte[8], flash_read_buffer_byte[9]);
+						LOG_INF("crc: %04X  crc_to_compare: %04X",crc, crc_to_compare);
+
 						// k_sleep(K_MSEC(3));
 						samples_to_load_cntr++; // try another sample
 						flash_address_read += 10;
@@ -471,6 +480,8 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 		err = 0;
 		//	err = data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 		//						   byte_ptr, sizestruct);
+
+
 		err = data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE,
 						   byte_ptr, sizestruct);
 		if (err)
@@ -479,7 +490,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 			return;
 		}
 		seed_packet.CRC = flash_sample_fail_counter; // jen info o poctu falu pri cteni
-		LOG_INF("sample record CRC mismatch counter, %d", flash_sample_fail_counter);
+		//LOG_INF("sample record CRC mismatch counter, %d", flash_sample_fail_counter);
 	}
 
 	train_counter++;
@@ -800,20 +811,40 @@ do_connect:
 	return 1;
 }
 
+void test_hfclk_precision_clock(void)
+{
+	bool hfxo_running = nrf_clock_hf_is_running(NRF_CLOCK, NRF_CLOCK_HFCLK_HIGH_ACCURACY);
+	LOG_INF("precision clock running: %s;", hfxo_running ? "YES" : "NO");
+}
+
+
+void force_hfclk_precision_clock(void)
+{
+	LOG_INF("force precision clock;");
+	int err = clock_control_on(clk, (clock_control_subsys_t)CLOCK_CONTROL_NRF_SUBSYS_HF);
+	if (err < 0)
+	{
+		printk("precision clock request failed: %d;", err);
+	}
+	test_hfclk_precision_clock();
+}
+
+
+
 // FIME tady byl konec reseni pooling
 int8_t mqtt_pooling_procedure(void)
 {
-	LOG_INF("mqtt_keepalive_time_left fcn");
+	LOG_INF("mqtt_keepalive_time_left fcn;");
 	err = poll(&fds, 1, mqtt_keepalive_time_left(&client));
 	if (err < 0)
 	{
-		LOG_ERR("Error in poll(): %d", errno);
+		LOG_ERR("Error in poll(): %d;", errno);
 		return (-1);
 	}
 	err = mqtt_live(&client);
 	if ((err != 0) && (err != -EAGAIN))
 	{
-		LOG_ERR("Error in mqtt_live: %d", err);
+		LOG_ERR("Error in mqtt_live: %d;", err);
 		return (-1);
 	}
 	if ((fds.revents & POLLIN) == POLLIN)
@@ -821,60 +852,60 @@ int8_t mqtt_pooling_procedure(void)
 		err = mqtt_input(&client);
 		if (err != 0)
 		{
-			LOG_ERR("Error in mqtt_input: %d", err);
+			LOG_ERR("Error in mqtt_input: %d;", err);
 			return (-1);
 		}
 	}
 
 	if ((fds.revents & POLLERR) == POLLERR)
 	{
-		LOG_ERR("POLLERR");
+		LOG_ERR("POLLERR;");
 		return (-1);
 	}
 
 	if ((fds.revents & POLLNVAL) == POLLNVAL)
 	{
-		LOG_ERR("POLLNVAL");
+		LOG_ERR("POLLNVAL;");
 		return (-1);
 	}
 
 	if (config_request_flag == 1)
 	{
 		config_request_flag = 0;
-		LOG_INF("CFG solving");
+		LOG_INF("CFG solving;");
 
 		uint16_t v1, v2, v3, v4;
 
 		if (sscanf(cfg_buff, "CFG %hu %hu %hu %hu", &v1, &v2, &v3, &v4) == 4)
 		{
-			LOG_INF("CFG received params %d %d %d %d", v1, v2, v3, v4);
+			LOG_INF("CFG received params %d %d %d %d;", v1, v2, v3, v4);
 
 			rms_trig_start = v1;
 			eeprom_emul_write_u16(EEPROM_KEY_TRIG_START, rms_trig_start);
-			LOG_INF("EEPROM MQTT def triggeru high ");
+			LOG_INF("EEPROM MQTT def triggeru high;");
 
 			rms_trig_end = v2;
 			eeprom_emul_write_u16(EEPROM_KEY_TRIG_END, rms_trig_end);
-			LOG_INF("EEPROM MQTT def triggeru low ");
+			LOG_INF("EEPROM MQTT def triggeru low;");
 
 			rms_trig_end_duration = v3;
 			eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
-			LOG_INF("EEPROM MQTT def triggeru low duration");
+			LOG_INF("EEPROM MQTT def triggeru low duration;");
 
 			bme280_enabled = v4;
 			eeprom_emul_write_u16(EEPROM_KEY_BME280_ENA, bme280_enabled);
-			LOG_INF("EEPROM MQTT def BME280 enable state");
+			LOG_INF("EEPROM MQTT def BME280 enable state;");
 		}
 		else
 		{
-			LOG_INF("CFG params not valid");
+			LOG_INF("CFG params not valid;");
 		}
 	}
 
 	if (dump_log_flag == 1)
 	{
 		dump_log_flag = 0;
-		LOG_INF("ENTERING LOG DUMP MQTT REPORT");
+		LOG_INF("ENTERING LOG DUMP MQTT REPORT;");
 
 		while ((len = log_ram_read(buf, sizeof(buf))) > 0)
 		{
@@ -888,25 +919,25 @@ int8_t mqtt_pooling_procedure(void)
 	if (mqtt_trigger_reset == 1)
 	{
 		mqtt_trigger_reset = 0;
-		LOG_INF("trigger reset in progress");
+		LOG_INF("trigger reset in progress;");
 		k_sleep(K_MSEC(1000));
-		LOG_INF("end-up mqtt client connection");
+		LOG_INF("end-up mqtt client connection;");
 
 		int8_t errrno;
 		errrno = mqtt_disconnect(&client);
 		if (errrno)
 		{
-			LOG_ERR("Could not disconnect: %d", errrno);
+			LOG_ERR("Could not disconnect: %d;", errrno);
 		}
 		k_sleep(K_MSEC(1000));
 
-		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
+		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE;");
 		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
 		k_sleep(K_MSEC(1000));
-		LOG_INF("nrf_modem_lib_shutdown");
+		LOG_INF("nrf_modem_lib_shutdown;");
 		nrf_modem_lib_shutdown();
 		k_sleep(K_MSEC(3000));
-		LOG_INF("RST trigg REBOOT NOW");
+		LOG_INF("RST trigg REBOOT NOW;");
 		k_sleep(K_MSEC(3000));
 		sys_reboot(SYS_REBOOT_COLD);
 		k_sleep(K_MSEC(1000));
@@ -915,19 +946,19 @@ int8_t mqtt_pooling_procedure(void)
 	if (mqtt_skip_init_procedure == 1)
 	{
 		mqtt_skip_init_procedure = 0;
-		LOG_INF("SKIP REQUEST RECEIVED");
+		LOG_INF("SKIP REQUEST RECEIVED;");
 		int8_t errrno;
 		errrno = mqtt_disconnect(&client);
 		if (errrno)
 		{
-			LOG_ERR("Could not disconnect: %d", errrno);
+			LOG_ERR("Could not disconnect: %d;", errrno);
 		}
 		k_sleep(K_MSEC(1000));
 
-		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
+		LOG_INF("LTE_LC_FUNC_MODE_OFFLINE;");
 		lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
 		k_sleep(K_MSEC(1000));
-		LOG_INF("nrf_modem_lib_shutdown");
+		LOG_INF("nrf_modem_lib_shutdown;");
 		nrf_modem_lib_shutdown();
 		k_sleep(K_MSEC(2000));
 		return (-1);
@@ -936,7 +967,7 @@ int8_t mqtt_pooling_procedure(void)
 	if (first_alive_flag == 2)
 	{
 
-		LOG_INF("entering first_alive_flag=2");
+		LOG_INF("entering first_alive_flag=2;");
 		initial_stage_timeout_counter++;
 		if (initial_stage_timeout_counter == 2)
 		{
@@ -944,14 +975,14 @@ int8_t mqtt_pooling_procedure(void)
 			errrno = mqtt_disconnect(&client);
 			if (errrno)
 			{
-				LOG_ERR("Could not disconnect: %d", errrno);
+				LOG_ERR("Could not disconnect: %d;", errrno);
 			}
 			k_sleep(K_MSEC(1000));
 
-			LOG_INF("LTE_LC_FUNC_MODE_OFFLINE");
+			LOG_INF("LTE_LC_FUNC_MODE_OFFLINE;");
 			lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
 			k_sleep(K_MSEC(1000));
-			LOG_INF("nrf_modem_lib_shutdown");
+			LOG_INF("nrf_modem_lib_shutdown;");
 			nrf_modem_lib_shutdown();
 			k_sleep(K_MSEC(1000));
 			return (-1);
@@ -960,10 +991,10 @@ int8_t mqtt_pooling_procedure(void)
 
 	if (first_alive_flag == 1)
 	{
-		LOG_INF("entering first_alive_flag=1");
+		LOG_INF("entering first_alive_flag=1;");
 		first_alive_flag = 2;
 		char charbuf[] = {"UNIT ALIVE"};
-		LOG_INF("MQTT UNIT SENDING ALIVE INFO");
+		LOG_INF("MQTT UNIT SENDING ALIVE INFO;");
 		err = sys_data_publish(&client, MQTT_QOS_0_AT_MOST_ONCE, charbuf, 10); // FIXME CHECK ONLY 10 is ok
 	}
 
@@ -971,7 +1002,7 @@ int8_t mqtt_pooling_procedure(void)
 	{
 		data_ready_to_send = 0;
 		get_time_procedure();
-		LOG_INF("timestamp gathered from modem %" PRIu32, record_unix_time_s);
+		LOG_INF("timestamp gathered from modem %" PRIu32 ";", record_unix_time_s);
 
 		prepare_and_send_telemetry_data();
 		k_sleep(K_MSEC(1000));
@@ -1000,10 +1031,10 @@ void test_flash(void)
 
 	FLASH_MEMORY_READ_DATA(flash_address_write, flash_read_buffer_byte, 8);
 
-	LOG_INF("data %d \t %d", flash_read_buffer_byte[0], flash_read_buffer_byte[1]);
-	LOG_INF("data %d \t %d", flash_read_buffer_byte[2], flash_read_buffer_byte[3]);
-	LOG_INF("data %d \t %d", flash_read_buffer_byte[4], flash_read_buffer_byte[5]);
-	LOG_INF("data %d \t %d", flash_read_buffer_byte[6], flash_read_buffer_byte[7]);
+	LOG_INF("data %d \t %d;", flash_read_buffer_byte[0], flash_read_buffer_byte[1]);
+	LOG_INF("data %d \t %d;", flash_read_buffer_byte[2], flash_read_buffer_byte[3]);
+	LOG_INF("data %d \t %d;", flash_read_buffer_byte[4], flash_read_buffer_byte[5]);
+	LOG_INF("data %d \t %d;", flash_read_buffer_byte[6], flash_read_buffer_byte[7]);
 
 	flash_address_write += 8;
 	k_sleep(K_MSEC(100));
@@ -1016,14 +1047,14 @@ int main(void)
 	(void)status;
 
 	k_sleep(K_MSEC(500));
-	LOG_INF("\n\nSAMPLE APP STARTS");
+	LOG_INF("\n\nSAMPLE APP STARTS;");
 	k_sleep(K_MSEC(100));
 
 #if defined(__ZEPHYR__)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
 #endif
 
-	LOG_INF("GPIO setup");
+	LOG_INF("GPIO setup;");
 	nrf_gpio_cfg_output(MEM_CS_PIN);
 	nrf_gpio_cfg_output(BME_CS_PIN);
 
@@ -1031,7 +1062,9 @@ int main(void)
 	nrf_gpio_pin_set(BME_CS_PIN);
 
 	k_sleep(K_MSEC(500));
-	LOG_INF("SPIM INIT");
+	force_hfclk_precision_clock();
+	k_sleep(K_MSEC(500));
+	LOG_INF("SPIM INIT;");
 
 	k_sleep(K_MSEC(100));
 
@@ -1046,7 +1079,7 @@ int main(void)
 	status = nrfx_spim_init(&spim_inst, &spim_config, NULL, NULL);
 
 	k_sleep(K_MSEC(100));
-	LOG_INF("SPIM INIT finished");
+	LOG_INF("SPIM INIT finished;");
 	k_sleep(K_MSEC(500));
 
 	nrfx_timer_t timer_inst = NRFX_TIMER_INSTANCE(TIMER_INST_IDX);
@@ -1068,12 +1101,12 @@ int main(void)
 
 	if (dk_leds_init() != 0)
 	{
-		LOG_ERR("Failed to initialize the LED library\n");
+		LOG_ERR("Failed to initialize the LED library;");
 	}
 
 	if (!device_is_ready(adc_dev))
 	{
-		LOG_ERR("ADC not ready\n");
+		LOG_ERR("ADC not ready;");
 		while (1)
 		{
 		}
@@ -1101,7 +1134,7 @@ int main(void)
 	int16_t offsets[4];
 	uint8_t chsel = 0;
 
-	uint16_t offset_gather_cnt = 200;
+	uint16_t offset_gather_cnt = 1000;
 
 	eeprom_emul_init();
 	k_sleep(K_MSEC(100));
@@ -1112,39 +1145,63 @@ int main(void)
 	{
 		rms_trig_end_duration = DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END;
 		eeprom_emul_write_u16(EEPROM_KEY_END_TRIG_DURATION, rms_trig_end_duration);
-		LOG_INF("EEPROM self def triggeru low duration");
+		LOG_INF("EEPROM self def triggeru low duration;");
 	}
 
 	if (eeprom_emul_read_u16(EEPROM_KEY_TRIG_START, &rms_trig_start) != 0)
 	{
 		rms_trig_start = DEFAULT_START_RMS_TRIG_TRESHOLD;
 		eeprom_emul_write_u16(EEPROM_KEY_TRIG_START, rms_trig_start);
-		LOG_INF("EEPROM self def triggeru high ");
+		LOG_INF("EEPROM self def triggeru high;");
 	}
 
 	if (eeprom_emul_read_u16(EEPROM_KEY_TRIG_END, &rms_trig_end) != 0)
 	{
 		rms_trig_end = DEFAULT_END_RMS_TRIG_TRESHOLD;
 		eeprom_emul_write_u16(EEPROM_KEY_TRIG_END, rms_trig_end);
-		LOG_INF("EEPROM self def triggeru low ");
+		LOG_INF("EEPROM self def triggeru low;");
 	}
 
 	if (eeprom_emul_read_u16(EEPROM_KEY_BME280_ENA, &bme280_enabled) != 0)
 	{
 		bme280_enabled = DEFAULT_BME280_USAGE_SETUP;
 		eeprom_emul_write_u16(EEPROM_KEY_BME280_ENA, bme280_enabled);
-		LOG_INF("EEPROM self def BME280 disabled ");
+		LOG_INF("EEPROM self def BME280 disabled;");
 	}
 
-	LOG_INF("start trigger val %d", rms_trig_start);
-	LOG_INF("end trigger val %d", rms_trig_end);
-	LOG_INF("end trig low duration %d smpls", rms_trig_end_duration);
-	LOG_INF("BME280 enable val %d", bme280_enabled);
+	LOG_INF("start trigger val %d;", rms_trig_start);
+	LOG_INF("end trigger val %d;", rms_trig_end);
+	LOG_INF("end trig low duration %d smpls;", rms_trig_end_duration);
+	LOG_INF("BME280 enable val %d;", bme280_enabled);
 	k_sleep(K_MSEC(1000));
 
 	while (0)
 	{
 		test_flash();
+	}
+
+	if (0)
+	{
+
+		LOG_INF("hfxo value test start;");
+		test_hfclk_precision_clock();
+		nrfx_timer_enable(&timer_inst);
+		k_sleep(K_MSEC(2000));
+		uint32_t delay_counter = 0;
+		while (1)
+		{
+			if (ADC_SAMPLE_FLAG == 1)
+			{
+				ADC_SAMPLE_FLAG = 0;
+				nrf_gpio_pin_set(MEM_CS_PIN);
+				delay_counter = 0;
+				while (delay_counter < 1000)
+				{
+					delay_counter++;
+				}
+				nrf_gpio_pin_clear(MEM_CS_PIN); // gpio_pin_set_dt(&led0, 1);
+			}
+		}
 	}
 
 	if (0)
@@ -1166,13 +1223,13 @@ int main(void)
 		printk("********* END OF RAM RECS DUMP **********\n\n\n\n");
 	}
 
-	if (1)
+	if (0)  //FIXME
 	{
-		LOG_INF("-----------------------------");
-		LOG_INF("<---- REMOTE CONFIG STAGE --->");
-		LOG_INF("first modem init");
+		LOG_INF("-----------------------------;");
+		LOG_INF("<---- REMOTE CONFIG STAGE --->;");
+		LOG_INF("first modem init;");
 		init_modem_and_mqtt();
-		LOG_INF("--entering MQTT pooling loop--");
+		LOG_INF("--entering MQTT pooling loop--;");
 		while (1)
 		{
 			pool_retval = mqtt_pooling_procedure();
@@ -1182,15 +1239,15 @@ int main(void)
 			}
 		}
 		connect_attempt = 0;
-		LOG_INF("leaving  INIT STAGE");
-		LOG_INF("-----------------------------\n");
+		LOG_INF("leaving  INIT STAGE;");
+		LOG_INF("-----------------------------;\n");
 	}
 	else
 	{
 		first_alive_flag = 0;
 	}
 
-	LOG_INF("GPIO update config after modem off");
+	LOG_INF("GPIO update config after modem off;");
 	nrf_gpio_cfg_output(MEM_CS_PIN);
 	nrf_gpio_cfg_output(BME_CS_PIN);
 
@@ -1199,41 +1256,46 @@ int main(void)
 
 	if (bme280_enabled == 1)
 	{
-		LOG_INF("BME reset");
+		LOG_INF("BME reset;");
 		bme280_reset();
 		k_sleep(K_MSEC(500));
-		LOG_INF("BME init");
+		LOG_INF("BME init;");
 		custom_bme280_init(&sens_data_str);
 		k_sleep(K_MSEC(500));
-		LOG_INF("BME init done");
+		LOG_INF("BME init done;");
 	}
 
-
 	// FOR TEST PURPOSES
-	if (0) {
-		while(1){
+	if (0)
+	{
+		while (1)
+		{
 			custom_bme280_sample_fetch(&sens_data_str);
 			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_AMBIENT_TEMP, &unit_temperature);
 			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_HUMIDITY, &unit_humidity);
 			bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure_hpa);
-		   // LOG_INF("BME280-1 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
-		    LOG_INF("T %d H %d P %d", (int16_t)unit_temperature, (int16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
+			// LOG_INF("BME280-1 T %d H %d P %d", sens_data_str.comp_temp, sens_data_str.comp_humidity, sens_data_str.comp_press);
+			LOG_INF("T %d H %d P %d", (int16_t)unit_temperature, (int16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
 			k_sleep(K_MSEC(500));
 		}
 	}
 
-	LOG_INF("<----MEASUREMENT STAGE --->");
-	LOG_INF("starting timer");
-	k_sleep(K_MSEC(100));
+	LOG_INF("<----MEASUREMENT STAGE --->;");
+	LOG_INF("checking precision clock;");
+	test_hfclk_precision_clock();
+	LOG_INF("starting timer;");
+	k_sleep(K_MSEC(200));
 	nrfx_timer_enable(&timer_inst);
-	k_sleep(K_MSEC(100));
-	LOG_INF("gathering offsets");
+	k_sleep(K_MSEC(200));
+	LOG_INF("gathering offsets;");
+
+	test_hfclk_precision_clock();
 
 	while (offset_gather_cnt--)
 	{
 		while (ADC_SAMPLE_FLAG == 0)
 		{
-			//k_sleep(K_USEC(10));// wait FIXME zmerit na OSCILO
+			// k_sleep(K_USEC(10));// wait FIXME zmerit na OSCILO
 		}
 		if (ADC_SAMPLE_FLAG == 1)
 		{
@@ -1259,14 +1321,13 @@ int main(void)
 	offsets[2] = filtered_value_array[2];
 	offsets[3] = filtered_value_array[3];
 
-	LOG_INF("offsets done");
-
+	LOG_INF("offsets: %d, %d, %d, %d;", offsets[0], offsets[1], offsets[2], offsets[3]);
 	buff_head = 0;
 	total_recorded_samples = 0;
 
-	LOG_INF("circular buffer init");
+	LOG_INF("circular buffer init;");
 	circular_buffer_init();
-	LOG_INF("entering trigger waiting loop");
+	LOG_INF("entering trigger waiting loop;");
 
 	while (1) // waiting for trigger
 	{
@@ -1315,7 +1376,7 @@ int main(void)
 
 		if ((rms_value[0] > rms_trig_start) || (rms_value[2] > rms_trig_start))
 		{
-			LOG_INF("RMS treshold %d crossed", rms_trig_start);
+			LOG_INF("RMS treshold %d crossed;", rms_trig_start);
 			uint32_t sample_cntr = 0;
 
 			if (circ_buff_overflow == 1)
@@ -1335,7 +1396,6 @@ int main(void)
 
 			trigger_measurement_end = 0;
 
-			first_record_write = 1;
 
 			while (1)
 			{
@@ -1377,10 +1437,28 @@ int main(void)
 					flash_write_buffer_byte[6] = ch3_off_value >> 8;
 					flash_write_buffer_byte[7] = ch3_off_value & 0xff;
 
+					//FIXME
+				//flash_write_buffer_byte[0] = 0xaa;
+				//flash_write_buffer_byte[1] = 0xbb;
+
+				//flash_write_buffer_byte[2] = 0xc3;
+				//flash_write_buffer_byte[3] = 0xdd;
+
+				//flash_write_buffer_byte[4] = 0xee;
+				//flash_write_buffer_byte[5] = 0xff;
+
+				//flash_write_buffer_byte[6] = 0x11;
+				//flash_write_buffer_byte[7] = 0x22;
+
+
 					crc = crc16_ccitt_jch(flash_write_buffer_byte, 8);
+
 					flash_write_buffer_byte[8] = crc >> 8;
 					flash_write_buffer_byte[9] = crc & 0xff;
-					FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 10); // cca 20-40 us?
+
+				   FLASH_MEMORY_WRITE_BYTE_ARRAY(flash_address_write, flash_write_buffer_byte, 10); // cca 20-40 us?
+	
+
 
 					flash_address_write += 10;
 
@@ -1404,7 +1482,7 @@ int main(void)
 
 					if (sample_cntr > NR_OF_SAMPLES_TO_MEASURE)
 					{
-						LOG_INF("end trigger - sample limit");
+						LOG_INF("end trigger - sample limit;");
 						trigger_measurement_end = 1;
 					}
 
@@ -1412,7 +1490,9 @@ int main(void)
 					{
 						break;
 					}
-				}
+				} else {
+					k_sleep(K_USEC(5)); // FIXME
+				} // wait FIXME zmerit na OSCILO
 			}
 
 			nrfx_timer_disable(&timer_inst);
@@ -1476,10 +1556,9 @@ int main(void)
 				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_HUMIDITY, &unit_humidity);
 				bme280_sensor_channel_get(&sens_data_str, SENSOR_CHAN_PRESS, &unit_pressure_hpa);
 
-		    	LOG_INF("BME280 T %d H %d P %d", (int16_t)unit_temperature, (uint16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
-
+				LOG_INF("BME280 T %d H %d P %d;", (int16_t)unit_temperature, (uint16_t)unit_humidity, (uint16_t)unit_pressure_hpa);
 			}
-			LOG_INF("data_ready_to_send flag set");
+			LOG_INF("data_ready_to_send flag set;");
 			break;
 		}
 	}
@@ -1496,16 +1575,16 @@ int main(void)
 		}
 	}
 
-	LOG_INF("PROGRAM END Disconnecting MQTT client");
+	LOG_INF("PROGRAM END Disconnecting MQTT client;");
 
 	err = mqtt_disconnect(&client);
 
 	if (err)
 	{
-		LOG_ERR("Could not disconnect MQTT client: %d", err);
+		LOG_ERR("Could not disconnect MQTT client: %d;", err);
 	}
 
-	LOG_INF("PROGRAM END  trigg REBOOT NOW\n");
+	LOG_INF("PROGRAM END  trigg REBOOT NOW;\n");
 	k_sleep(K_MSEC(1000));
 	sys_reboot(SYS_REBOOT_COLD);
 

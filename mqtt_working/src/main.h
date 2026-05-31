@@ -66,11 +66,19 @@
 #include <poll.h>
 #include <zephyr/types.h>
 
+
+#include <zephyr/device.h>
+#include <zephyr/drivers/clock_control.h>
+#include <zephyr/drivers/clock_control/nrf_clock_control.h>
+
+
+
 #include <zephyr/logging/log.h>
 #include <dk_buttons_and_leds.h>
 #include <modem/nrf_modem_lib.h>
 #include <modem/lte_lc.h>
 #include <modem/modem_info.h>
+#include <hal/nrf_clock.h>
 
 /* STEP 2.3 - Include the header file for the MQTT Library*/
 #include <zephyr/net/mqtt.h>
