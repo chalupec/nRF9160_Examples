@@ -1099,11 +1099,6 @@ int main(void)
 
 	k_sleep(K_MSEC(500));
 
-//if (dk_leds_init() != 0)
-//{
-//	LOG_ERR("Failed to initialize the LED library;");
-//}
-
 	if (!device_is_ready(adc_dev))
 	{
 		LOG_ERR("ADC not ready;");
@@ -1223,7 +1218,7 @@ int main(void)
 		printk("********* END OF RAM RECS DUMP **********\n\n\n\n");
 	}
 
-	if (0)  //FIXME
+	if (1)  //FIXME
 	{
 		LOG_INF("-----------------------------;");
 		LOG_INF("<---- REMOTE CONFIG STAGE --->;");
