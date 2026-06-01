@@ -1052,7 +1052,6 @@ arduino_spi: &spi3 {
     chosen {
         zephyr,storage = &storage_partition;
     };
-
 };
 
 
@@ -1063,7 +1062,7 @@ arduino_spi: &spi3 {
 
 
 &uart0_default {
- hw-flow-control = "false";
+ /delete-node/ group2;
 
  group1 {
   psels = <((((((0) * 32U) + (27)) & 0x1FFU) << 0U) | ((0U & 0xFFU) << 24U))>, <((((((0) * 32U) + (26)) & 0x1FFU) << 0U) | ((1U & 0xFFU) << 24U))>;
@@ -1073,6 +1072,7 @@ arduino_spi: &spi3 {
 
 
 &uart0 {
+ /delete-property/ hw-flow-control;
  current-speed = <250000>;
 };
 
@@ -1085,6 +1085,8 @@ arduino_spi: &spi3 {
 };
 
 &uart0_sleep {
+ /delete-node/ group2;
+
  group1 {
   psels = <((((((0) * 32U) + (27)) & 0x1FFU) << 0U) | ((0U & 0xFFU) << 24U))>, <((((((0) * 32U) + (26)) & 0x1FFU) << 0U) | ((1U & 0xFFU) << 24U))>;
  };

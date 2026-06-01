@@ -20,7 +20,6 @@
     chosen {
         zephyr,storage = &storage_partition;
     };
-
 };
 
 
@@ -31,8 +30,8 @@
 
 
 &uart0_default {
-	hw-flow-control = "false";
-	
+	/delete-node/ group2;
+
 	group1 {
 		psels = <NRF_PSEL(UART_TX, 0, 27)>, <NRF_PSEL(UART_RX, 0, 26)>;
 	};
@@ -41,6 +40,7 @@
 
 
 &uart0 {
+	/delete-property/ hw-flow-control;
 	current-speed = <250000>;
 };
 
@@ -53,6 +53,8 @@
 };
 
 &uart0_sleep {
+	/delete-node/ group2;
+
 	group1 {
 		psels = <NRF_PSEL(UART_TX, 0, 27)>, <NRF_PSEL(UART_RX, 0, 26)>;
 	};
@@ -91,5 +93,3 @@
 		};
 	};
 };
-
-

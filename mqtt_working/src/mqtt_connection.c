@@ -278,12 +278,12 @@ void mqtt_evt_handler(struct mqtt_client *const c,
 
 
 			// Control the LED 
-			if(strncmp(payload_buf,CONFIG_TURN_LED_ON_CMD,sizeof(CONFIG_TURN_LED_ON_CMD)-1) == 0){
-				dk_set_led_on(LED_CONTROL_OVER_MQTT);
-			}
-			else if(strncmp(payload_buf,CONFIG_TURN_LED_OFF_CMD,sizeof(CONFIG_TURN_LED_OFF_CMD)-1) == 0){
-				dk_set_led_off(LED_CONTROL_OVER_MQTT);
-			}
+		//	if(strncmp(payload_buf,CONFIG_TURN_LED_ON_CMD,sizeof(CONFIG_TURN_LED_ON_CMD)-1) == 0){
+		//		dk_set_led_on(LED_CONTROL_OVER_MQTT);
+		//	}
+		//	else if(strncmp(payload_buf,CONFIG_TURN_LED_OFF_CMD,sizeof(CONFIG_TURN_LED_OFF_CMD)-1) == 0){
+		//		dk_set_led_off(LED_CONTROL_OVER_MQTT);
+		//	}
 		/* STEP 6.3 - On failed extraction of data */
 		// Payload buffer is smaller than the received data 
 		} else if (err == -EMSGSIZE) {

@@ -1099,10 +1099,10 @@ int main(void)
 
 	k_sleep(K_MSEC(500));
 
-	if (dk_leds_init() != 0)
-	{
-		LOG_ERR("Failed to initialize the LED library;");
-	}
+//if (dk_leds_init() != 0)
+//{
+//	LOG_ERR("Failed to initialize the LED library;");
+//}
 
 	if (!device_is_ready(adc_dev))
 	{
@@ -1223,7 +1223,7 @@ int main(void)
 		printk("********* END OF RAM RECS DUMP **********\n\n\n\n");
 	}
 
-	if (1)  //FIXME
+	if (0)  //FIXME
 	{
 		LOG_INF("-----------------------------;");
 		LOG_INF("<---- REMOTE CONFIG STAGE --->;");
@@ -1291,37 +1291,48 @@ int main(void)
 
 	test_hfclk_precision_clock();
 
-	while (offset_gather_cnt--)
+	uint8_t offset_gather_runs=1;
+	while (offset_gather_runs--)
 	{
-		while (ADC_SAMPLE_FLAG == 0)
+		offset_gather_cnt = 5000;
+		while (offset_gather_cnt--)
 		{
-			// k_sleep(K_USEC(10));// wait FIXME zmerit na OSCILO
-		}
-		if (ADC_SAMPLE_FLAG == 1)
-		{
-			// gpio_pin_set_dt(&led0, 1);
-			ADC_SAMPLE_FLAG = 0;
-			adc_read(adc_dev, &sequence);				  // takes 248 us
-			add_samples_to_buffer(sample_buffer, buffer); // takes 2 us
-			average_of_vectors(buffer, sample_buffer2);	  // 3.5 us
-
-			chsel = 0;
-			while (chsel < 4)
+			while (ADC_SAMPLE_FLAG == 0)
 			{
-				filtered_value = filtered_value_array[chsel];
-				temp_value = sample_buffer2[chsel];
-				filtered_value = exponential_filter(filtered_value, temp_value);
-				filtered_value_array[chsel] = filtered_value;
-				chsel++;
+				k_sleep(K_USEC(5));// wait FIXME zmerit na OSCILO
+			}
+			if (ADC_SAMPLE_FLAG == 1)
+			{
+				// gpio_pin_set_dt(&led0, 1);
+				ADC_SAMPLE_FLAG = 0;
+				adc_read(adc_dev, &sequence);				  // takes 248 us
+				add_samples_to_buffer(sample_buffer, buffer); // takes 2 us
+				average_of_vectors(buffer, sample_buffer2);	  // 3.5 us
+
+				chsel = 0;
+				while (chsel < 4)
+				{
+					filtered_value = filtered_value_array[chsel];
+					temp_value = sample_buffer2[chsel];
+					filtered_value = exponential_filter(filtered_value, temp_value);
+					filtered_value_array[chsel] = filtered_value;
+					chsel++;
+				}
 			}
 		}
-	}
-	offsets[0] = filtered_value_array[0];
-	offsets[1] = filtered_value_array[1];
-	offsets[2] = filtered_value_array[2];
-	offsets[3] = filtered_value_array[3];
+		offsets[0] = filtered_value_array[0];
+		offsets[1] = filtered_value_array[1];
+		offsets[2] = filtered_value_array[2];
+		offsets[3] = filtered_value_array[3];
 
-	LOG_INF("offsets: %d, %d, %d, %d;", offsets[0], offsets[1], offsets[2], offsets[3]);
+		filtered_value_array[0]=0;
+		filtered_value_array[1]=0;
+		filtered_value_array[2]=0;
+		filtered_value_array[3]=0;
+
+		LOG_INF("offsets: %d, %d, %d, %d;", offsets[0], offsets[1], offsets[2], offsets[3]);
+	}
+	
 	buff_head = 0;
 	total_recorded_samples = 0;
 
