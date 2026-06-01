@@ -1221,7 +1221,7 @@ int main(void)
 	if (1)  //FIXME
 	{
 		LOG_INF("-----------------------------;");
-		LOG_INF("<---- REMOTE CONFIG STAGE --->;");
+		LOG_INF("<--- REMOTE CONFIG STAGE --->;");
 		LOG_INF("first modem init;");
 		init_modem_and_mqtt();
 		LOG_INF("--entering MQTT pooling loop--;");
