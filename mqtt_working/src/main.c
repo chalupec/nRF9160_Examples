@@ -1218,6 +1218,7 @@ int main(void)
 		printk("********* END OF RAM RECS DUMP **********\n\n\n\n");
 	}
 
+	
 	if (1)  //FIXME
 	{
 		LOG_INF("-----------------------------;");
