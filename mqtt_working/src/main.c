@@ -54,6 +54,10 @@ uint32_t crc_err_counter = 0;
 uint32_t flash_sample_fail_counter = 0;
 
 uint32_t record_unix_time_s;
+uint32_t record_begin_unix_time_s;
+static uint32_t rtcc_base_unix_time_s;
+static int64_t rtcc_base_uptime_ms;
+static uint8_t rtcc_time_valid;
 
 int16_t buffer[BUFFER_LENGTH][BUFFER_WIDTH] = {0};
 volatile uint8_t index = 0;
@@ -229,7 +233,7 @@ void prepare_and_send_telemetry_data(void)
 	telemetry_packet.hw_ver_minor = 1;
 	telemetry_packet.sw_ver_major = 0;
 	telemetry_packet.sw_ver_minor = 1;
-	telemetry_packet.timestamp = record_unix_time_s;
+	telemetry_packet.timestamp = record_begin_unix_time_s;
 	// version depended section
 
 	telemetry_packet.reserve_word = 0xAAAA;
@@ -341,7 +345,7 @@ void send_measured_train_data_with_multiple_packets_from_flash(void)
 		seed_packet.packet_version = 0x0101;
 		seed_packet.actual_packet_nr = pckt_cnt++;
 		seed_packet.total_packet_nr = total_packet_to_send;
-		seed_packet.timestamp = record_unix_time_s;
+		seed_packet.timestamp = record_begin_unix_time_s;
 		seed_packet.train_counter = train_counter;
 		seed_packet.CRC = 0xABCD;
 
@@ -518,7 +522,7 @@ void send_measured_train_data_with_multiple_packets_from_flash_to_UART(void)
 		seed_packet.packet_version = 0x0101;
 		seed_packet.actual_packet_nr = pckt_cnt++;
 		seed_packet.total_packet_nr = total_packet_to_send;
-		seed_packet.timestamp = record_unix_time_s;
+		seed_packet.timestamp = record_begin_unix_time_s;
 		seed_packet.train_counter = train_counter;
 		seed_packet.CRC = 0xABCD;
 
@@ -736,7 +740,37 @@ uint16_t circular_buffer_add_value(int16_t value0, int16_t value1, int16_t value
 	return (buff_head);
 }
 
-void get_time_procedure(void)
+void rtcc_init(void)
+{
+	rtcc_base_unix_time_s = 0;
+	rtcc_base_uptime_ms = k_uptime_get();
+	rtcc_time_valid = 0;
+	record_unix_time_s = 0;
+}
+
+void rtcc_update_unix_time(uint32_t unix_time_s)
+{
+	rtcc_base_unix_time_s = unix_time_s;
+	rtcc_base_uptime_ms = k_uptime_get();
+	rtcc_time_valid = 1;
+	record_unix_time_s = unix_time_s;
+}
+
+uint32_t rtcc_get_unix_time(void)
+{
+	if (rtcc_time_valid == 0)
+	{
+		LOG_INF("getting rtcc time failed");
+		return record_unix_time_s;
+	}
+
+	int64_t elapsed_ms = k_uptime_get() - rtcc_base_uptime_ms;
+	record_unix_time_s = rtcc_base_unix_time_s + (uint32_t)(elapsed_ms / 1000);
+
+	return record_unix_time_s;
+}
+
+void modem_get_time_procedure(void)
 {
 	err = date_time_update_async(NULL);
 	if (err)
@@ -754,8 +788,7 @@ void get_time_procedure(void)
 	}
 
 	time_t unix_time_s = unix_time_ms / 1000;
-
-	record_unix_time_s = unix_time_ms / 1000;
+	rtcc_update_unix_time((uint32_t)unix_time_s);
 
 	gmtime_r(&unix_time_s, &timeinfo);
 
@@ -1001,8 +1034,8 @@ int8_t mqtt_pooling_procedure(void)
 	if (data_ready_to_send == 1)
 	{
 		data_ready_to_send = 0;
-		get_time_procedure();
-		LOG_INF("timestamp gathered from modem %" PRIu32 ";", record_unix_time_s);
+		modem_get_time_procedure();
+		LOG_INF("timestamp gathered from modem %" PRIu32 ";", rtcc_get_unix_time());
 
 		prepare_and_send_telemetry_data();
 		k_sleep(K_MSEC(1000));
@@ -1049,6 +1082,7 @@ int main(void)
 	k_sleep(K_MSEC(500));
 	LOG_INF("\n\nSAMPLE APP STARTS;");
 	k_sleep(K_MSEC(100));
+	rtcc_init();
 
 #if defined(__ZEPHYR__)
 	IRQ_CONNECT(NRFX_IRQ_NUMBER_GET(NRF_TIMER_INST_GET(TIMER_INST_IDX)), IRQ_PRIO_LOWEST, NRFX_TIMER_INST_HANDLER_GET(TIMER_INST_IDX), 0, 0);
@@ -1225,6 +1259,10 @@ int main(void)
 		LOG_INF("<--- REMOTE CONFIG STAGE --->;");
 		LOG_INF("first modem init;");
 		init_modem_and_mqtt();
+	    modem_get_time_procedure();
+		LOG_INF("timestamp gathered from modem %" PRIu32 ";", rtcc_get_unix_time());
+
+
 		LOG_INF("--entering MQTT pooling loop--;");
 		while (1)
 		{
@@ -1397,6 +1435,8 @@ int main(void)
 
 			total_recorded_samples = sample_cntr;
 
+			record_begin_unix_time_s = rtcc_get_unix_time();
+			
 			flash_address_write = 0;
 
 			rms_low_counter_to_end = 0;

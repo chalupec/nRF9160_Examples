@@ -215,7 +215,11 @@ uint16_t circular_buffer_add_value(int16_t v0,
                                    int16_t v3);
 
 /* Utility */
-void get_time_procedure(void);
+void rtcc_init(void);
+void rtcc_update_unix_time(uint32_t unix_time_s);
+uint32_t rtcc_get_unix_time(void);
+
+void modem_get_time_procedure(void);
 void test_flash(void);
 
 #endif /* APP_MAIN_H_ */
