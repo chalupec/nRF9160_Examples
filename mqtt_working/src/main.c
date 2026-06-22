@@ -118,6 +118,8 @@ int err;
 uint32_t connect_attempt = 0;
 int8_t pool_retval = 0;
 
+uint16_t auto_reset_counter_after_succesful_measurement = 0;
+
 uint32_t initial_stage_timeout_counter = 0;
 
 const struct device *clk = DEVICE_DT_GET(DT_NODELABEL(clock));
@@ -1042,6 +1044,36 @@ int8_t mqtt_pooling_procedure(void)
 		send_measured_train_data_with_multiple_packets_from_flash();
 	}
 
+
+	if (auto_reset_counter_after_succesful_measurement>0) {
+		auto_reset_counter_after_succesful_measurement--;
+		if (auto_reset_counter_after_succesful_measurement==0) {
+			LOG_INF("auto reset after succesful measurement;");
+			k_sleep(K_MSEC(1000));
+			LOG_INF("end-up mqtt client connection;");
+			int8_t errrno;
+			errrno = mqtt_disconnect(&client);
+			if (errrno)
+			{
+				LOG_ERR("Could not disconnect: %d;", errrno);
+			}
+			k_sleep(K_MSEC(1000));
+
+			LOG_INF("LTE_LC_FUNC_MODE_OFFLINE;");
+			lte_lc_func_mode_set(LTE_LC_FUNC_MODE_OFFLINE);
+			k_sleep(K_MSEC(1000));
+			LOG_INF("nrf_modem_lib_shutdown;");
+			nrf_modem_lib_shutdown();
+			k_sleep(K_MSEC(3000));
+			LOG_INF("RST trigg REBOOT NOW;");
+			k_sleep(K_MSEC(3000));
+			sys_reboot(SYS_REBOOT_COLD);
+			k_sleep(K_MSEC(1000));
+		}
+	}
+
+
+
 	return (1);
 }
 
@@ -1611,6 +1643,8 @@ int main(void)
 	}
 
 	init_modem_and_mqtt();
+
+	auto_reset_counter_after_succesful_measurement = 6;
 
 	while (1)
 	{
