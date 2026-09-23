@@ -4,6 +4,9 @@
 #include <nrf_modem_gnss.h>
 #include <modem/nrf_modem_lib.h>
 #include <modem/modem_info.h>
+#include <hal/nrf_gpio.h>
+#define GPS_EN_CTRL 20
+
 
 static K_SEM_DEFINE(pvt_data_sem, 0, 1);
 
@@ -23,11 +26,11 @@ static void gnss_event_handler(int event)
 			break;
 
 		case NRF_MODEM_GNSS_EVT_FIX:
-			//printk("NRF_MODEM_GNSS_EVT_FIX:\n");
+			printk("NRF_MODEM_GNSS_EVT_FIX:\n");
 			break;
 
 		case NRF_MODEM_GNSS_EVT_NMEA:
-			//printk("NRF_MODEM_GNSS_EVT_NMEA:\n");
+			printk("NRF_MODEM_GNSS_EVT_NMEA:\n");
 			break;
 
 		case NRF_MODEM_GNSS_EVT_AGNSS_REQ:
@@ -44,6 +47,10 @@ int main(void)
 {
 	int err;
 	char buf[80];
+
+
+	nrf_gpio_cfg_output(GPS_EN_CTRL);
+	nrf_gpio_pin_set(GPS_EN_CTRL);
 
 	printk("\nnRF9160 GNSS Example (%s)\n", CONFIG_BOARD);
 
