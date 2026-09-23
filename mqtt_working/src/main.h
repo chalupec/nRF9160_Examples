@@ -16,9 +16,9 @@
 #define ALPHA_NUM 1  // Numerator of alpha (e.g., 1)
 #define ALPHA_DEN 25 // Denominator of alpha (e.g., 10) → alpha = 0.1
 
-#define DEFAULT_START_RMS_TRIG_TRESHOLD 55
-#define DEFAULT_END_RMS_TRIG_TRESHOLD 35
-#define DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END 4000 // cca 2 sec   2000smp=1sec
+#define DEFAULT_START_RMS_TRIG_TRESHOLD 100
+#define DEFAULT_END_RMS_TRIG_TRESHOLD 100
+#define DEFAULTRMS_LOW_SAMPLES_TO_TRIGGER_END 8000 // cca 4 sec   2000smp=1sec
 
 #define RMS_BUFFER_SIZE 100
 
