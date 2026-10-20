@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/CMakeFiles/sms"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/CMakeFiles/sms.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/CMakeFiles/sms-complete.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-build.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-configure.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-download.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-install.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-mkdir.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-patch.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"sms"
+		],
+		"name" : "sms"
+	}
+}

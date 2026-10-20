@@ -1,0 +1,7 @@
+default: sms
+build_dir: C:/ADWITECH/nRF9160_Examples/sms/build
+domains:
+  - name: sms
+    build_dir: C:/ADWITECH/nRF9160_Examples/sms/build/sms
+flash_order:
+  - sms

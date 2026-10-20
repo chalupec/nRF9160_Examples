@@ -160,7 +160,7 @@
 	 };
  
  
-	 while (1) {
+	 while (0) {
 		 int ret = adc_read(adc_dev, &sequence);
 		 if (ret == 0) {
 			 printk("%d,%d,%d,%d\n\r", sample_buffer[0], sample_buffer[1], sample_buffer[2], sample_buffer[3]);

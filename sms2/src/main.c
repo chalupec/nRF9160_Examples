@@ -312,6 +312,56 @@ int main(void)
 	while (1)
 	{
 
+
+
+
+
+
+
+
+k_msleep(2000);
+printk("Sending SMS\n");
+k_msleep(2000);
+			
+			if (strcmp(CONFIG_SMS_SEND_PHONE_NUMBER, ""))
+			{
+				printk("Sending SMS: number=%s, text=\"SMS sample: testing\"\n",
+					   CONFIG_SMS_SEND_PHONE_NUMBER);
+				ret = sms_send_text(CONFIG_SMS_SEND_PHONE_NUMBER,
+									"Co na to hrabes curaku?");
+				if (ret)
+				{
+					printk("Sending SMS failed with error: %d\n", ret);
+				}
+			}
+			else
+			{
+				printk("\nSMS sending is skipped but receiving will still work.\n"
+					   "If you wish to send SMS, please configure "
+					   "CONFIG_SMS_SEND_PHONE_NUMBER\n");
+			}
+
+			k_msleep(2000);
+	
+
+while (1) {
+k_msleep(200);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		rec_counter = 0;
 		int16_t sample_buffer2[4] = {0};
 		while (1)

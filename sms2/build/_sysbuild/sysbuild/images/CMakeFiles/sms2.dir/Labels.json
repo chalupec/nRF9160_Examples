@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/CMakeFiles/sms2"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/CMakeFiles/sms2.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/CMakeFiles/sms2-complete.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/sms2-prefix/src/sms2-stamp/sms2-build.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/sms2-prefix/src/sms2-stamp/sms2-configure.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/sms2-prefix/src/sms2-stamp/sms2-download.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/sms2-prefix/src/sms2-stamp/sms2-install.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/sms2-prefix/src/sms2-stamp/sms2-mkdir.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/sms2-prefix/src/sms2-stamp/sms2-patch.rule"
+		},
+		{
+			"file" : "C:/ADWITECH/nRF9160_Examples/sms2/build/_sysbuild/sysbuild/images/sms2-prefix/src/sms2-stamp/sms2-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"sms2"
+		],
+		"name" : "sms2"
+	}
+}

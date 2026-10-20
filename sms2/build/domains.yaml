@@ -1,0 +1,7 @@
+default: sms2
+build_dir: C:/ADWITECH/nRF9160_Examples/sms2/build
+domains:
+  - name: sms2
+    build_dir: C:/ADWITECH/nRF9160_Examples/sms2/build/sms2
+flash_order:
+  - sms2

@@ -1,0 +1,13 @@
+# Target labels
+ sms
+# Source files and their labels
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/CMakeFiles/sms
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/CMakeFiles/sms.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/CMakeFiles/sms-complete.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-build.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-configure.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-download.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-install.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-mkdir.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-patch.rule
+C:/ADWITECH/nRF9160_Examples/sms/build/_sysbuild/sysbuild/images/sms-prefix/src/sms-stamp/sms-update.rule
